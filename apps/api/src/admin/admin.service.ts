@@ -105,7 +105,7 @@ export class AdminService {
 
   async createChecklistItem(actorId: string, id: string, label: string) {
     await this.requireRole(actorId, APPLICATION_MANAGERS);
-    return this.reviewsService.createChecklistItem(id, label);
+    return this.reviewsService.createChecklistItem(id, actorId, label);
   }
 
   async setChecklistItem(actorId: string, itemId: string, isCompleted: boolean) {

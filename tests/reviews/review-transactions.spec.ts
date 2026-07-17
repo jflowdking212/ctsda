@@ -13,6 +13,14 @@ describe('Review Engine - Payment Gate & Approval Transactionality', () => {
 
     service = module.get<ReviewsService>(ReviewsService);
     prisma = module.get<PrismaService>(PrismaService);
+
+    // transitionStatus now gates on assertCanReview before any data access.
+    // Stub the actor as an active reviewer so the gate passes.
+    jest.spyOn(prisma.user, 'findUnique').mockResolvedValue({
+      id: 'user-1',
+      role: 'reviewer',
+      isActive: true,
+    } as any);
   });
 
   it('blocks under_review transition when invoice unpaid', async () => {

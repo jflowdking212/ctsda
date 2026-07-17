@@ -77,8 +77,12 @@ export class ReviewsController {
 
   @Post('applications/:id/checklist')
   @UseGuards(AuthGuard)
-  async createChecklistItem(@Param('id') applicationId: string, @Body() body: { label: string }) {
-    return this.reviewsService.createChecklistItem(applicationId, body.label);
+  async createChecklistItem(
+    @CurrentUser() user: any,
+    @Param('id') applicationId: string,
+    @Body() body: { label: string },
+  ) {
+    return this.reviewsService.createChecklistItem(applicationId, user.userId, body.label);
   }
 
   @Patch('checklist/:id')

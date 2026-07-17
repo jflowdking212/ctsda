@@ -10,6 +10,17 @@ import { randomBytes } from 'crypto';
 import QRCode from 'qrcode';
 import { PrismaService } from '../common/prisma.service';
 
+// Roles permitted to perform review actions (status transitions, checklist,
+// internal notes). Excludes content_manager and auditor, who have no review
+// authority. Used by assertCanReview() to close the authz hole where any
+// authenticated user could previously approve/reject an application.
+const REVIEW_ACTION_ROLES = [
+  'super_admin',
+  'reviewer',
+  'support_officer',
+  'finance_officer',
+];
+
 const ALLOWED_TRANSITIONS: Record<string, ApplicationStatus[]> = {
   draft: ['submitted'],
   submitted: ['under_review', 'changes_requested'],
@@ -31,9 +42,31 @@ export class ReviewsService {
     @InjectQueue('certificates') private certificateQueue: Queue,
   ) {}
 
+  /**
+   * Assert the actor holds a role authorised to perform review actions.
+   * Mirrors the existing role-check pattern in assignReviewer so the whole
+   * review surface is gated, not just reviewer assignment.
+   */
+  private async assertCanReview(actorId: string) {
+    const actor = await this.prisma.user.findUnique({
+      where: { id: actorId },
+      select: { role: true, isActive: true },
+    });
+    if (!actor || !actor.isActive || !REVIEW_ACTION_ROLES.includes(actor.role)) {
+      throw new ForbiddenException('Insufficient permissions to perform review actions');
+    }
+    return actor;
+  }
+
   async assignReviewer(applicationId: string, reviewerId: string, actorId: string) {
-    const actor = await this.prisma.user.findUnique({ where: { id: actorId } });
-    if (!['super_admin', 'support_officer'].includes(actor?.role || '')) {
+    // Reviewer assignment is narrower than general review actions: only
+    // super_admin and support_officer may reassign. (assertCanReview is too
+    // broad here, so we keep the explicit role check.)
+    const actor = await this.prisma.user.findUnique({
+      where: { id: actorId },
+      select: { role: true, isActive: true },
+    });
+    if (!actor || !actor.isActive || !['super_admin', 'support_officer'].includes(actor.role)) {
       throw new ForbiddenException('Only admins can assign reviewers');
     }
 
@@ -67,18 +100,41 @@ export class ReviewsService {
   }
 
   async addComment(applicationId: string, authorId: string, content: string, isInternal = false) {
+    if (isInternal) {
+      // Internal (admin-only) notes require review authority.
+      await this.assertCanReview(authorId);
+    } else {
+      // Public comments are allowed for reviewers/admins OR the applicant who
+      // owns the application — not arbitrary authenticated users.
+      const actor = await this.prisma.user.findUnique({
+        where: { id: authorId },
+        select: { role: true, isActive: true },
+      });
+      const isReviewer = actor?.isActive && REVIEW_ACTION_ROLES.includes(actor.role);
+      if (!isReviewer) {
+        const app = await this.prisma.application.findUnique({
+          where: { id: applicationId },
+          select: { applicantId: true },
+        });
+        if (!app || app.applicantId !== authorId) {
+          throw new ForbiddenException('You cannot comment on this application');
+        }
+      }
+    }
     return this.prisma.applicationComment.create({
       data: { applicationId, authorId, content, isInternal },
     });
   }
 
-  async createChecklistItem(applicationId: string, label: string) {
+  async createChecklistItem(applicationId: string, actorId: string, label: string) {
+    await this.assertCanReview(actorId);
     return this.prisma.applicationChecklistItem.create({
       data: { applicationId, label },
     });
   }
 
   async setChecklistItemCompleted(itemId: string, actorId: string, isCompleted: boolean) {
+    await this.assertCanReview(actorId);
     return this.prisma.applicationChecklistItem.update({
       where: { id: itemId },
       data: {
@@ -95,6 +151,9 @@ export class ReviewsService {
     actorId: string,
     metadata?: Record<string, any>,
   ) {
+    // Close the authz hole: only review-authorised roles may transition status.
+    await this.assertCanReview(actorId);
+
     const app = await this.prisma.application.findUnique({
       where: { id: applicationId },
     });

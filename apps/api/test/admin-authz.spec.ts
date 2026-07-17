@@ -82,4 +82,21 @@ describe('AdminService authorization', () => {
       ForbiddenException,
     );
   });
+
+  it.each([
+    ['transition applications', (service: AdminService) => service.transitionApplication('actor-1', 'application-1', 'approved')],
+    ['assign reviewers', (service: AdminService) => service.assignReviewer('actor-1', 'application-1', 'reviewer-1')],
+    ['add comments', (service: AdminService) => service.addComment('actor-1', 'application-1', 'Internal note')],
+    ['create checklist items', (service: AdminService) => service.createChecklistItem('actor-1', 'application-1', 'Policy review')],
+    ['update checklist items', (service: AdminService) => service.setChecklistItem('actor-1', 'item-1', true)],
+    ['update reviewer notes', (service: AdminService) => service.updateReviewerNotes('actor-1', 'application-1', 'Notes')],
+    ['update institutions', (service: AdminService) => service.updateInstitution('actor-1', 'institution-1', { logoUrl: 'https://example.com/logo.png' })],
+    ['suspend accreditations', (service: AdminService) => service.suspendAccreditation('actor-1', 'accreditation-1')],
+    ['reactivate accreditations', (service: AdminService) => service.reactivateAccreditation('actor-1', 'accreditation-1')],
+    ['update users', (service: AdminService) => service.updateUser('actor-1', 'user-2', { role: 'reviewer' as any })],
+  ])('blocks applicants from %s', async (_label, call) => {
+    const { service } = makeService('applicant');
+
+    await expect(call(service)).rejects.toBeInstanceOf(ForbiddenException);
+  });
 });
