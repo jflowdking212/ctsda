@@ -1,0 +1,270 @@
+import {
+  Injectable,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import { ApplicationStatus } from '@prisma/client';
+import { Queue } from 'bullmq';
+import { randomBytes } from 'crypto';
+import QRCode from 'qrcode';
+import { PrismaService } from '../common/prisma.service';
+
+const ALLOWED_TRANSITIONS: Record<string, ApplicationStatus[]> = {
+  draft: ['submitted'],
+  submitted: ['under_review', 'changes_requested'],
+  initial_screening: ['under_review', 'changes_requested'],
+  payment_pending: ['under_review'],
+  under_review: ['changes_requested', 'final_review', 'approved', 'rejected'],
+  changes_requested: ['resubmitted'],
+  resubmitted: ['under_review'],
+  final_review: ['approved', 'rejected'],
+  approved: [],
+  rejected: ['under_review'],
+  withdrawn: [],
+};
+
+@Injectable()
+export class ReviewsService {
+  constructor(
+    private prisma: PrismaService,
+    @InjectQueue('certificates') private certificateQueue: Queue,
+  ) {}
+
+  async assignReviewer(applicationId: string, reviewerId: string, actorId: string) {
+    const actor = await this.prisma.user.findUnique({ where: { id: actorId } });
+    if (!['super_admin', 'support_officer'].includes(actor?.role || '')) {
+      throw new ForbiddenException('Only admins can assign reviewers');
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await tx.application.update({
+        where: { id: applicationId },
+        data: { reviewedBy: reviewerId },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: actorId,
+          action: 'reviewer_assigned',
+          entityType: 'application',
+          entityId: applicationId,
+          metadata: { reviewerId },
+        },
+      });
+
+      await tx.notification.create({
+        data: {
+          userId: reviewerId,
+          type: 'reviewer_assigned',
+          title: 'Application assigned',
+          body: `You have been assigned application ${applicationId}.`,
+        },
+      });
+
+      return updated;
+    });
+  }
+
+  async addComment(applicationId: string, authorId: string, content: string, isInternal = false) {
+    return this.prisma.applicationComment.create({
+      data: { applicationId, authorId, content, isInternal },
+    });
+  }
+
+  async createChecklistItem(applicationId: string, label: string) {
+    return this.prisma.applicationChecklistItem.create({
+      data: { applicationId, label },
+    });
+  }
+
+  async setChecklistItemCompleted(itemId: string, actorId: string, isCompleted: boolean) {
+    return this.prisma.applicationChecklistItem.update({
+      where: { id: itemId },
+      data: {
+        isCompleted,
+        completedBy: isCompleted ? actorId : null,
+        completedAt: isCompleted ? new Date() : null,
+      },
+    });
+  }
+
+  async transitionStatus(
+    applicationId: string,
+    newStatus: ApplicationStatus,
+    actorId: string,
+    metadata?: Record<string, any>,
+  ) {
+    const app = await this.prisma.application.findUnique({
+      where: { id: applicationId },
+    });
+    if (!app) throw new BadRequestException('Application not found');
+
+    const currentStatus = app.status as ApplicationStatus;
+    const allowed = ALLOWED_TRANSITIONS[currentStatus] || [];
+    if (!allowed.includes(newStatus)) {
+      throw new BadRequestException(
+        `Cannot transition from ${currentStatus} to ${newStatus}`,
+      );
+    }
+
+    if (currentStatus === 'payment_pending' && newStatus === 'under_review') {
+      const invoice = await this.prisma.invoice.findFirst({
+        where: { applicationId, status: 'paid' },
+      });
+      if (!invoice) {
+        throw new BadRequestException('Invoice must be paid before review');
+      }
+    }
+
+    let certificateId: string | undefined;
+    const updated = await this.prisma.$transaction(
+      async (tx) => {
+        const next = await tx.application.update({
+          where: { id: applicationId },
+          data: {
+            status: newStatus,
+            ...(metadata?.reviewerId && { reviewedBy: metadata.reviewerId }),
+            ...(metadata?.comments && { reviewerNotes: metadata.comments }),
+            ...(newStatus === 'submitted' && { submittedAt: new Date() }),
+            ...(newStatus === 'approved' || newStatus === 'rejected'
+              ? { reviewedAt: new Date() }
+              : {}),
+          },
+        });
+
+        await tx.applicationStatusHistory.create({
+          data: {
+            applicationId,
+            fromStatus: currentStatus,
+            toStatus: newStatus,
+            changedBy: actorId,
+            reason: metadata?.reason,
+          },
+        });
+
+        await tx.auditLog.create({
+          data: {
+            userId: actorId,
+            action: 'status_transition',
+            entityType: 'application',
+            entityId: applicationId,
+            metadata: { from: currentStatus, to: newStatus, ...metadata },
+          },
+        });
+
+        if (newStatus === 'approved') {
+          const acc = await tx.accreditation.create({
+            data: {
+              institutionId: app.institutionId,
+              applicationId,
+              accreditationCode: this.generateAccreditationCode(),
+              status: 'active',
+              issuedAt: new Date(),
+              expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            },
+          });
+
+          const verificationToken = this.generateVerificationToken();
+          const verificationBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+          const qrCodeUrl = await QRCode.toDataURL(`${verificationBaseUrl}/verify?token=${verificationToken}`);
+          const certificate = await tx.certificate.create({
+            data: {
+              accreditationId: acc.id,
+              certificateNumber: this.generateCertificateNumber(),
+              status: 'active',
+              issueDate: new Date(),
+              expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+              verificationToken,
+              qrCodeUrl,
+            },
+          });
+          certificateId = certificate.id;
+
+          await tx.notification.create({
+            data: {
+              userId: app.applicantId,
+              type: 'approved',
+              title: 'Application approved',
+              body: 'Your CTSDA accreditation application has been approved.',
+              metadata: { applicationId, accreditationId: acc.id },
+            },
+          });
+        }
+
+        return next;
+      },
+      { maxWait: 5000, timeout: 15000 },
+    );
+
+    if (newStatus === 'approved' && certificateId) {
+      await this.certificateQueue.add(
+        'generate-certificate-pdf',
+        { certificateId, applicationId },
+        { attempts: 3, backoff: { type: 'exponential', delay: 1000 } },
+      );
+    }
+
+    return updated;
+  }
+
+  private generateAccreditationCode(): string {
+    return `CTSDA-${randomBytes(4).toString('hex').toUpperCase()}`;
+  }
+
+  private generateCertificateNumber(): string {
+    return randomBytes(6).toString('hex').toUpperCase();
+  }
+
+  private generateVerificationToken(): string {
+    return randomBytes(32).toString('base64url');
+  }
+
+  async findCertificateByToken(token: string) {
+    return this.prisma.certificate.findFirst({
+      where: { verificationToken: token },
+      include: {
+        accreditation: {
+          include: {
+            institution: {
+              select: {
+                name: true,
+                registrationNumber: true,
+                country: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async logVerificationEvent(certificateId: string, ipAddress?: string, userAgent?: string) {
+    return this.prisma.verificationEvent.create({
+      data: { certificateId, ipAddress, userAgent },
+    });
+  }
+
+  async listInstitutions() {
+    return this.prisma.institution.findMany({
+      where: { accreditations: { some: { status: 'active' } } },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        country: true,
+        institutionType: true,
+        description: true,
+        accreditations: {
+          where: { status: 'active' },
+          select: {
+            id: true,
+            accreditationCode: true,
+            issuedAt: true,
+            expiresAt: true,
+          },
+        },
+      },
+    });
+  }
+}

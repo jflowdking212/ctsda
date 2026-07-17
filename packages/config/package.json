@@ -1,0 +1,15 @@
+{
+  "name": "@ctsda/config",
+  "version": "0.0.1",
+  "private": true,
+  "files": [
+    "tsconfig.base.json",
+    "tsconfig.nextjs.json",
+    "tsconfig.nestjs.json"
+  ],
+  "exports": {
+    "./tsconfig/base": "./tsconfig.base.json",
+    "./tsconfig/nextjs": "./tsconfig.nextjs.json",
+    "./tsconfig/nestjs": "./tsconfig.nestjs.json"
+  }
+}

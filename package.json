@@ -1,0 +1,31 @@
+{
+  "name": "ctsda-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CTSDA Platform - Accreditation Management System",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "clean": "turbo clean",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "db:migrate": "cd packages/db && pnpm run migrate",
+    "db:seed": "cd packages/db && pnpm run seed",
+    "db:studio": "cd packages/db && pnpm run studio"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "turbo": "^2.3.0",
+    "prettier": "^3.4.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@11.0.8"
+}

@@ -1,0 +1,612 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============== ENUMS ===============
+
+enum ApplicationStatus {
+  draft
+  submitted
+  initial_screening
+  payment_pending
+  under_review
+  changes_requested
+  resubmitted
+  final_review
+  approved
+  rejected
+  withdrawn
+}
+
+enum AccreditationStatus {
+  active
+  suspended
+  expired
+  revoked
+}
+
+enum UserRole {
+  super_admin
+  reviewer
+  finance_officer
+  support_officer
+  content_manager
+  auditor
+  applicant
+}
+
+enum DocumentType {
+  certificate_of_incorporation
+  business_license
+  tax_clearance
+  accreditation_certificate
+  financial_statement
+  staff_qualification
+  curriculum
+  facility_document
+  insurance_certificate
+  other
+}
+
+enum DocumentStatus {
+  pending
+  clean
+  quarantined
+  rejected
+}
+
+enum PaymentStatus {
+  pending
+  processing
+  completed
+  failed
+  refunded
+  partially_refunded
+}
+
+enum InvoiceStatus {
+  draft
+  sent
+  paid
+  overdue
+  cancelled
+  refunded
+}
+
+enum NotificationType {
+  account_created
+  email_verified
+  application_submitted
+  application_status_changed
+  reviewer_assigned
+  changes_requested
+  approved
+  rejected
+  certificate_issued
+  payment_received
+  payment_failed
+  expiry_reminder
+  password_changed
+  security_alert
+}
+
+enum EmailDeliveryStatus {
+  pending
+  sent
+  delivered
+  bounced
+  failed
+}
+
+// =============== USER & AUTH ===============
+
+model User {
+  id             String    @id @default(uuid()) @db.Uuid
+  email          String    @unique @db.VarChar(255)
+  passwordHash   String    @db.VarChar(255)
+  firstName      String    @db.VarChar(100)
+  lastName       String    @db.VarChar(100)
+  phone          String?   @db.VarChar(20)
+  role           UserRole  @default(applicant)
+  isActive       Boolean   @default(true)
+  isEmailVerified Boolean  @default(false)
+  isTotpEnabled  Boolean   @default(false)
+  totpSecret     String?   @db.VarChar(255)
+  emailVerificationToken String? @db.VarChar(255)
+  passwordResetToken      String? @db.VarChar(255)
+  passwordResetExpiresAt  DateTime?
+  lastLoginAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  sessions              Session[]
+  roleAssignments       UserRoleAssignment[]
+  applications          Application[]          @relation("ApplicantApplications")
+  reviewedApplications  Application[]          @relation("ReviewerApplications")
+  applicationComments   ApplicationComment[]
+  applicationReviews    ApplicationReview[]
+  documents             ApplicationDocument[]
+  checklistCompletions  ApplicationChecklistItem[]
+  notifications         Notification[]
+  emailDeliveryLogs     EmailDeliveryLog[]
+  auditLogs             AuditLog[]
+  payments              Payment[]              @relation("ProcessedPayments")
+  invoices              Invoice[]              @relation("CreatedInvoices")
+  createdInstitutions   Institution[]
+  statusChanges         ApplicationStatusHistory[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  ipAddress String?   @db.VarChar(45)
+  userAgent String?   @db.Text
+  data      String?   @db.Text
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        UserRole @unique
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users UserRoleAssignment[]
+
+  @@map("roles")
+}
+
+model UserRoleAssignment {
+  userId     String   @db.Uuid
+  roleId     String   @db.Uuid
+  assignedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+// =============== INSTITUTIONS ===============
+
+model Institution {
+  id                 String   @id @default(uuid()) @db.Uuid
+  name               String   @db.VarChar(300)
+  slug               String   @unique @db.VarChar(300)
+  registrationNumber String   @unique @db.VarChar(100)
+  institutionType    String   @db.VarChar(100)
+  country            String   @db.VarChar(100)
+  address            String   @db.VarChar(500)
+  phone              String   @db.VarChar(20)
+  email              String   @db.VarChar(255)
+  website            String?  @db.VarChar(500)
+  logoUrl            String?  @db.VarChar(500)
+  yearEstablished    Int?
+  description        String?  @db.Text
+  isActive           Boolean  @default(true)
+  createdBy          String   @db.Uuid
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Relations
+  contacts         InstitutionContact[]
+  socialLinks      InstitutionSocialLink[]
+  trainingAreas    InstitutionTrainingArea[]
+  applications     Application[]
+  preRegistrations PreRegistration[]
+  accreditations   Accreditation[]
+  createdByUser    User @relation(fields: [createdBy], references: [id])
+
+  @@map("institutions")
+}
+
+model InstitutionContact {
+  id         String  @id @default(uuid()) @db.Uuid
+  institutionId String @db.Uuid
+  fullName   String  @db.VarChar(200)
+  position   String  @db.VarChar(200)
+  email      String  @db.VarChar(255)
+  phone      String  @db.VarChar(20)
+  isPrimary  Boolean @default(false)
+
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@map("institution_contacts")
+}
+
+model InstitutionSocialLink {
+  id         String @id @default(uuid()) @db.Uuid
+  institutionId String @db.Uuid
+  platform   String @db.VarChar(50)
+  url        String @db.VarChar(500)
+
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@map("institution_social_links")
+}
+
+model TrainingArea {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @db.VarChar(200)
+  code        String   @unique @db.VarChar(50)
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  institutions InstitutionTrainingArea[]
+  applications ApplicationTrainingArea[]
+
+  @@map("training_areas")
+}
+
+model InstitutionTrainingArea {
+  institutionId String @db.Uuid
+  trainingAreaId String @db.Uuid
+
+  institution   Institution   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  trainingArea  TrainingArea  @relation(fields: [trainingAreaId], references: [id], onDelete: Cascade)
+
+  @@id([institutionId, trainingAreaId])
+  @@map("institution_training_areas")
+}
+
+model PreRegistration {
+  id            String    @id @default(uuid()) @db.Uuid
+  institutionId String?   @db.Uuid
+  email         String    @db.VarChar(255)
+  token         String    @unique @db.VarChar(255)
+  expiresAt     DateTime
+  usedAt        DateTime?
+  createdAt     DateTime  @default(now())
+
+  institution Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@map("pre_registrations")
+}
+
+model ApplicationTrainingArea {
+  applicationId String @db.Uuid
+  trainingAreaId String @db.Uuid
+
+  application  Application  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  trainingArea TrainingArea @relation(fields: [trainingAreaId], references: [id], onDelete: Cascade)
+
+  @@id([applicationId, trainingAreaId])
+  @@map("application_training_areas")
+}
+
+// =============== APPLICATIONS ===============
+
+model Application {
+  id             String            @id @default(uuid()) @db.Uuid
+  institutionId  String            @db.Uuid
+  applicantId    String            @db.Uuid
+  status         ApplicationStatus @default(draft)
+  // Compatibility fields retained while the API migrates to the related tables below.
+  certificatesOffered String[]     @default([])
+  deliveryMethods     String[]     @default([])
+  staffingCount       Int?
+  operationalInfo     String?      @db.Text
+  submittedAt    DateTime?
+  reviewedAt     DateTime?
+  reviewedBy     String?           @db.Uuid
+  reviewerNotes  String?           @db.Text
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  // Relations
+  institution      Institution          @relation(fields: [institutionId], references: [id])
+  applicant        User                 @relation("ApplicantApplications", fields: [applicantId], references: [id])
+  reviewer         User?                @relation("ReviewerApplications", fields: [reviewedBy], references: [id])
+  statusHistory    ApplicationStatusHistory[]
+  trainingAreas    ApplicationTrainingArea[]
+  offeredCertificates ApplicationCertificateOffered[]
+  deliveryMethodRecords ApplicationDeliveryMethod[]
+  documents        ApplicationDocument[]
+  reviews          ApplicationReview[]
+  comments         ApplicationComment[]
+  checklistItems   ApplicationChecklistItem[]
+  accreditations   Accreditation[]
+  invoices         Invoice[]
+
+  @@map("applications")
+}
+
+model ApplicationCertificateOffered {
+  id            String   @id @default(uuid()) @db.Uuid
+  applicationId String   @db.Uuid
+  name          String   @db.VarChar(200)
+  createdAt     DateTime @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, name])
+  @@map("application_certificates_offered")
+}
+
+model ApplicationDeliveryMethod {
+  id            String   @id @default(uuid()) @db.Uuid
+  applicationId String   @db.Uuid
+  name          String   @db.VarChar(100)
+  createdAt     DateTime @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, name])
+  @@map("application_delivery_methods")
+}
+
+model ApplicationStatusHistory {
+  id            String            @id @default(uuid()) @db.Uuid
+  applicationId String            @db.Uuid
+  fromStatus    ApplicationStatus
+  toStatus      ApplicationStatus
+  changedBy     String            @db.Uuid
+  reason        String?           @db.Text
+  createdAt     DateTime          @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  changedByUser User      @relation(fields: [changedBy], references: [id])
+
+  @@map("application_status_history")
+}
+
+model ApplicationDocument {
+  id            String         @id @default(uuid()) @db.Uuid
+  applicationId String         @db.Uuid
+  uploaderId    String         @db.Uuid
+  documentType  DocumentType
+  fileName      String         @db.VarChar(500)
+  fileSize      Int
+  mimeType      String         @db.VarChar(100)
+  storageKey    String         @db.VarChar(500)
+  status        DocumentStatus @default(pending)
+  version       Int            @default(1)
+  malwareScanResult String?    @db.Text
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  uploader    User        @relation(fields: [uploaderId], references: [id])
+
+  @@map("application_documents")
+}
+
+model ApplicationReview {
+  id            String            @id @default(uuid()) @db.Uuid
+  applicationId String            @db.Uuid
+  reviewerId    String            @db.Uuid
+  decision      ApplicationStatus
+  comments      String            @db.Text
+  isInternal    Boolean           @default(false)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  reviewer    User        @relation(fields: [reviewerId], references: [id])
+
+  @@map("application_reviews")
+}
+
+model ApplicationComment {
+  id            String   @id @default(uuid()) @db.Uuid
+  applicationId String   @db.Uuid
+  authorId      String   @db.Uuid
+  content       String   @db.Text
+  isInternal    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  author      User        @relation(fields: [authorId], references: [id])
+
+  @@map("application_comments")
+}
+
+model ApplicationChecklistItem {
+  id            String    @id @default(uuid()) @db.Uuid
+  applicationId String    @db.Uuid
+  label         String    @db.VarChar(300)
+  isCompleted   Boolean   @default(false)
+  completedBy   String?   @db.Uuid
+  completedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  completedByUser User?     @relation(fields: [completedBy], references: [id])
+
+  @@map("application_checklist_items")
+}
+
+// =============== ACCREDITATIONS & CERTIFICATES ===============
+
+model Accreditation {
+  id             String              @id @default(uuid()) @db.Uuid
+  institutionId  String              @db.Uuid
+  applicationId  String              @db.Uuid
+  accreditationCode String           @unique @db.VarChar(100)
+  status         AccreditationStatus @default(active)
+  issuedAt       DateTime            @default(now())
+  expiresAt      DateTime
+  suspendedAt    DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  // Relations
+  institution  Institution          @relation(fields: [institutionId], references: [id])
+  application  Application          @relation(fields: [applicationId], references: [id])
+  certificates Certificate[]
+  statusHistory CertificateStatusHistory[]
+
+  @@map("accreditations")
+}
+
+model Certificate {
+  id                String              @id @default(uuid()) @db.Uuid
+  accreditationId   String              @db.Uuid
+  certificateNumber String              @unique @db.VarChar(100)
+  verificationToken String              @unique @db.VarChar(255)
+  issueDate         DateTime            @default(now())
+  expiryDate        DateTime
+  status            AccreditationStatus @default(active)
+  pdfUrl            String?             @db.VarChar(500)
+  qrCodeUrl         String?             @db.VarChar(500)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  // Relations
+  accreditation      Accreditation             @relation(fields: [accreditationId], references: [id], onDelete: Cascade)
+  verificationEvents VerificationEvent[]
+
+  @@map("certificates")
+}
+
+model CertificateStatusHistory {
+  id            String              @id @default(uuid()) @db.Uuid
+  accreditationId String            @db.Uuid
+  fromStatus    AccreditationStatus
+  toStatus      AccreditationStatus
+  changedBy     String              @db.Uuid
+  reason        String?             @db.Text
+  createdAt     DateTime            @default(now())
+
+  accreditation Accreditation @relation(fields: [accreditationId], references: [id], onDelete: Cascade)
+
+  @@map("certificate_status_history")
+}
+
+model VerificationEvent {
+  id            String   @id @default(uuid()) @db.Uuid
+  certificateId String   @db.Uuid
+  ipAddress     String?  @db.VarChar(45)
+  userAgent     String?  @db.Text
+  verifiedAt    DateTime @default(now())
+
+  certificate Certificate @relation(fields: [certificateId], references: [id], onDelete: Cascade)
+
+  @@map("verification_events")
+}
+
+// =============== PAYMENTS & INVOICES ===============
+
+model Invoice {
+  id             String        @id @default(uuid()) @db.Uuid
+  applicationId  String        @db.Uuid
+  invoiceNumber  String        @unique @db.VarChar(50)
+  amount         Decimal       @db.Decimal(12, 2)
+  currency       String        @default("USD") @db.VarChar(3)
+  status         InvoiceStatus @default(draft)
+  description    String?       @db.Text
+  dueDate        DateTime
+  paidAt         DateTime?
+  createdBy      String        @db.Uuid
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations
+  application Application @relation(fields: [applicationId], references: [id])
+  createdByUser User      @relation("CreatedInvoices", fields: [createdBy], references: [id])
+  payments     Payment[]
+
+  @@map("invoices")
+}
+
+model Payment {
+  id              String        @id @default(uuid()) @db.Uuid
+  invoiceId       String        @db.Uuid
+  amount          Decimal       @db.Decimal(12, 2)
+  currency        String        @default("USD") @db.VarChar(3)
+  status          PaymentStatus @default(pending)
+  provider        String        @default("stripe") @db.VarChar(50)
+  providerPaymentId String?     @db.VarChar(255)
+  providerEventId String?       @db.VarChar(255)
+  idempotencyKey  String        @unique @db.VarChar(255)
+  refundedAmount  Decimal       @default(0) @db.Decimal(12, 2)
+  metadata        Json?         @db.JsonB
+  processedBy     String?       @db.Uuid
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  invoice      Invoice @relation(fields: [invoiceId], references: [id])
+  processedByUser User? @relation("ProcessedPayments", fields: [processedBy], references: [id])
+
+  @@map("payments")
+}
+
+// =============== NOTIFICATIONS ===============
+
+model Notification {
+  id         String           @id @default(uuid()) @db.Uuid
+  userId     String           @db.Uuid
+  type       NotificationType
+  title      String           @db.VarChar(300)
+  body       String           @db.Text
+  isRead     Boolean          @default(false)
+  metadata   Json?            @db.JsonB
+  createdAt  DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model EmailDeliveryLog {
+  id               String             @id @default(uuid()) @db.Uuid
+  notificationId   String?            @db.Uuid
+  userId           String             @db.Uuid
+  recipient        String             @db.VarChar(255)
+  subject          String             @db.VarChar(500)
+  status           EmailDeliveryStatus @default(pending)
+  providerMessageId String?           @db.VarChar(255)
+  errorMessage     String?            @db.Text
+  retryCount       Int                @default(0)
+  sentAt           DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("email_delivery_logs")
+}
+
+// =============== AUDIT LOGS ===============
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @db.Uuid
+  action     String   @db.VarChar(100)
+  entityType String?  @db.VarChar(100)
+  entityId   String?  @db.VarChar(100)
+  oldValue   Json?    @db.JsonB
+  newValue   Json?    @db.JsonB
+  ipAddress  String?  @db.VarChar(45)
+  userAgent  String?  @db.Text
+  metadata   Json?    @db.JsonB
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
