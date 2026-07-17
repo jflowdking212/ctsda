@@ -76,7 +76,12 @@ export class AuthController {
       }
     }
 
-    const sessionId = await this.authService.createSession(user.id, req.ip, req.headers['user-agent']);
+    const sessionId = await this.authService.createSession(
+      user.id,
+      user.role,
+      req.ip,
+      req.headers['user-agent'],
+    );
     await this.authService.clearLoginFailures(dto.email, req.ip);
     await this.authService.recordLogin(user.id, req.ip, req.headers['user-agent']);
 

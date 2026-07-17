@@ -171,7 +171,12 @@ export class AuthService {
     return { success: true };
   }
 
-  async createSession(userId: string, ipAddress?: string, userAgent?: string): Promise<string> {
+  async createSession(
+    userId: string,
+    role: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<string> {
     const sessionId = uuidv4();
     const ttl = parseInt(this.configService.get('SESSION_TTL_SECONDS', '86400'), 10);
     const expiresAt = new Date(Date.now() + ttl * 1000);
@@ -180,7 +185,11 @@ export class AuthService {
       data: { id: sessionId, userId, ipAddress, userAgent, expiresAt },
     });
 
-    await this.redis.setex(`session:${sessionId}`, ttl, userId);
+    // Store role alongside userId in the Redis payload so AuthGuard can
+    // populate request.user.role without a per-request DB hit — this is what
+    // makes RbacGuard functional (previously user.role was always undefined).
+    const payload = JSON.stringify({ userId, role });
+    await this.redis.setex(`session:${sessionId}`, ttl, payload);
     return sessionId;
   }
 
@@ -208,9 +217,12 @@ export class AuthService {
   }
 
   async revokeSession(sessionId: string) {
-    const userId = await this.redis.get(`session:${sessionId}`);
-    if (userId) {
-      await this.prisma.session.deleteMany({ where: { id: sessionId, userId } });
+    const raw = await this.redis.get(`session:${sessionId}`);
+    if (raw) {
+      // Delete by id (already unique to this session) — sufficient for cleanup
+      // regardless of whether the payload is the new JSON shape or a legacy
+      // bare-string session.
+      await this.prisma.session.deleteMany({ where: { id: sessionId } });
       await this.redis.del(`session:${sessionId}`);
     }
   }

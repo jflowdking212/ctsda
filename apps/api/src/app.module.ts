@@ -7,6 +7,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { BullModule } from '@nestjs/bullmq';
 import IORedis from 'ioredis';
 
+import { RbacGuard } from './common/guards/rbac.guard';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { InstitutionsModule } from './institutions/institutions.module';
@@ -82,6 +83,9 @@ import { createPinoRedactOptions } from './common/logging/redaction';
     AdminModule,
   ],
   controllers: [HealthController, VerifyController],
-  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
+  providers: [
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: RbacGuard },
+  ],
 })
 export class AppModule {}
