@@ -1,0 +1,63 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  verify-build-migrate:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.0.8
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @ctsda/db generate
+
+      - name: Verify
+        run: |
+          pnpm lint
+          pnpm typecheck
+          pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Build container images
+        run: |
+          docker build -f apps/api/Dockerfile -t ctsda-api:${{ github.sha }} .
+          docker build -f apps/web/Dockerfile -t ctsda-web:${{ github.sha }} .
+          docker build -f apps/worker/Dockerfile -t ctsda-worker:${{ github.sha }} .
+
+      - name: Deploy database migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: pnpm --filter @ctsda/db exec prisma migrate deploy
+
+      - name: Deployment handoff
+        run: |
+          echo "Images built with tag ${{ github.sha }}."
+          echo "Push/deploy these images using your host-specific rollout command."

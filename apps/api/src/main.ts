@@ -24,7 +24,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     adapter,
-    { bufferLogs: true },
+    { bufferLogs: true, rawBody: true },
   );
 
   const configService = app.get(ConfigService);
@@ -53,7 +53,7 @@ async function bootstrap() {
     origin: [configService.get('FRONTEND_URL', 'http://localhost:3000')],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Requested-With', 'X-Session-Id'],
     exposedHeaders: ['X-Trace-Id'],
   });
 

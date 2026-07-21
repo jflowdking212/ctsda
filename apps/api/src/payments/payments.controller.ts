@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Headers, Post, Req, UseGuards } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { AuthGuard } from '../common/guards/auth.guard';
@@ -14,8 +14,8 @@ export class PaymentsController {
   }
 
   @Post('webhook')
-  async webhook(@Body() body: any, @Headers('stripe-signature') signature?: string) {
-    return this.paymentsService.handleWebhook(body, signature);
+  async webhook(@Body() body: any, @Req() request: any, @Headers('stripe-signature') signature?: string) {
+    return this.paymentsService.handleWebhook(body, signature, request.rawBody);
   }
 
   @Post('refund')

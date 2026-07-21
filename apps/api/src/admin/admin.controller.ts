@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Header, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Header, Param, Patch, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { ApplicationStatus, UserRole } from '@prisma/client';
 import { AdminService } from './admin.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -11,7 +11,8 @@ export class AdminController {
 
   @Get('me')
   async me(@CurrentUser() user: any) {
-    return this.adminService.getAdminProfile(user.userId);
+    const profile = await this.adminService.getAdminProfile(user.userId);
+    return { ...profile, sessionId: user.sessionId };
   }
 
   @Get('applications')
@@ -71,6 +72,15 @@ export class AdminController {
     return this.adminService.updateReviewerNotes(user.userId, id, body.notes);
   }
 
+  @Post('applications/:id/manual-payment')
+  async recordManualPayment(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Body() body: { amount?: number; currency?: string; reference?: string; notes?: string },
+  ) {
+    return this.adminService.recordManualPayment(user.userId, id, body);
+  }
+
   @Post('applications/:id/checklist')
   async createChecklistItem(@CurrentUser() user: any, @Param('id') id: string, @Body() body: { label: string }) {
     return this.adminService.createChecklistItem(user.userId, id, body.label);
@@ -118,6 +128,14 @@ export class AdminController {
     return this.adminService.listUsers(user.userId);
   }
 
+  @Post('users')
+  async createAdminUser(
+    @CurrentUser() user: any,
+    @Body() body: { email: string; firstName: string; lastName: string; role: UserRole; phone?: string },
+  ) {
+    return this.adminService.createAdminUser(user.userId, body);
+  }
+
   @Patch('users/:id')
   async updateUser(@CurrentUser() user: any, @Param('id') id: string, @Body() body: { role?: UserRole; isActive?: boolean }) {
     return this.adminService.updateUser(user.userId, id, body);
@@ -131,5 +149,30 @@ export class AdminController {
   @Get('audit-logs')
   async listAuditLogs(@CurrentUser() user: any) {
     return this.adminService.listAuditLogs(user.userId);
+  }
+
+  @Get('reports/summary')
+  async reportSummary(@CurrentUser() user: any) {
+    return this.adminService.getReportSummary(user.userId);
+  }
+
+  @Post('legacy/accredited-institutions')
+  async createLegacyAccreditedInstitution(@CurrentUser() user: any, @Body() body: any) {
+    return this.adminService.createLegacyAccreditedInstitution(user.userId, body);
+  }
+
+  @Get('reports/export.csv')
+  @Header('Content-Type', 'text/csv; charset=utf-8')
+  @Header('Content-Disposition', 'attachment; filename="ctsda-board-report.csv"')
+  async exportReportCsv(@CurrentUser() user: any) {
+    return this.adminService.exportReportCsv(user.userId);
+  }
+
+  @Get('reports/export.pdf')
+  async exportReportPdf(@CurrentUser() user: any, @Res({ passthrough: true }) reply: any) {
+    const pdf = await this.adminService.exportReportPdf(user.userId);
+    reply.header('Content-Type', 'application/pdf');
+    reply.header('Content-Disposition', 'attachment; filename="ctsda-board-report.pdf"');
+    return pdf;
   }
 }

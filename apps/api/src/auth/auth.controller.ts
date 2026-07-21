@@ -61,8 +61,15 @@ export class AuthController {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (user.forcePasswordReset) {
+      return {
+        requiresPasswordReset: true,
+        message: 'Password reset is required before dashboard access.',
+      };
+    }
+
     // Check if TOTP is required for admin users
-    if (this.authService.isAdminRole(user.role)) {
+    if (this.authService.isAdminRole(user.role) && user.isTotpEnabled) {
       if (!dto.totpCode) {
         return {
           requiresTotp: true,

@@ -23,8 +23,8 @@ const REVIEW_ACTION_ROLES = [
 
 const ALLOWED_TRANSITIONS: Record<string, ApplicationStatus[]> = {
   draft: ['submitted'],
-  submitted: ['under_review', 'changes_requested'],
-  initial_screening: ['under_review', 'changes_requested'],
+  submitted: ['under_review', 'changes_requested', 'rejected'],
+  initial_screening: ['under_review', 'changes_requested', 'rejected'],
   payment_pending: ['under_review'],
   under_review: ['changes_requested', 'final_review', 'approved', 'rejected'],
   changes_requested: ['resubmitted'],

@@ -94,6 +94,19 @@ describe('AdminService authorization', () => {
     ['suspend accreditations', (service: AdminService) => service.suspendAccreditation('actor-1', 'accreditation-1')],
     ['reactivate accreditations', (service: AdminService) => service.reactivateAccreditation('actor-1', 'accreditation-1')],
     ['update users', (service: AdminService) => service.updateUser('actor-1', 'user-2', { role: 'reviewer' as any })],
+    ['record manual payments', (service: AdminService) => service.recordManualPayment('actor-1', 'application-1', { reference: 'BANK-1' })],
+    ['create admin users', (service: AdminService) => service.createAdminUser('actor-1', { email: 'new@example.com', firstName: 'New', lastName: 'Admin', role: 'reviewer' as any })],
+    ['seed legacy accredited institutions', (service: AdminService) => service.createLegacyAccreditedInstitution('actor-1', {
+      name: 'Legacy Institution',
+      registrationNumber: 'LEG-1',
+      institutionType: 'training',
+      country: 'US',
+      address: 'Address',
+      phone: '123',
+      email: 'legacy@example.com',
+      accreditationCode: 'CTSDA-628356-TG',
+      certificateNumber: 'CTSDA-628356-TG',
+    })],
   ])('blocks applicants from %s', async (_label, call) => {
     const { service } = makeService('applicant');
 

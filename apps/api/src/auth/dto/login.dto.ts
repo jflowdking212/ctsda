@@ -12,5 +12,7 @@ export interface LoginResponseDto {
     role: string;
   };
   requiresTotp?: boolean;
+  requiresPasswordReset?: boolean;
+  message?: string;
   tempToken?: string;
 }

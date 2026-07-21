@@ -8,14 +8,23 @@ type Application = {
   institution?: { name: string; country: string };
 };
 
+const PORTAL_SESSION_KEY = 'ctsda_portal_session';
+
 export default function ApplicationsPage() {
   const [apps, setApps] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState('');
+  const [payingId, setPayingId] = useState<string | null>(null);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
   useEffect(() => {
     async function load() {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/applications/me`, {
+      const storedSession = window.localStorage.getItem(PORTAL_SESSION_KEY) || '';
+      const res = await fetch(`${apiUrl}/applications/me`, {
         credentials: 'include',
+        headers: {
+          ...(storedSession ? { 'X-Session-Id': storedSession } : {}),
+        },
       });
       if (res.ok) {
         const data = await res.json();
@@ -24,24 +33,75 @@ export default function ApplicationsPage() {
       setLoading(false);
     }
     load();
-  }, []);
+  }, [apiUrl]);
+
+  async function startCheckout(applicationId: string) {
+    setMessage('');
+    setPayingId(applicationId);
+    try {
+      const response = await fetch(`${apiUrl}/payments/create-checkout`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(window.localStorage.getItem(PORTAL_SESSION_KEY) ? { 'X-Session-Id': window.localStorage.getItem(PORTAL_SESSION_KEY) || '' } : {}),
+        },
+        body: JSON.stringify({ applicationId }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || 'Unable to start checkout');
+      }
+      if (result.url) {
+        window.location.href = result.url;
+        return;
+      }
+      setMessage(result.message || 'Payment is already complete.');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Unable to start checkout');
+    } finally {
+      setPayingId(null);
+    }
+  }
 
   return (
-    <div style={{ maxWidth: 900, margin: '2rem auto', padding: '0 1rem' }}>
-      <h1>My Applications</h1>
-      <p><a href="/portal/applications/new" style={{ color: '#1a365d' }}>Start a draft application</a></p>
-      {loading && <p>Loading...</p>}
-      {!loading && apps.length === 0 && <p>No applications yet.</p>}
+    <main className="content-page">
+      <header className="content-header">
+        <p className="eyebrow">Applications</p>
+        <h1>My Applications</h1>
+        <p>Review your CTSDA submissions, payment status, and next application steps.</p>
+        <a className="button primary" href="/portal/applications/new">Start a draft application</a>
+      </header>
+
+      {message && <p className="status-message">{message}</p>}
+      {loading && <p className="loading-inline">Loading applications...</p>}
+      {!loading && apps.length === 0 && (
+        <section className="content-panel">
+          <p>No applications yet.</p>
+        </section>
+      )}
       {apps.length > 0 && (
-        <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
+        <section className="content-list">
           {apps.map((app) => (
-            <div key={app.id} style={{ padding: '1rem', border: '1px solid #e2e8f0', borderRadius: 6 }}>
-              <h3 style={{ margin: '0 0 0.5rem' }}>{app.institution?.name || 'Application'}</h3>
-              <p style={{ margin: 0, color: '#4a5568' }}>{app.institution?.country} · Status: {app.status}</p>
+            <div className="content-list-card" key={app.id}>
+              <h3>{app.institution?.name || 'Application'}</h3>
+              <p className="meta-line">
+                {app.institution?.country} - Status: {app.status}
+              </p>
+              {['submitted', 'payment_pending'].includes(app.status) && (
+                <button
+                  className={payingId === app.id ? 'button primary is-loading' : 'button primary'}
+                  type="button"
+                  onClick={() => startCheckout(app.id)}
+                  disabled={payingId === app.id}
+                >
+                  {payingId === app.id ? 'Starting checkout...' : 'Pay application fee'}
+                </button>
+              )}
             </div>
           ))}
-        </div>
+        </section>
       )}
-    </div>
+    </main>
   );
 }

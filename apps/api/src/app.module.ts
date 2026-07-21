@@ -20,13 +20,17 @@ import { PaymentsModule } from './payments/payments.module';
 import { AdminModule } from './admin/admin.module';
 import { VerifyController } from './verify/verify.controller';
 import { HealthController } from './health.controller';
+import { SettingsModule } from './settings/settings.module';
+import { BlogModule } from './blog/blog.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { TrainingModule } from './training/training.module';
 import { createPinoRedactOptions } from './common/logging/redaction';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env', '.env.local'],
+      envFilePath: ['.env', '.env.local', '../../.env', '../../.env.local'],
       validationOptions: { allowUnknown: true, abortEarly: false },
     }),
     LoggerModule.forRootAsync({
@@ -81,6 +85,10 @@ import { createPinoRedactOptions } from './common/logging/redaction';
     NotificationsModule,
     PaymentsModule,
     AdminModule,
+    SettingsModule,
+    BlogModule,
+    SubscriptionsModule,
+    TrainingModule,
   ],
   controllers: [HealthController, VerifyController],
   providers: [

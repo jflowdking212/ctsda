@@ -29,19 +29,25 @@ export default function PortalDashboard() {
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: '2rem auto', padding: '0 1rem' }}>
-      <h1>Applicant Portal</h1>
-      <p>Welcome to your CTSDA portal.</p>
-      <div style={{ marginTop: '1rem' }}>
+    <main className="content-page">
+      <header className="content-header">
+        <p className="eyebrow">Applicant portal</p>
+        <h1>Applicant Portal</h1>
+        <p>Track your CTSDA applications and continue work on pending submissions.</p>
+      </header>
+
+      <section className="content-panel">
         <h2>Applications</h2>
         {applications.length === 0 && <p>No applications yet.</p>}
-        {applications.map((app) => (
-          <div key={app.id} style={{ padding: '1rem', border: '1px solid #e2e8f0', borderRadius: 6, marginTop: '0.5rem' }}>
-            <strong>{app.institution?.name || 'Application'}</strong>
-            <div style={{ color: '#4a5568' }}>{app.status}</div>
-          </div>
-        ))}
-      </div>
-    </div>
+        <div className="content-list">
+          {applications.map((app) => (
+            <div className="content-list-card" key={app.id}>
+              <h3>{app.institution?.name || 'Application'}</h3>
+              <p className="meta-line">{app.status}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
   );
 }

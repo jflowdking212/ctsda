@@ -1,7 +1,7 @@
 import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RbacGuard } from '../src/common/guards/rbac.guard';
-import { ROLES_KEY, Roles } from '../src/common/decorators/roles.decorator';
+import { Roles } from '../src/common/decorators/roles.decorator';
 
 class FakeHandler {
   @Roles('content_manager', 'super_admin')

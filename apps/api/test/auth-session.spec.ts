@@ -55,6 +55,36 @@ describe('AuthController sessions and security flows', () => {
     expect(authService.recordFailedLogin).toHaveBeenCalledWith('admin@ctsda.org', '127.0.0.1', 'jest');
   });
 
+  it('requires forced password reset before admin TOTP/session creation', async () => {
+    const authService = {
+      assertLoginNotLocked: jest.fn().mockResolvedValue(undefined),
+      validateUser: jest.fn().mockResolvedValue({
+        id: 'admin-1',
+        email: 'admin@ctsda.org',
+        role: 'super_admin',
+        forcePasswordReset: true,
+      }),
+      isAdminRole: jest.fn().mockReturnValue(true),
+      createSession: jest.fn(),
+      verifyTotp: jest.fn(),
+    } as any;
+    const controller = new AuthController(authService);
+
+    await expect(
+      controller.login(
+        { email: 'admin@ctsda.org', password: 'temporary' },
+        { ip: '127.0.0.1', headers: { 'user-agent': 'jest' } },
+        { setCookie: jest.fn() },
+      ),
+    ).resolves.toEqual({
+      requiresPasswordReset: true,
+      message: 'Password reset is required before dashboard access.',
+    });
+
+    expect(authService.verifyTotp).not.toHaveBeenCalled();
+    expect(authService.createSession).not.toHaveBeenCalled();
+  });
+
   it('does not enable TOTP when verification fails', async () => {
     const authService = {
       verifyTotp: jest.fn().mockResolvedValue(false),

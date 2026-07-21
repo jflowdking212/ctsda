@@ -44,6 +44,7 @@ export class AuthService {
       role: user.role,
       isTotpEnabled: user.isTotpEnabled,
       totpSecret: user.totpSecret,
+      forcePasswordReset: user.forcePasswordReset,
     };
   }
 
@@ -157,6 +158,7 @@ export class AuthService {
         passwordHash: await this.hashPassword(password),
         passwordResetToken: null,
         passwordResetExpiresAt: null,
+        forcePasswordReset: false,
       },
     });
 

@@ -17,38 +17,36 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const sessionId = request.headers['x-session-id'] || request.cookies['sessionId'];
+    const sessionCandidates = [
+      request.cookies?.sessionId,
+      request.headers['x-session-id'],
+    ].filter(Boolean) as string[];
 
-    if (!sessionId) {
+    if (sessionCandidates.length === 0) {
       throw new UnauthorizedException('No session provided');
     }
 
-    const raw = await this.redis.get(`session:${sessionId}`);
-    if (!raw) {
-      throw new UnauthorizedException('Invalid or expired session');
-    }
+    for (const sessionId of [...new Set(sessionCandidates)]) {
+      const raw = await this.redis.get(`session:${sessionId}`);
+      if (!raw) continue;
 
-    // The session payload is JSON { userId, role } (post-A3). A bare string
-    // would be a pre-launch legacy session; reject it so RBAC never degrades
-    // to an undefined role silently — the user simply re-logs in.
-    let payload: SessionPayload;
-    try {
-      const parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== 'object' || !parsed.userId) {
-        throw new Error('not a session payload');
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object' || !parsed.userId) continue;
+
+        const payload = parsed as SessionPayload;
+        request.user = {
+          userId: payload.userId,
+          id: payload.userId,
+          sessionId,
+          role: payload.role,
+        };
+        return true;
+      } catch {
+        continue;
       }
-      payload = parsed as SessionPayload;
-    } catch {
-      throw new UnauthorizedException('Session expired, please log in again');
     }
 
-    // Attach role so RbacGuard (and service-layer checks) can authorise.
-    request.user = {
-      userId: payload.userId,
-      id: payload.userId,
-      sessionId,
-      role: payload.role,
-    };
-    return true;
+    throw new UnauthorizedException('Invalid or expired session');
   }
 }

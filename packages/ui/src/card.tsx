@@ -2,23 +2,28 @@ import React from 'react';
 
 interface CardProps {
   children: React.ReactNode;
-  style?: React.CSSProperties;
   className?: string;
+  variant?: 'default' | 'elevated' | 'bordered' | 'premium';
 }
 
-export function Card({ children, style }: CardProps) {
+export function Card({ children, className = '', variant = 'default' }: CardProps) {
+  const baseClasses = 'rounded-xl transition-all duration-300';
+  
+  const variantClasses: Record<string, string> = {
+    default: 'bg-white border border-line shadow-sm p-6',
+    elevated: 'bg-white p-6 shadow-lg hover:shadow-xl',
+    bordered: 'bg-white p-6 border-2 border-line hover:border-emerald-500',
+    premium: 'bg-white p-8 shadow-premium border border-line relative overflow-hidden',
+  };
+
   return (
-    <div
-      style={{
-        padding: '1.5rem',
-        backgroundColor: 'white',
-        borderRadius: '0.5rem',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        border: '1px solid #e2e8f0',
-        ...style,
-      }}
-    >
-      {children}
+    <div className={`${baseClasses} ${variantClasses[variant]} ${className}`}>
+      {variant === 'premium' && (
+        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500 to-emerald-600" />
+      )}
+      <div className={variant === 'premium' ? 'pl-4' : ''}>
+        {children}
+      </div>
     </div>
   );
 }

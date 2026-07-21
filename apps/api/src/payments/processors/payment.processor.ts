@@ -16,9 +16,7 @@ export class PaymentProcessor extends WorkerHost {
       return { pdfUrl: `s3://pending/invoices/${invoiceId}.pdf` };
     }
 
-    // In production, this would call Stripe/Paystack/Flutterwave SDK
-    // and create a real checkout session URL.
-    console.log(`[PaymentProcessor] create checkout for invoice=${invoiceId}`);
-    return { checkoutUrl: `https://pay.example.com/invoice/${invoiceId}` };
+    console.log(`[PaymentProcessor] checkout is handled synchronously for invoice=${invoiceId}`);
+    return { invoiceId };
   }
 }

@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { PublicPage } from '../../../components/public-shell';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,24 +25,35 @@ export default async function InstitutionPage({ params }: { params: Promise<{ sl
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: '2rem auto', padding: '0 1rem' }}>
-      <h1>{institution.name}</h1>
-      <p style={{ color: '#4a5568' }}>{institution.country} · {institution.institutionType}</p>
-      <p>{institution.description}</p>
-      <div style={{ marginTop: '1rem' }}>
-        <h3>Accreditations</h3>
-        {institution.accreditations?.length > 0 ? (
-          <ul>
-            {institution.accreditations.map((acc: any) => (
-              <li key={acc.id}>
-                {acc.accreditationCode} (valid until {new Date(acc.expiresAt).toLocaleDateString()})
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No active accreditations.</p>
-        )}
-      </div>
-    </div>
+    <PublicPage>
+      <main className="content-page">
+        <header className="content-header">
+          <p className="eyebrow">Accredited institution</p>
+          <h1>{institution.name}</h1>
+          <p>{institution.country} - {institution.institutionType}</p>
+        </header>
+
+        <section className="content-panel">
+          <h2>Institution profile</h2>
+          <p>{institution.description || 'No public description has been provided yet.'}</p>
+        </section>
+
+        <section className="content-panel">
+          <h2>Accreditations</h2>
+          {institution.accreditations?.length > 0 ? (
+            <div className="content-list">
+              {institution.accreditations.map((acc: any) => (
+                <div className="content-list-card" key={acc.id}>
+                  <h3>{acc.accreditationCode}</h3>
+                  <p className="meta-line">Valid until {new Date(acc.expiresAt).toLocaleDateString()}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>No active accreditations.</p>
+          )}
+        </section>
+      </main>
+    </PublicPage>
   );
 }

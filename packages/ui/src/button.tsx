@@ -12,44 +12,42 @@ export function Button({
   size = 'md',
   isLoading = false,
   disabled,
-  style,
+  className = '',
   ...props
 }: ButtonProps) {
-  const baseStyle: React.CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.5rem',
-    fontWeight: 600,
-    borderRadius: '0.375rem',
-    border: 'none',
-    cursor: disabled || isLoading ? 'not-allowed' : 'pointer',
-    opacity: disabled || isLoading ? 0.6 : 1,
-    transition: 'all 0.2s',
+  const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60';
+  
+  const sizeClasses: Record<string, string> = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-base',
+    lg: 'px-6 py-3 text-lg',
   };
 
-  const sizeStyles: Record<string, React.CSSProperties> = {
-    sm: { padding: '0.375rem 0.75rem', fontSize: '0.875rem' },
-    md: { padding: '0.5rem 1rem', fontSize: '1rem' },
-    lg: { padding: '0.75rem 1.5rem', fontSize: '1.125rem' },
-  };
-
-  const variantStyles: Record<string, React.CSSProperties> = {
-    primary: { backgroundColor: '#1a365d', color: 'white' },
-    secondary: { backgroundColor: '#e2e8f0', color: '#1a202c' },
-    outline: { backgroundColor: 'transparent', color: '#1a365d', border: '2px solid #1a365d' },
-    ghost: { backgroundColor: 'transparent', color: '#4a5568' },
-    danger: { backgroundColor: '#e53e3e', color: 'white' },
+  const variantClasses: Record<string, string> = {
+    primary: 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0',
+    secondary: 'bg-white text-navy border border-line hover:border-emerald-500',
+    outline: 'bg-transparent text-navy border-2 border-navy hover:bg-navy hover:text-white',
+    ghost: 'bg-transparent text-muted hover:text-navy',
+    danger: 'bg-red-600 text-white hover:bg-red-700',
   };
 
   return (
     <button
-      style={{ ...baseStyle, ...sizeStyles[size], ...variantStyles[variant], ...style }}
+      className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
       disabled={disabled || isLoading}
       {...props}
     >
-      {isLoading && <span>Loading...</span>}
-      {children}
+      {isLoading ? (
+        <>
+          <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          Loading...
+        </>
+      ) : (
+        children
+      )}
     </button>
   );
 }

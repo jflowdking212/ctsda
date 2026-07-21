@@ -17,7 +17,8 @@ export default function ContactPage() {
           </p>
         </PageHero>
         <section className="section">
-          <div className="section-inner split">
+          <div className="container">
+            <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-start">
             <div>
               <p className="eyebrow">Get in touch</p>
               <h2>We will route your inquiry to the right team.</h2>
@@ -25,7 +26,7 @@ export default function ContactPage() {
                 Begin an application
               </Link>
             </div>
-            <div className="feature-grid">
+            <div className="grid sm:grid-cols-2 gap-4">
               {[
                 ['Email', 'management@ctsdamerica.com'],
                 ['Address', 'The Green, STE A, Dover, Kent, Delaware, United States'],
@@ -38,6 +39,7 @@ export default function ContactPage() {
                   <p>{text}</p>
                 </article>
               ))}
+            </div>
             </div>
           </div>
         </section>

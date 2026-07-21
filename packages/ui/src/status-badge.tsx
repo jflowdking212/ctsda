@@ -3,10 +3,10 @@ import { Badge } from './badge';
 
 interface StatusBadgeProps {
   status: string;
-  style?: React.CSSProperties;
+  className?: string;
 }
 
-const statusVariantMap: Record<string, 'success' | 'warning' | 'error' | 'info' | 'default'> = {
+const statusVariantMap: Record<string, 'success' | 'warning' | 'error' | 'info' | 'default' | 'premium'> = {
   active: 'success',
   approved: 'success',
   completed: 'success',
@@ -31,9 +31,9 @@ const statusVariantMap: Record<string, 'success' | 'warning' | 'error' | 'info' 
   refunded: 'info',
 };
 
-export function StatusBadge({ status, style }: StatusBadgeProps) {
+export function StatusBadge({ status, className = '' }: StatusBadgeProps) {
   const variant = statusVariantMap[status] || 'default';
   const label = status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
-  return <Badge variant={variant} style={style}>{label}</Badge>;
+  return <Badge variant={variant} className={className}>{label}</Badge>;
 }

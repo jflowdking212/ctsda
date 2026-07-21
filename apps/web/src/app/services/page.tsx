@@ -25,7 +25,8 @@ export default function ServicesPage() {
           </p>
         </PageHero>
         <section className="section">
-          <div className="section-inner content-grid">
+          <div className="container">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map(([title, text]) => (
               <article className="feature-card" key={title}>
                 <span className="feature-dot" />
@@ -33,6 +34,7 @@ export default function ServicesPage() {
                 <p>{text}</p>
               </article>
             ))}
+            </div>
           </div>
         </section>
       </main>

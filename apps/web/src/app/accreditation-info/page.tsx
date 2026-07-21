@@ -16,7 +16,7 @@ export default function AccreditationInfoPage() {
           </p>
         </PageHero>
         <section className="section process-section">
-          <div className="section-inner">
+          <div className="container">
             <div className="process-grid">
               {[
                 ['01', 'Apply', 'Create your applicant account and submit the institutional profile.'],

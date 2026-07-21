@@ -5,7 +5,18 @@ export const dynamic = 'force-dynamic';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-  const routes = ['', '/about', '/services', '/contact', '/legal', '/accreditation-info', '/verify', '/directory'];
+  const routes = [
+    '',
+    '/about',
+    '/services',
+    '/contact',
+    '/legal',
+    '/privacy-policy',
+    '/terms-of-service',
+    '/accreditation-info',
+    '/verify',
+    '/directory',
+  ];
 
   const entries: MetadataRoute.Sitemap = routes.map((route) => ({
     url: `${siteUrl}${route}`,
