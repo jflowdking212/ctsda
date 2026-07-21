@@ -14,7 +14,7 @@ export class PaymentsService {
     @InjectQueue('payments') private paymentQueue: Queue,
   ) {}
 
-  async createCheckoutSession(userId: string, applicationId: string) {
+  async createCheckoutSession(userId: string, applicationId: string, feeAmount: number = 500, description: string = 'CTSDA accreditation application fee') {
     const application = await this.prisma.application.findUnique({
       where: { id: applicationId },
       include: { institution: true },
@@ -36,19 +36,21 @@ export class PaymentsService {
       return { url: null, message: 'Already paid' };
     }
 
+    const invoiceAmount = Math.round(feeAmount * 100);
+
     const invoice = existingInvoice
       ? await this.prisma.invoice.update({
           where: { id: existingInvoice.id },
-          data: {},
+          data: { amount: feeAmount, description },
         })
       : await this.prisma.invoice.create({
           data: {
             invoiceNumber: this.generateInvoiceNumber(),
             applicationId,
-            amount: 50000,
+            amount: feeAmount,
           currency: 'USD',
           status: 'sent',
-          description: 'CTSDA accreditation application fee',
+          description,
           dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
           createdBy: userId,
           },
@@ -78,9 +80,9 @@ export class PaymentsService {
             quantity: 1,
             price_data: {
               currency: invoice.currency.toLowerCase(),
-              unit_amount: Number(invoice.amount),
+              unit_amount: Math.round(Number(invoice.amount) * 100),
               product_data: {
-                name: 'CTSDA accreditation application fee',
+                name: description,
                 description: application.institution.name,
               },
             },
@@ -223,6 +225,65 @@ export class PaymentsService {
         status: 'completed',
       },
     });
+
+    if (invoice.applicationId) {
+      const application = await this.prisma.application.findUnique({
+        where: { id: invoice.applicationId },
+      });
+      if (application && application.status === 'payment_pending') {
+        await this.prisma.application.update({
+          where: { id: application.id },
+          data: { status: 'submitted', submittedAt: new Date() },
+        });
+      } else if (application && application.status === 'approved' && invoice.description === 'CTSDA Final Accreditation Fee') {
+        // Issue the accreditation now that the fee is paid
+        const crypto = require('crypto');
+        const QRCode = require('qrcode');
+        
+        const acc = await this.prisma.accreditation.create({
+          data: {
+            institutionId: application.institutionId,
+            applicationId: application.id,
+            accreditationCode: `CTSDA-${crypto.randomBytes(4).toString('hex').toUpperCase()}`,
+            status: 'active',
+            issuedAt: new Date(),
+            expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          },
+        });
+
+        const verificationToken = crypto.randomBytes(32).toString('base64url');
+        const verificationBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        const qrCodeUrl = await QRCode.toDataURL(`${verificationBaseUrl}/verify?token=${verificationToken}`);
+        
+        const certificate = await this.prisma.certificate.create({
+          data: {
+            accreditationId: acc.id,
+            certificateNumber: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            status: 'active',
+            issueDate: new Date(),
+            expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            verificationToken,
+            qrCodeUrl,
+          },
+        });
+
+        await this.prisma.notification.create({
+          data: {
+            userId: application.applicantId,
+            type: 'approved',
+            title: 'Application approved - Certificate Issued',
+            body: 'We have received your accreditation fee. Your CTSDA accreditation application is fully approved and your certificate has been issued.',
+            metadata: { applicationId: application.id, accreditationId: acc.id },
+          },
+        });
+
+        await this.paymentQueue.add(
+          'generate-certificate-pdf',
+          { certificateId: certificate.id, applicationId: application.id },
+          { attempts: 3, backoff: { type: 'exponential', delay: 1000 } }
+        );
+      }
+    }
 
     return { success: true };
   }

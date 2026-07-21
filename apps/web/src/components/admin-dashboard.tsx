@@ -14,7 +14,7 @@ const ADMIN_SESSION_KEY = 'ctsda_admin_session';
 const adminNav = [
   { href: '/admin/reports', section: 'reports', label: 'Reports', roles: ['super_admin', 'reviewer', 'finance_officer', 'support_officer', 'auditor'] },
   { href: '/admin/queue', section: 'queue', label: 'Queue', roles: ['super_admin', 'reviewer', 'support_officer'] },
-  { href: '/admin/institutions', section: 'institutions', label: 'Institutions', roles: ['super_admin', 'support_officer', 'content_manager'] },
+  { href: '/admin/institutions', section: 'institutions', label: 'Directory', roles: ['super_admin', 'support_officer', 'content_manager'] },
   { href: '/admin/billing', section: 'billing', label: 'Billing & Orders', roles: ['super_admin', 'finance_officer'] },
   { href: '/admin/users', section: 'users', label: 'Users', roles: ['super_admin'] },
   { href: '/admin/blog', section: 'blog', label: 'CMS / Blog', roles: ['super_admin', 'content_manager'] },
@@ -189,6 +189,7 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
     let response: Response;
     try {
       response = await fetch(`${API_BASE}${path}`, {
+        cache: 'no-store',
         ...init,
         credentials: 'include',
         headers: {
@@ -731,6 +732,9 @@ function ReportPanel({ summary }: { summary: any | null }) {
     ['Approval rate', `${Math.round(summary.pipeline.approvalRate * 100)}%`, 'Approved vs rejected'],
     ['Active accreditations', summary.accreditations.active, 'Currently valid'],
     ['Expiring soon', summary.accreditations.expiringIn90Days, 'Next 90 days'],
+    ['Total trainings', summary.content?.totalTrainings || 0, 'Published courses'],
+    ['Total enrollments', summary.content?.totalEnrollments || 0, 'Student enrollments'],
+    ['Blog posts', summary.content?.totalBlogPosts || 0, 'Published articles'],
     ['Completed revenue', summary.revenue.completedAmount, 'Paid invoices'],
     ['Paid transactions', summary.revenue.completedPayments, 'Completed payments'],
   ];
@@ -776,6 +780,24 @@ function ReportPanel({ summary }: { summary: any | null }) {
             value: item.openReviews,
           }))}
         />
+        {summary.content?.popularTrainings?.length > 0 && (
+          <ReportList
+            title="Popular trainings"
+            items={summary.content.popularTrainings.map((item: any) => ({
+              label: item.title,
+              value: item.enrollments,
+            }))}
+          />
+        )}
+        {summary.content?.recentBlogPosts?.length > 0 && (
+          <ReportList
+            title="Recent blog posts"
+            items={summary.content.recentBlogPosts.map((item: any) => ({
+              label: item.title,
+              value: new Date(item.publishedAt).toLocaleDateString(),
+            }))}
+          />
+        )}
       </div>
     </div>
   );

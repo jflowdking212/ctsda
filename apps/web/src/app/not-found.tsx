@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { PremiumHeader } from '../../components/premium-header';
-import { PremiumFooter } from '../../components/premium-footer';
+import { PremiumHeader } from '../components/premium-header';
+import { PremiumFooter } from '../components/premium-footer';
 
 export default function NotFound() {
   return (

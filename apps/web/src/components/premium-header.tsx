@@ -15,7 +15,7 @@ const navItems = [
   {
     label: 'Directory & Verify',
     children: [
-      { href: '/directory', label: 'School Directory' },
+      { href: '/directory', label: 'Directory' },
       { href: '/verify', label: 'Verify Certificate' },
     ],
   },

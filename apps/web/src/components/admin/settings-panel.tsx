@@ -29,8 +29,8 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
         body: JSON.stringify(settings),
       });
       alert('Settings saved successfully!');
-    } catch {
-      alert('Failed to save settings');
+    } catch (error: any) {
+      alert(`Failed to save settings: ${error.message}`);
     }
     setSaving(false);
   }
@@ -120,6 +120,53 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
                   onChange={e => setSettings({...settings, smtpPort: e.target.value})} 
                   style={{ padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', outline: 'none' }}
                 />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.5rem', marginTop: '1rem' }}>
+            <legend style={{ padding: '0 0.5rem', fontSize: '0.875rem', fontWeight: 600, color: '#475569' }}>Accreditation Pricing & Workflow</legend>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>Workflow Model</label>
+                <select 
+                  value={settings.accreditationWorkflow || 'review_first'} 
+                  onChange={e => setSettings({...settings, accreditationWorkflow: e.target.value})} 
+                  style={{ padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', outline: 'none', backgroundColor: 'white' }}
+                >
+                  <option value="review_first">Review First (Apply free, Pay on approval)</option>
+                  <option value="pay_upfront">Pay Upfront (Pay full fee before submission)</option>
+                  <option value="hybrid">Hybrid (Pay app fee upfront, Pay accreditation fee on approval)</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: (settings.accreditationWorkflow || 'review_first') === 'review_first' ? '1fr' : '1fr 1fr', gap: '1.5rem' }}>
+                {(settings.accreditationWorkflow || 'review_first') !== 'review_first' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>Application Fee (USD)</label>
+                    <input 
+                      type="number" 
+                      min="0"
+                      step="0.01"
+                      value={settings.applicationFee || 0} 
+                      onChange={e => setSettings({...settings, applicationFee: parseFloat(e.target.value) || 0})} 
+                      style={{ padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', outline: 'none' }}
+                    />
+                    <small style={{ color: '#64748b' }}>Used in Pay Upfront & Hybrid modes.</small>
+                  </div>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>Accreditation Fee (USD)</label>
+                  <input 
+                    type="number" 
+                    min="0"
+                    step="0.01"
+                    value={settings.accreditationFee || 500} 
+                    onChange={e => setSettings({...settings, accreditationFee: parseFloat(e.target.value) || 0})} 
+                    style={{ padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', outline: 'none' }}
+                  />
+                  <small style={{ color: '#64748b' }}>Used in Review First & Hybrid modes.</small>
+                </div>
               </div>
             </div>
           </fieldset>

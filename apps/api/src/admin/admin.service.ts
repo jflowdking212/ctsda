@@ -494,6 +494,9 @@ export class AdminService {
       reviewerWorkloadCounts,
       invoiceStatus,
       revenue,
+      totalTrainings,
+      totalEnrollments,
+      totalBlogPosts,
     ] = await Promise.all([
       this.prisma.application.count(),
       this.prisma.application.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
@@ -544,6 +547,9 @@ export class AdminService {
         _sum: { amount: true },
         _count: { _all: true },
       }),
+      this.prisma.training.count(),
+      this.prisma.trainingEnrollment.count(),
+      this.prisma.blogPost.count(),
     ]);
 
     const trainingAreaIds = popularTrainingAreaCounts.map((item) => item.trainingAreaId);
@@ -622,6 +628,21 @@ export class AdminService {
           count: item._count._all,
           amount: Number(item._sum.amount || 0),
         })),
+      },
+      content: {
+        totalTrainings,
+        totalEnrollments,
+        totalBlogPosts,
+        popularTrainings: (await this.prisma.training.findMany({
+          orderBy: { enrollments: { _count: 'desc' } },
+          include: { _count: { select: { enrollments: true } } },
+          take: 5,
+        })).map((t) => ({ title: t.title, enrollments: t._count.enrollments })),
+        recentBlogPosts: (await this.prisma.blogPost.findMany({
+          orderBy: { publishedAt: 'desc' },
+          where: { isPublished: true },
+          take: 5,
+        })).map((p) => ({ title: p.title, publishedAt: p.publishedAt })),
       },
     };
   }

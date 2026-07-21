@@ -6,6 +6,7 @@ type Application = {
   id: string;
   status: string;
   institution?: { name: string; country: string };
+  invoices?: { id: string; amount: string; description: string }[];
 };
 
 const PORTAL_SESSION_KEY = 'ctsda_portal_session';
@@ -34,6 +35,44 @@ export default function ApplicationsPage() {
     }
     load();
   }, [apiUrl]);
+
+  async function submitApplication(applicationId: string) {
+    setMessage('');
+    setPayingId(applicationId);
+    try {
+      const response = await fetch(`${apiUrl}/applications/${applicationId}/submit`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(window.localStorage.getItem(PORTAL_SESSION_KEY) ? { 'X-Session-Id': window.localStorage.getItem(PORTAL_SESSION_KEY) || '' } : {}),
+        },
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || 'Unable to submit application');
+      }
+      if (result.paymentUrl) {
+        window.location.href = result.paymentUrl;
+        return;
+      }
+      setMessage(result.message || 'Application submitted successfully.');
+      // Refresh list
+      const res = await fetch(`${apiUrl}/applications/me`, {
+        credentials: 'include',
+        headers: {
+          ...(window.localStorage.getItem(PORTAL_SESSION_KEY) ? { 'X-Session-Id': window.localStorage.getItem(PORTAL_SESSION_KEY) || '' } : {}),
+        },
+      });
+      if (res.ok) {
+        setApps(await res.json());
+      }
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Unable to submit application');
+    } finally {
+      setPayingId(null);
+    }
+  }
 
   async function startCheckout(applicationId: string) {
     setMessage('');
@@ -88,14 +127,24 @@ export default function ApplicationsPage() {
               <p className="meta-line">
                 {app.institution?.country} - Status: {app.status}
               </p>
-              {['submitted', 'payment_pending'].includes(app.status) && (
+              {app.status === 'draft' && (
+                <button
+                  className={payingId === app.id ? 'button primary is-loading' : 'button primary'}
+                  type="button"
+                  onClick={() => submitApplication(app.id)}
+                  disabled={payingId === app.id}
+                >
+                  {payingId === app.id ? 'Submitting...' : 'Submit application'}
+                </button>
+              )}
+              {(app.status === 'payment_pending' || (app.invoices && app.invoices.length > 0)) && (
                 <button
                   className={payingId === app.id ? 'button primary is-loading' : 'button primary'}
                   type="button"
                   onClick={() => startCheckout(app.id)}
                   disabled={payingId === app.id}
                 >
-                  {payingId === app.id ? 'Starting checkout...' : 'Pay application fee'}
+                  {payingId === app.id ? 'Starting checkout...' : 'Complete payment'}
                 </button>
               )}
             </div>

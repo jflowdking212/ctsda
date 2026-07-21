@@ -213,42 +213,74 @@ export class ReviewsService {
         });
 
         if (newStatus === 'approved') {
-          const acc = await tx.accreditation.create({
-            data: {
-              institutionId: app.institutionId,
-              applicationId,
-              accreditationCode: this.generateAccreditationCode(),
-              status: 'active',
-              issuedAt: new Date(),
-              expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-            },
-          });
+          const settings = await tx.siteSetting.findMany();
+          const getSetting = (key: string) => settings.find(s => s.key === key)?.value;
+          const workflow = getSetting('accreditationWorkflow') || 'review_first';
+          const accreditationFee = Number(getSetting('accreditationFee')) || 500;
 
-          const verificationToken = this.generateVerificationToken();
-          const verificationBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-          const qrCodeUrl = await QRCode.toDataURL(`${verificationBaseUrl}/verify?token=${verificationToken}`);
-          const certificate = await tx.certificate.create({
-            data: {
-              accreditationId: acc.id,
-              certificateNumber: this.generateCertificateNumber(),
-              status: 'active',
-              issueDate: new Date(),
-              expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-              verificationToken,
-              qrCodeUrl,
-            },
-          });
-          certificateId = certificate.id;
+          if ((workflow === 'review_first' || workflow === 'hybrid') && accreditationFee > 0) {
+            // Post-approval invoicing
+            await tx.invoice.create({
+              data: {
+                invoiceNumber: `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                applicationId,
+                amount: accreditationFee,
+                currency: 'USD',
+                status: 'sent',
+                description: 'CTSDA Final Accreditation Fee',
+                dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+                createdBy: actorId,
+              },
+            });
 
-          await tx.notification.create({
-            data: {
-              userId: app.applicantId,
-              type: 'approved',
-              title: 'Application approved',
-              body: 'Your CTSDA accreditation application has been approved.',
-              metadata: { applicationId, accreditationId: acc.id },
-            },
-          });
+            await tx.notification.create({
+              data: {
+                userId: app.applicantId,
+                type: 'approved_pending_payment' as any,
+                title: 'Application Approved - Payment Required',
+                body: 'Your CTSDA accreditation application has been approved. Please complete payment of the accreditation fee to receive your certificate.',
+                metadata: { applicationId },
+              },
+            });
+          } else {
+            // Immediate issuance (Pay Upfront or zero fee)
+            const acc = await tx.accreditation.create({
+              data: {
+                institutionId: app.institutionId,
+                applicationId,
+                accreditationCode: this.generateAccreditationCode(),
+                status: 'active',
+                issuedAt: new Date(),
+                expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+              },
+            });
+
+            const verificationToken = this.generateVerificationToken();
+            const verificationBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+            const qrCodeUrl = await QRCode.toDataURL(`${verificationBaseUrl}/verify?token=${verificationToken}`);
+            const certificate = await tx.certificate.create({
+              data: {
+                accreditationId: acc.id,
+                certificateNumber: this.generateCertificateNumber(),
+                status: 'active',
+                issueDate: new Date(),
+                expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+                verificationToken,
+                qrCodeUrl,
+              },
+            });
+            certificateId = certificate.id;
+
+            await tx.notification.create({
+              data: {
+                userId: app.applicantId,
+                type: 'approved',
+                title: 'Application approved',
+                body: 'Your CTSDA accreditation application has been approved.',
+                metadata: { applicationId, accreditationId: acc.id },
+              },
+            });
+          }
         }
 
         return next;
