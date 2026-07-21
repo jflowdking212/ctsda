@@ -2,6 +2,7 @@ import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/com
 import { PrismaService } from '../common/prisma.service';
 import { SettingsService } from '../settings/settings.service';
 import { PaymentsService } from '../payments/payments.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class ApplicationsService {
@@ -9,6 +10,7 @@ export class ApplicationsService {
     private prisma: PrismaService,
     private settingsService: SettingsService,
     private paymentsService: PaymentsService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async getMyApplications(applicantId: string) {
@@ -28,6 +30,7 @@ export class ApplicationsService {
   async submitApplication(applicationId: string, userId: string) {
     const application = await this.prisma.application.findUnique({
       where: { id: applicationId },
+      include: { institution: true },
     });
 
     if (!application) {
@@ -62,6 +65,15 @@ export class ApplicationsService {
       where: { id: applicationId },
       data: { status: 'submitted', submittedAt: new Date() },
     });
+
+    if (settings.adminNotificationEmail) {
+      await this.notificationsService.enqueueEmail({
+        to: settings.adminNotificationEmail,
+        subject: 'New Application Pending Review',
+        html: `<p>A new application has been submitted by ${application.institution?.name} and is pending review.</p>`,
+        userId: userId,
+      });
+    }
 
     return { message: 'Application submitted successfully', status: 'submitted' };
   }

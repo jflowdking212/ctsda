@@ -5,8 +5,11 @@ import { UsersModule } from '../users/users.module';
 import { AuditModule } from '../audit/audit.module';
 import { PrismaService } from '../common/prisma.service';
 
+import { SettingsModule } from '../settings/settings.module';
+import { NotificationsModule } from '../notifications/notifications.module';
+
 @Module({
-  imports: [UsersModule, AuditModule],
+  imports: [UsersModule, AuditModule, SettingsModule, NotificationsModule],
   controllers: [AuthController],
   providers: [AuthService, PrismaService],
   exports: [AuthService],

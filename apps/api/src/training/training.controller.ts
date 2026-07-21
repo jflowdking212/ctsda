@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Req, BadRequestException } from '@nestjs/common';
 import { TrainingService } from './training.service';
 import { AuthGuard } from '../common/guards/auth.guard';
+import { RbacGuard } from '../common/guards/rbac.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller()
@@ -15,28 +16,28 @@ export class TrainingController {
 
   // Admin: full CRUD
   @Get('admin/training')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RbacGuard)
   @Roles('super_admin', 'content_manager')
   async listAll() {
     return this.trainingService.findAll();
   }
 
   @Post('admin/training')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RbacGuard)
   @Roles('super_admin', 'content_manager')
   async create(@Body() body: any) {
     return this.trainingService.create(body);
   }
 
   @Put('admin/training/:id')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RbacGuard)
   @Roles('super_admin', 'content_manager')
   async update(@Param('id') id: string, @Body() body: any) {
     return this.trainingService.update(id, body);
   }
 
   @Delete('admin/training/:id')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RbacGuard)
   @Roles('super_admin', 'content_manager')
   async remove(@Param('id') id: string) {
     return this.trainingService.remove(id);

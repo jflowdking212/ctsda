@@ -52,6 +52,16 @@ export function BlogPanel({ api }: { api: (path: string, init?: RequestInit) => 
     }
   }
 
+  async function deletePost(id: string) {
+    if (!confirm('Are you sure you want to delete this post?')) return;
+    try {
+      await api(`/admin/blog/${id}`, { method: 'DELETE' });
+      loadPosts();
+    } catch (err: any) {
+      alert(`Failed to delete: ${err.message}`);
+    }
+  }
+
   const openNew = () => { setCurrent({ isPublished: false }); setView('editor'); };
   const openEdit = (p: any) => { setCurrent(p); setView('editor'); };
 
@@ -200,9 +210,12 @@ export function BlogPanel({ api }: { api: (path: string, init?: RequestInit) => 
                     </span>
                   </td>
                   <td style={{ ...S.td, color: '#64748b', fontSize: '0.875rem' }}>{new Date(p.createdAt).toLocaleDateString()}</td>
-                  <td style={{ ...S.td, textAlign: 'right' }}>
+                  <td style={{ ...S.td, textAlign: 'right', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
                     <button onClick={() => openEdit(p)} style={{ padding: '0.375rem 0.875rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', backgroundColor: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer' }}>
                       Edit
+                    </button>
+                    <button onClick={() => deletePost(p.id)} style={{ padding: '0.375rem 0.875rem', borderRadius: '0.375rem', border: '1px solid #fecaca', backgroundColor: '#fef2f2', color: '#ef4444', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer' }}>
+                      Delete
                     </button>
                   </td>
                 </tr>

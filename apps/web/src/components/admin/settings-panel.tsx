@@ -23,10 +23,29 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
   async function saveSettings(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+    
+    const payload = { ...settings };
+    if (!payload.smtpPassword) {
+      delete payload.smtpPassword;
+    }
+
     try {
+      if (payload.smtpHost) {
+        const testRes = await api('/settings/test-smtp', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+        if (!testRes.ok) {
+          const err = await testRes.json();
+          alert(`SMTP Test Failed: ${err.message || 'Unknown error'}. Settings were NOT saved.`);
+          setSaving(false);
+          return;
+        }
+      }
+
       await api('/settings', {
         method: 'PUT',
-        body: JSON.stringify(settings),
+        body: JSON.stringify(payload),
       });
       alert('Settings saved successfully!');
     } catch (error: any) {
@@ -81,7 +100,7 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>Logo URL</label>
               <input 
-                type="url" 
+                type="text" 
                 value={settings.logoUrl || ''} 
                 onChange={e => setSettings({...settings, logoUrl: e.target.value})} 
                 style={{ padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', outline: 'none' }}
@@ -91,7 +110,7 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>Favicon URL</label>
               <input 
-                type="url" 
+                type="text" 
                 value={settings.faviconUrl || ''} 
                 onChange={e => setSettings({...settings, faviconUrl: e.target.value})} 
                 style={{ padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', outline: 'none' }}
@@ -121,6 +140,60 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
                   style={{ padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', outline: 'none' }}
                 />
               </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1.5rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>SMTP Username</label>
+                <input 
+                  type="text" 
+                  value={settings.smtpUser || ''} 
+                  onChange={e => setSettings({...settings, smtpUser: e.target.value})} 
+                  style={{ padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', outline: 'none' }}
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>SMTP Password</label>
+                <input 
+                  type="password" 
+                  value={settings.smtpPassword || ''} 
+                  onChange={e => setSettings({...settings, smtpPassword: e.target.value})} 
+                  style={{ padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', outline: 'none' }}
+                />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1.5rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>From Email (Sender)</label>
+                <input 
+                  type="email" 
+                  value={settings.smtpFrom || ''} 
+                  onChange={e => setSettings({...settings, smtpFrom: e.target.value})} 
+                  style={{ padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', outline: 'none' }}
+                  placeholder="e.g. noreply@ctsda.com"
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>Use Secure (TLS/SSL)</label>
+                <select 
+                  value={settings.smtpSecure || 'false'} 
+                  onChange={e => setSettings({...settings, smtpSecure: e.target.value})} 
+                  style={{ padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', outline: 'none', backgroundColor: 'white' }}
+                >
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1.5rem' }}>
+              <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>Admin Notification Email</label>
+              <input 
+                type="email" 
+                value={settings.adminNotificationEmail || ''} 
+                onChange={e => setSettings({...settings, adminNotificationEmail: e.target.value})} 
+                style={{ padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', outline: 'none' }}
+                placeholder="e.g. admin@ctsda.com"
+              />
+              <small style={{ color: '#64748b' }}>Receives notifications for new registrations, pending reviews, etc.</small>
             </div>
           </fieldset>
 
@@ -171,17 +244,35 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
             </div>
           </fieldset>
 
-          <div style={{ marginTop: '1rem', borderTop: '1px solid #e2e8f0', paddingTop: '1.5rem', display: 'flex', justifyContent: 'flex-end' }}>
-            <button 
-              type="submit" 
-              disabled={saving} 
-              style={{ backgroundColor: '#0f766e', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '0.375rem', border: 'none', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}
-            >
-              {saving ? 'Saving...' : 'Save Settings'}
-            </button>
-          </div>
-        </form>
-      )}
-    </div>
-  );
-}
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', borderTop: '1px solid #e2e8f0', paddingTop: '1.5rem', justifyContent: 'flex-end' }}>
+              <button 
+                type="button" 
+                disabled={saving}
+                onClick={async () => {
+                  setSaving(true);
+                  const payload = { ...settings };
+                  if (!payload.smtpPassword) delete payload.smtpPassword;
+                  try {
+                    const testRes = await api('/settings/test-smtp', { method: 'POST', body: JSON.stringify(payload) });
+                    if (testRes.ok) alert('SMTP Test Successful!');
+                    else alert(`SMTP Test Failed: ${(await testRes.json()).message || 'Unknown error'}`);
+                  } catch (err: any) { alert(`SMTP Test Failed: ${err.message}`); }
+                  setSaving(false);
+                }}
+                style={{ backgroundColor: '#f1f5f9', color: '#334155', padding: '0.75rem 1.5rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}
+              >
+                Test SMTP Connection
+              </button>
+              <button 
+                type="submit" 
+                disabled={saving} 
+                style={{ backgroundColor: '#0f766e', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '0.375rem', border: 'none', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}
+              >
+                {saving ? 'Saving...' : 'Save Settings'}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    );
+  }

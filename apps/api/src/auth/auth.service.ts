@@ -8,6 +8,8 @@ import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
 import { PrismaService } from '../common/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { SettingsService } from '../settings/settings.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 const ADMIN_ROLES = [
   'super_admin',
@@ -29,6 +31,8 @@ export class AuthService {
     private prisma: PrismaService,
     private configService: ConfigService,
     private auditService: AuditService,
+    private settingsService: SettingsService,
+    private notificationsService: NotificationsService,
   ) {
     this.redis = new IORedis(this.configService.get<string>('REDIS_URL', 'redis://localhost:6379'));
   }
@@ -85,6 +89,16 @@ export class AuthService {
       entityId: user.id,
       metadata: { emailVerificationPending: true },
     });
+
+    const settings = await this.settingsService.getAll();
+    if (settings.adminNotificationEmail) {
+      await this.notificationsService.enqueueEmail({
+        to: settings.adminNotificationEmail,
+        subject: 'New User Registration',
+        html: `<p>A new user has registered: ${user.firstName} ${user.lastName} (${user.email})</p>`,
+        userId: user.id,
+      });
+    }
 
     return { user, emailVerificationToken };
   }

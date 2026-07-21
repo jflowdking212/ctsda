@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { AuthGuard } from '../common/guards/auth.guard';
+import { RbacGuard } from '../common/guards/rbac.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @Controller('admin/blog')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RbacGuard)
 @Roles('super_admin', 'content_manager')
 export class BlogAdminController {
   constructor(private readonly blogService: BlogService) {}

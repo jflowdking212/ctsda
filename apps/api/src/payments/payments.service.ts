@@ -4,6 +4,8 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { randomUUID } from 'crypto';
 import Stripe from 'stripe';
+import { SettingsService } from '../settings/settings.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class PaymentsService {
@@ -12,6 +14,8 @@ export class PaymentsService {
   constructor(
     private prisma: PrismaService,
     @InjectQueue('payments') private paymentQueue: Queue,
+    private settingsService: SettingsService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async createCheckoutSession(userId: string, applicationId: string, feeAmount: number = 500, description: string = 'CTSDA accreditation application fee') {
@@ -229,12 +233,23 @@ export class PaymentsService {
     if (invoice.applicationId) {
       const application = await this.prisma.application.findUnique({
         where: { id: invoice.applicationId },
+        include: { institution: true },
       });
       if (application && application.status === 'payment_pending') {
         await this.prisma.application.update({
           where: { id: application.id },
           data: { status: 'submitted', submittedAt: new Date() },
         });
+
+        const settings = await this.settingsService.getAll();
+        if (settings.adminNotificationEmail) {
+          await this.notificationsService.enqueueEmail({
+            to: settings.adminNotificationEmail,
+            subject: 'New Application Pending Review (Fee Paid)',
+            html: `<p>A new application has been submitted by ${application.institution?.name} after paying the application fee and is now pending review.</p>`,
+            userId: invoice.createdBy || application.applicantId,
+          });
+        }
       } else if (application && application.status === 'approved' && invoice.description === 'CTSDA Final Accreditation Fee') {
         // Issue the accreditation now that the fee is paid
         const crypto = require('crypto');

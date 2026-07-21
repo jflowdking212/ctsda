@@ -93,7 +93,6 @@ import { createPinoRedactOptions } from './common/logging/redaction';
   controllers: [HealthController, VerifyController],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
-    { provide: APP_GUARD, useClass: RbacGuard },
   ],
 })
 export class AppModule {}

@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service';
 import { AuthGuard } from '../common/guards/auth.guard';
+import { RbacGuard } from '../common/guards/rbac.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('admin/billing')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RbacGuard)
 @Roles('super_admin')
 export class SubscriptionsController {
   constructor(private readonly billingService: SubscriptionsService) {}
