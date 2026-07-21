@@ -25,6 +25,7 @@ type TrainingItem = {
   videoUrl?: string;
   resourceUrl?: string;
   duration?: string;
+  price?: number | string;
   isPublished: boolean;
   createdAt?: string;
 };
@@ -110,7 +111,7 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.25rem' }}>
             <div>
               <label style={S.label}>Category</label>
               <select
@@ -130,6 +131,18 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
                 placeholder="e.g. 1h 45m"
                 value={current.duration || ''}
                 onChange={e => setCurrent({ ...current, duration: e.target.value })}
+              />
+            </div>
+            <div>
+              <label style={S.label}>Price (USD)</label>
+              <input
+                style={S.input}
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="e.g. 0.00 for free"
+                value={current.price !== undefined ? current.price : 0}
+                onChange={e => setCurrent({ ...current, price: parseFloat(e.target.value) || 0 })}
               />
             </div>
           </div>
@@ -219,6 +232,7 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
                 <th style={S.th}>Title</th>
                 <th style={S.th}>Category</th>
                 <th style={S.th}>Duration</th>
+                <th style={S.th}>Price</th>
                 <th style={S.th}>Status</th>
                 <th style={{ ...S.th, textAlign: 'right' }}>Actions</th>
               </tr>
@@ -238,6 +252,9 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
                     ) : <span style={{ color: '#94a3b8' }}>—</span>}
                   </td>
                   <td style={{ ...S.td, color: '#64748b', fontSize: '0.875rem' }}>{item.duration || '—'}</td>
+                  <td style={{ ...S.td, color: '#64748b', fontSize: '0.875rem' }}>
+                    {item.price && Number(item.price) > 0 ? `$${Number(item.price).toFixed(2)}` : 'Free'}
+                  </td>
                   <td style={S.td}>
                     <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600, backgroundColor: item.isPublished ? '#dcfce7' : '#fef3c7', color: item.isPublished ? '#16a34a' : '#92400e' }}>
                       {item.isPublished ? 'Published' : 'Draft'}

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Query, Req, BadRequestException } from '@nestjs/common';
 import { TrainingService } from './training.service';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -40,5 +40,26 @@ export class TrainingController {
   @Roles('super_admin', 'content_manager')
   async remove(@Param('id') id: string) {
     return this.trainingService.remove(id);
+  }
+
+  // Public/User: Register for training (supports guest checkout)
+  @Post('training/:id/register')
+  async register(
+    @Param('id') id: string, 
+    @Body('userId') userId?: string,
+    @Body('email') email?: string,
+  ) {
+    return this.trainingService.register(userId || null, id, email || null);
+  }
+
+  // User: Get enrolled trainings
+  @Get('portal/training/my-enrollments')
+  @UseGuards(AuthGuard)
+  async getMyEnrollments(@Req() req: any) {
+    const userId = req.user?.id || req.user?.sub;
+    if (!userId) {
+      throw new BadRequestException('User ID not found in session');
+    }
+    return this.trainingService.getMyEnrollments(userId);
   }
 }

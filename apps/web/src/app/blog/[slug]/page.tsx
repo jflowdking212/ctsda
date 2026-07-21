@@ -55,7 +55,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           overflow: 'hidden',
         }}>
           <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-          <div style={{ position: 'relative', zIndex: 10, maxWidth: '800px', margin: '0 auto' }}>
+          <div style={{ position: 'relative', zIndex: 10, maxWidth: '1000px', margin: '0 auto' }}>
             <Link href="/blog" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: '#34d399', fontSize: '0.875rem', fontWeight: 600, marginBottom: '2rem', textDecoration: 'none' }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
               Back to Blog
@@ -80,7 +80,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
 
         {/* Article Content */}
-        <div style={{ maxWidth: '820px', margin: '-2rem auto 5rem', padding: '0 1.5rem', position: 'relative', zIndex: 10 }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem 1.5rem 5rem', position: 'relative', zIndex: 10 }}>
           <div style={{ backgroundColor: 'white', borderRadius: '1rem', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.12)', overflow: 'hidden' }}>
             {/* Featured Image */}
             {post.featuredImg && (

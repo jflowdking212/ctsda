@@ -62,6 +62,7 @@ export function PortalHeader() {
         {/* Desktop Nav */}
         <nav className="portal-nav" aria-label="Applicant portal">
           <Link href="/portal/applications">My Applications</Link>
+          <Link href="/portal/training">My Training</Link>
           <button
             className={loggingOut ? 'portal-nav-button is-loading' : 'portal-nav-button'}
             type="button"
@@ -114,10 +115,15 @@ export function PortalHeader() {
           </button>
         </div>
 
-        <div className="portal-drawer-items">
+        <nav className="portal-drawer-nav">
           <Link className="portal-drawer-link" href="/portal/applications" onClick={closeMenu}>
             My Applications
           </Link>
+          <Link className="portal-drawer-link" href="/portal/training" onClick={closeMenu}>
+            My Training
+          </Link>
+        </nav>
+        <div className="portal-drawer-items">
           <button
             className={`portal-drawer-link portal-drawer-logout ${loggingOut ? 'is-loading' : ''}`}
             type="button"

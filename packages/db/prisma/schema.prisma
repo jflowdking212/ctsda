@@ -142,6 +142,7 @@ model User {
   createdInstitutions  Institution[]
   statusChanges        ApplicationStatusHistory[]
   blogPosts            BlogPost[]
+  trainingEnrollments  TrainingEnrollment[]
 
   @@map("users")
 }
@@ -748,9 +749,30 @@ model Training {
   videoUrl    String?  @db.VarChar(2048)
   resourceUrl String?  @db.VarChar(2048)
   duration    String?  @db.VarChar(50)
+  price       Decimal  @default(0) @db.Decimal(12, 2)
   isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  enrollments TrainingEnrollment[]
+
   @@map("training")
+}
+
+model TrainingEnrollment {
+  id              String   @id @default(uuid()) @db.Uuid
+  trainingId      String   @db.Uuid
+  userId          String   @db.Uuid
+  status          String   @default("pending") @db.VarChar(50)
+  amountPaid      Decimal  @default(0) @db.Decimal(12, 2)
+  stripeSessionId String?  @unique @db.VarChar(255)
+  isManual        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  training Training @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, trainingId])
+  @@map("training_enrollments")
 }

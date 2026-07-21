@@ -300,6 +300,16 @@ button, input, textarea, select {
   gap: 0.25rem;
 }
 
+/* Invisible bridge to prevent hover loss when moving mouse from trigger to menu */
+.nav-dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -0.6rem;
+  left: 0;
+  right: 0;
+  height: 0.6rem;
+}
+
 .nav-dropdown-group:hover .nav-dropdown-menu {
   display: flex;
 }

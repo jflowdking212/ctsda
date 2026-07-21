@@ -82,10 +82,8 @@ export default async function BlogPage() {
         <div
           style={{
             maxWidth: '1200px',
-            margin: '-3rem auto 0',
-            padding: '0 2rem',
-            position: 'relative',
-            zIndex: 20,
+            margin: '0 auto',
+            padding: '4rem 2rem 5rem',
           }}
         >
           {posts.length === 0 ? (

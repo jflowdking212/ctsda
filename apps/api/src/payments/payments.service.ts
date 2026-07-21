@@ -118,9 +118,52 @@ export class PaymentsService {
 
   private async handleCheckoutCompleted(event: Stripe.Event) {
     const session = event.data.object as Stripe.Checkout.Session;
+    
+    // Check if this is a training enrollment checkout
+    const trainingEnrollmentId = session.metadata?.trainingEnrollmentId;
+    const trainingId = session.metadata?.trainingId;
+    const guestEmail = session.metadata?.guestEmail;
+
+    if (trainingEnrollmentId) {
+      await this.prisma.trainingEnrollment.update({
+        where: { id: trainingEnrollmentId },
+        data: { status: 'paid' },
+      });
+      return { success: true, type: 'training_enrollment' };
+    } else if (trainingId && guestEmail) {
+      // Guest checkout success
+      const bcrypt = require('bcryptjs');
+      const passwordHash = await bcrypt.hash(Math.random().toString(36).slice(-10), 10);
+      
+      const newUser = await this.prisma.user.create({
+        data: {
+          email: guestEmail,
+          passwordHash,
+          firstName: 'Guest',
+          lastName: 'User',
+          role: 'applicant',
+          isActive: true,
+        }
+      });
+
+      const training = await this.prisma.training.findUnique({ where: { id: trainingId } });
+      
+      await this.prisma.trainingEnrollment.create({
+        data: {
+          userId: newUser.id,
+          trainingId: trainingId,
+          status: 'paid',
+          amountPaid: training ? training.price : 0,
+          stripeSessionId: session.id,
+        }
+      });
+      return { success: true, type: 'training_guest_enrollment' };
+    }
+
+    // Default to invoice checkout
     const invoiceId = session.metadata?.invoiceId;
     if (!invoiceId) {
-      throw new BadRequestException('Missing invoice metadata');
+      throw new BadRequestException('Missing invoice or training metadata');
     }
 
     return this.handleProviderPayment({

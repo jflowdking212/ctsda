@@ -1,5 +1,8 @@
 import { PublicPage } from '../../components/public-shell';
 import Link from 'next/link';
+import { PremiumHeader } from '../../components/premium-header';
+import { PremiumFooter } from '../../components/premium-footer';
+import { TrainingRegisterBtn } from '../../components/training-register-btn';
 
 export const metadata = {
   title: 'Training | CTSDA',
@@ -34,18 +37,15 @@ export default async function TrainingPage() {
   const categories = [...new Set(items.map((i: any) => i.category).filter(Boolean))];
 
   return (
-    <PublicPage>
-      <main>
-        {/* Hero */}
-        <div style={{ background: 'linear-gradient(135deg, #0a192f 0%, #0f3460 100%)', color: 'white', padding: '5rem 2rem', textAlign: 'center' }}>
-          <p style={{ fontSize: '0.875rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#34d399', marginBottom: '1rem', fontWeight: 600 }}>
-            CTSDA Training Centre
-          </p>
-          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, marginBottom: '1.25rem', lineHeight: 1.1 }}>
-            Training Resources
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f8fafc' }}>
+      <PremiumHeader />
+      <main style={{ flex: 1 }}>
+        <div style={{ backgroundColor: '#0f172a', padding: '6rem 2rem 4rem', textAlign: 'center', color: 'white', backgroundImage: 'radial-gradient(circle at top right, #1e293b, #0f172a)' }}>
+          <h1 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1rem', letterSpacing: '-0.02em' }}>
+            Professional <span style={{ color: '#38bdf8' }}>Training</span> Center
           </h1>
-          <p style={{ fontSize: '1.2rem', color: '#94a3b8', maxWidth: '600px', margin: '0 auto' }}>
-            Explore our library of free training modules, instructional videos, and downloadable resources to support professional driver training.
+          <p style={{ fontSize: '1.125rem', color: '#94a3b8', maxWidth: '600px', margin: '0 auto' }}>
+            Elevate your skills with industry-leading modules designed for professional drivers and instructors.
           </p>
         </div>
 
@@ -58,7 +58,6 @@ export default async function TrainingPage() {
             </div>
           ) : (
             <>
-              {/* Category chips */}
               {categories.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '2.5rem' }}>
                   {categories.map((cat: any) => {
@@ -72,16 +71,21 @@ export default async function TrainingPage() {
                 </div>
               )}
 
-              {/* Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.75rem' }}>
                 {items.map((item: any) => {
                   const c = CATEGORY_COLORS[item.category] || DEFAULT_COLOR;
+                  const isFree = !item.price || Number(item.price) === 0;
+                  
                   return (
-                    <article key={item.id} style={{ backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '1rem', overflow: 'hidden', display: 'flex', flexDirection: 'column', transition: 'box-shadow 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-                      {/* Top bar */}
+                    <article key={item.id} style={{ backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '1rem', overflow: 'hidden', display: 'flex', flexDirection: 'column', transition: 'box-shadow 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', position: 'relative' }}>
+                      <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10 }}>
+                        <span style={{ padding: '0.3rem 0.8rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 700, backgroundColor: isFree ? '#10b981' : '#0f172a', color: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                          {isFree ? 'Free' : `$${Number(item.price).toFixed(2)}`}
+                        </span>
+                      </div>
                       <div style={{ height: '5px', background: 'linear-gradient(90deg, #10b981, #0ea5e9)' }} />
                       
-                      <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+                      <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '0.875rem', marginTop: '1.5rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                           {item.category && (
                             <span style={{ padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 600, backgroundColor: c.bg, color: c.text }}>
@@ -101,31 +105,7 @@ export default async function TrainingPage() {
                           </p>
                         )}
 
-                        <div style={{ display: 'flex', gap: '0.75rem', marginTop: 'auto', paddingTop: '0.5rem', borderTop: '1px solid #f1f5f9' }}>
-                          {item.videoUrl && (
-                            <a
-                              href={item.videoUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.5rem 1rem', backgroundColor: '#0f172a', color: 'white', borderRadius: '0.5rem', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none' }}
-                            >
-                              ▶ Watch Video
-                            </a>
-                          )}
-                          {item.resourceUrl && (
-                            <a
-                              href={item.resourceUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.5rem 1rem', backgroundColor: '#f0fdf4', color: '#15803d', border: '1px solid #86efac', borderRadius: '0.5rem', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none' }}
-                            >
-                              ↓ Download
-                            </a>
-                          )}
-                          {!item.videoUrl && !item.resourceUrl && (
-                            <span style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>Resources coming soon</span>
-                          )}
-                        </div>
+                        <TrainingRegisterBtn trainingId={item.id} price={item.price || 0} title={item.title} />
                       </div>
                     </article>
                   );
@@ -135,6 +115,7 @@ export default async function TrainingPage() {
           )}
         </div>
       </main>
-    </PublicPage>
+      <PremiumFooter />
+    </div>
   );
 }
