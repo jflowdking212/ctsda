@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 
-export function TrainingRegisterBtn({ trainingId, price, title }: { trainingId: string, price: string | number, title: string }) {
+export function TrainingRegisterBtn({ trainingId, price, title: _title }: { trainingId: string, price: string | number, title: string }) {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [showEmailInput, setShowEmailInput] = useState(false);

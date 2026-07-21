@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Query, Req, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Req, BadRequestException } from '@nestjs/common';
 import { TrainingService } from './training.service';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';

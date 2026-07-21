@@ -29,7 +29,7 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
         body: JSON.stringify(settings),
       });
       alert('Settings saved successfully!');
-    } catch (err) {
+    } catch {
       alert('Failed to save settings');
     }
     setSaving(false);

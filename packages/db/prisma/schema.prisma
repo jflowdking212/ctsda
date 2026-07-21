@@ -144,6 +144,9 @@ model User {
   blogPosts            BlogPost[]
   trainingEnrollments  TrainingEnrollment[]
 
+  @@index([role])
+  @@index([isActive])
+  @@index([createdAt])
   @@map("users")
 }
 
@@ -219,6 +222,9 @@ model Institution {
   orders           Order[]
   createdByUser    User                      @relation(fields: [createdBy], references: [id])
 
+  @@index([isActive])
+  @@index([country])
+  @@index([institutionType])
   @@map("institutions")
 }
 
@@ -333,6 +339,10 @@ model Application {
   accreditations        Accreditation[]
   invoices              Invoice[]
 
+  @@index([applicantId])
+  @@index([institutionId])
+  @@index([status])
+  @@index([createdAt])
   @@map("applications")
 }
 
@@ -557,6 +567,9 @@ model Payment {
   invoice         Invoice @relation(fields: [invoiceId], references: [id])
   processedByUser User?   @relation("ProcessedPayments", fields: [processedBy], references: [id])
 
+  @@index([status])
+  @@index([invoiceId])
+  @@index([createdAt])
   @@map("payments")
 }
 
@@ -574,6 +587,9 @@ model Notification {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
   @@map("notifications")
 }
 

@@ -1,5 +1,4 @@
-import { PublicPage } from '../../components/public-shell';
-import Link from 'next/link';
+
 import { PremiumHeader } from '../../components/premium-header';
 import { PremiumFooter } from '../../components/premium-footer';
 import { TrainingRegisterBtn } from '../../components/training-register-btn';

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from './auth-provider';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 const ADMIN_SESSION_KEY = 'ctsda_admin_session';
@@ -32,21 +33,21 @@ export function PortalHeader() {
     return () => document.removeEventListener('keydown', handleEscape);
   }, []);
 
+  const auth = useAuth();
+
   const closeMenu = useCallback(() => setIsMobileMenuOpen(false), []);
 
   async function logout() {
     setLoggingOut(true);
-    const storedSession = window.localStorage.getItem(PORTAL_SESSION_KEY) || window.localStorage.getItem(ADMIN_SESSION_KEY) || '';
+    const headers = auth.getAuthHeaders();
     try {
       await fetch(`${API_BASE}/auth/logout`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          ...(storedSession ? { 'X-Session-Id': storedSession } : {}),
-        },
+        headers,
       });
     } finally {
-      window.localStorage.removeItem(PORTAL_SESSION_KEY);
+      auth.logout();
       window.localStorage.removeItem(ADMIN_SESSION_KEY);
       window.location.href = '/portal/login';
     }
