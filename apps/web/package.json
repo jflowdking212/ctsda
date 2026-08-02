@@ -9,7 +9,7 @@
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
+  "dependencies": {`n    "lucide-react": "^0.300.0",
     "@ctsda/contracts": "workspace:*",
     "@ctsda/ui": "workspace:*",
     "next": "^15.0.0",
