@@ -285,6 +285,7 @@ export default function NewApplicationPage() {
                 value={instForm.institutionType}
                 onChange={(e) => setInstForm({ ...instForm, institutionType: e.target.value })}
                 disabled={loading}
+              >
                 <option value="tech_software">Tech, Software & Digital Skills Academy</option>
                 <option value="ecommerce_digital">E-Commerce, Digital Business & Marketing Institute</option>
                 <option value="corporate">Corporate Training & Professional Development</option>

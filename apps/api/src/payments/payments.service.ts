@@ -166,11 +166,19 @@ export class PaymentsService {
       return { success: true, type: 'training_guest_enrollment' };
     }
 
-    // Default to invoice checkout
     const invoiceId = session.metadata?.invoiceId;
     if (!invoiceId) {
       throw new BadRequestException('Missing invoice or training metadata');
     }
+
+    return this.handleProviderPayment({
+      eventId: event.id,
+      invoiceId,
+      providerPaymentId: typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id,
+      provider: 'stripe',
+      idempotencyKey: `stripe:${event.id}`,
+    });
+  }
 
   async verifyManualPayment(invoiceId: string, actorId: string) {
     const invoice = await this.prisma.invoice.findUnique({
