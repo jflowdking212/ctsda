@@ -38,6 +38,7 @@ export default function ApplyPage() {
   });
 
   const [trainingAreas, setTrainingAreas] = useState<any[]>([]);
+  const [accreditationFee, setAccreditationFee] = useState<string>('500');
 
   // UI State
   const [loading, setLoading] = useState(false);
@@ -45,6 +46,15 @@ export default function ApplyPage() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/settings/public`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.accreditationFee) {
+          setAccreditationFee(data.accreditationFee);
+        }
+      })
+      .catch(() => {});
+
     fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/institutions/training-areas`)
       .then(res => res.json())
       .then(data => {
@@ -186,7 +196,7 @@ export default function ApplyPage() {
         <div style={{ backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '0.5rem', padding: '0.85rem 1.15rem', display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem', alignSelf: 'stretch' }}>
           <span style={{ fontSize: '1.25rem' }}>💳</span>
           <p style={{ margin: 0, fontSize: '0.875rem', color: '#1e40af', lineHeight: 1.45, textAlign: 'left' }}>
-            <strong>Accreditation Fee: $500 USD</strong> — Initial application submission is <strong>FREE ($0)</strong>. The accreditation fee is payable only after your institution profile is reviewed and approved by the CTSDA board.
+            <strong>Accreditation Fee: ${accreditationFee} USD</strong> — Initial application submission is <strong>FREE ($0)</strong>. The accreditation fee is payable only after your institution profile is reviewed and approved by the CTSDA board.
           </p>
         </div>
       </header>

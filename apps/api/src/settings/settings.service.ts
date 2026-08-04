@@ -1,9 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../common/prisma.service';
 
 @Injectable()
 export class SettingsService {
-  private prisma = new PrismaClient();
+  constructor(private prisma: PrismaService) {}
 
   async getAll() {
     const settings = await this.prisma.siteSetting.findMany();

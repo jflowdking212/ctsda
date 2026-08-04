@@ -1,11 +1,22 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import { PageHero, PublicPage } from '../../components/public-shell';
 
-export const metadata = {
-  title: 'Accreditation Information',
-  description: 'Learn about the CTSDA accreditation process',
-};
-
 export default function AccreditationInfoPage() {
+  const [accreditationFee, setAccreditationFee] = useState<string>('500');
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/settings/public`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.accreditationFee) {
+          setAccreditationFee(data.accreditationFee);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <PublicPage>
       <main>
@@ -53,7 +64,7 @@ export default function AccreditationInfoPage() {
 
                 <div style={{ backgroundColor: '#ffffff', padding: '1.5rem', borderRadius: '0.75rem', border: '2px solid #2563eb', boxShadow: '0 4px 12px rgba(37,99,235,0.08)' }}>
                   <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', margin: '0 0 0.5rem 0' }}>Accreditation & Certification</h3>
-                  <p style={{ fontSize: '1.75rem', fontWeight: 800, color: '#2563eb', margin: '0 0 0.5rem 0' }}>$500 USD</p>
+                  <p style={{ fontSize: '1.75rem', fontWeight: 800, color: '#2563eb', margin: '0 0 0.5rem 0' }}>${accreditationFee} USD</p>
                   <p style={{ fontSize: '0.875rem', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
                     Payable only after your institution is reviewed and approved by the CTSDA Board. Includes certificate issuance and public registry listing.
                   </p>
