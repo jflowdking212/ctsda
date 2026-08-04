@@ -70,6 +70,74 @@ async function main() {
     console.log('Created demo blog posts.');
   }
 
+  // 4. Seed demo certificate for verification testing
+  let inst = await prisma.institution.findFirst({
+    where: { name: 'The Bliss Tech Academy' }
+  });
+  if (!inst) {
+    inst = await prisma.institution.create({
+      data: {
+        name: 'The Bliss Tech Academy',
+        slug: 'the-bliss-tech-academy',
+        institutionType: 'Academy',
+        registrationNumber: 'RC-889104',
+        country: 'Nigeria',
+        address: '12 Commercial Avenue, Yaba, Lagos',
+        phone: '+2348012345678',
+        email: 'info@theblisstech.com'
+      }
+    });
+  }
+
+  let app = await prisma.application.findFirst({
+    where: { institutionId: inst.id }
+  });
+  if (!app) {
+    app = await prisma.application.create({
+      data: {
+        institutionId: inst.id,
+        applicantFirstName: 'The Bliss',
+        applicantLastName: 'Tech',
+        applicantEmail: 'info@theblisstech.com',
+        status: 'approved'
+      }
+    });
+  }
+
+  let accreditation = await prisma.accreditation.findFirst({
+    where: { applicationId: app.id }
+  });
+  if (!accreditation) {
+    accreditation = await prisma.accreditation.create({
+      data: {
+        institutionId: inst.id,
+        applicationId: app.id,
+        accreditationCode: 'CTSDA-ACCR-2026-001',
+        status: 'active',
+        issuedAt: new Date('2026-08-04'),
+        expiresAt: new Date('2027-08-04')
+      }
+    });
+  }
+
+  const certNumber = 'CTSDA-2026-889104';
+  let cert = await prisma.certificate.findUnique({
+    where: { certificateNumber: certNumber }
+  });
+  if (!cert) {
+    cert = await prisma.certificate.create({
+      data: {
+        accreditationId: accreditation.id,
+        certificateNumber: certNumber,
+        verificationToken: 'v-tok-889104',
+        status: 'active',
+        issueDate: new Date('2026-08-04'),
+        expiryDate: new Date('2027-08-04')
+      }
+    });
+    console.log('Created Mock Certificate: CTSDA-2026-889104');
+  }
+
   console.log('Demo data seeded successfully!');
 }
 
