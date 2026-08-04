@@ -14,9 +14,13 @@ export class NotificationsService {
       backoff: { type: 'exponential', delay: 1000 },
     });
 
+    const isUuid =
+      typeof data.userId === 'string' &&
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(data.userId);
+
     await this.prisma.emailDeliveryLog.create({
       data: {
-        userId: data.userId,
+        userId: isUuid ? data.userId : null,
         recipient: data.to,
         subject: data.subject,
         status: 'pending',
