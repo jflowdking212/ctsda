@@ -138,6 +138,23 @@ async function main() {
     console.log('Created Mock Certificate: CTSDA-2026-889104');
   }
 
+  let cert2 = await prisma.certificate.findUnique({
+    where: { certificateNumber: 'CERT-0042' }
+  });
+  if (!cert2) {
+    cert2 = await prisma.certificate.create({
+      data: {
+        accreditationId: accreditation.id,
+        certificateNumber: 'CERT-0042',
+        verificationToken: 'abc123xy',
+        status: 'active',
+        issueDate: new Date('2026-08-04'),
+        expiryDate: new Date('2027-08-04')
+      }
+    });
+    console.log('Created Mock Certificate: CERT-0042 / abc123xy');
+  }
+
   console.log('Demo data seeded successfully!');
 }
 

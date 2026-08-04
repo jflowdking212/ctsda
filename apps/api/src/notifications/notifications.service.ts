@@ -16,15 +16,26 @@ export class NotificationsService {
     // 1. Attempt direct SMTP delivery first for immediate notification
     try {
       const siteSettings = await this.prisma.siteSetting.findMany();
-      const getSetting = (k: string) => siteSettings.find(s => s.key === k)?.value;
+      const getSetting = (k: string) => {
+        const val = siteSettings.find(s => s.key === k)?.value;
+        return val && val.trim() !== '' ? val : undefined;
+      };
 
       const host = getSetting('smtpHost') || process.env.SMTP_HOST || 'mail.acecoterieconsulting.com';
       const port = Number(getSetting('smtpPort') || process.env.SMTP_PORT) || 587;
       const user = getSetting('smtpUser') || process.env.SMTP_USER || 'accounts@acecoterieconsulting.com';
       const pass = getSetting('smtpPassword') || process.env.SMTP_PASS || 'Preciouskey2030';
       const from = getSetting('smtpFrom') || process.env.SMTP_FROM || user;
+      const rawSecure = getSetting('smtpSecure');
 
-      const isSecure = port === 465;
+      let isSecure = false;
+      if (rawSecure === 'true' || rawSecure === true || rawSecure === 'ssl') {
+        isSecure = true;
+      } else if (rawSecure === 'false' || rawSecure === false || rawSecure === 'tls') {
+        isSecure = false;
+      } else {
+        isSecure = port === 465;
+      }
 
       const nodemailer = require('nodemailer');
       const transporter = nodemailer.createTransport({
