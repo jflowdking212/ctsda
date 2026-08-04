@@ -233,10 +233,12 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
   async function api(path: string, init?: RequestInit) {
     const storedSession = readStoredSession();
     let response: Response;
+    const isPostOrPut = init?.method && ['POST', 'PUT', 'PATCH'].includes(init.method.toUpperCase());
     try {
       response = await fetch(`${API_BASE}${path}`, {
         cache: 'no-store',
         ...init,
+        body: init?.body ?? (isPostOrPut ? JSON.stringify({}) : undefined),
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',

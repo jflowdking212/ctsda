@@ -13,8 +13,10 @@ export default function LogoutPage() {
       try {
         await fetch(`${API_BASE}/auth/logout`, {
           method: 'POST',
+          body: JSON.stringify({}),
           credentials: 'include',
           headers: {
+            'Content-Type': 'application/json',
             ...(storedSession ? { 'X-Session-Id': storedSession } : {}),
           },
         });

@@ -125,6 +125,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @HttpCode(200)
   @UseGuards(AuthGuard)
   async logout(@CurrentUser() user: any, @Request() req: any, @Res({ passthrough: true }) reply: any) {
     await this.authService.revokeSession(user.sessionId);
