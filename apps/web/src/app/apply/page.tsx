@@ -180,7 +180,15 @@ export default function ApplyPage() {
       }}>
         <p className="eyebrow" style={{ color: '#d97706', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '0.75rem', marginBottom: '0.5rem', textAlign: 'left', alignSelf: 'flex-start' }}>Accreditation</p>
         <h1 style={{ textAlign: 'left', color: '#0f172a', fontSize: 'clamp(1.75rem, 3vw, 2.25rem)', fontWeight: 800, margin: '0 0 0.5rem 0', lineHeight: 1.2, alignSelf: 'flex-start' }}>Apply for CTSDA Accreditation</h1>
-        <p style={{ textAlign: 'left', color: '#64748b', fontSize: '1rem', margin: 0, lineHeight: 1.5, alignSelf: 'flex-start' }}>Complete the form below to begin the application process.</p>
+        <p style={{ textAlign: 'left', color: '#64748b', fontSize: '1rem', margin: '0 0 1rem 0', lineHeight: 1.5, alignSelf: 'flex-start' }}>Complete the form below to submit your institutional profile for evaluation.</p>
+        
+        {/* ACCREDITATION FEE NOTICE */}
+        <div style={{ backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '0.5rem', padding: '0.85rem 1.15rem', display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem', alignSelf: 'stretch' }}>
+          <span style={{ fontSize: '1.25rem' }}>💳</span>
+          <p style={{ margin: 0, fontSize: '0.875rem', color: '#1e40af', lineHeight: 1.45, textAlign: 'left' }}>
+            <strong>Accreditation Fee: $500 USD</strong> — Initial application submission is <strong>FREE ($0)</strong>. The accreditation fee is payable only after your institution profile is reviewed and approved by the CTSDA board.
+          </p>
+        </div>
       </header>
 
       {/* STEP WIZARD BAR */}
