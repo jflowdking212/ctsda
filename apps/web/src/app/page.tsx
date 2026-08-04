@@ -31,7 +31,7 @@ export default function Home() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '3rem', alignItems: 'center' }}>
               
               {/* Left Column (7 cols): Hero Copy & Primary CTAs */}
-              <div style={{ gridColumn: 'span 12', '@media (min-width: 1024px)': { gridColumn: 'span 7' } } as any} className="lg:col-span-7">
+              <div className="grid-col-12 lg:col-span-7">
                 
                 {/* Top Pill Badge */}
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', backgroundColor: 'rgba(255, 255, 255, 0.12)', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '0.45rem 1.1rem', borderRadius: '50px', backdropFilter: 'blur(10px)', marginBottom: '1.5rem' }}>
@@ -124,7 +124,7 @@ export default function Home() {
               </div>
 
               {/* Right Column (5 cols): Premium Glass Verification Card */}
-              <div style={{ gridColumn: 'span 12', '@media (min-width: 1024px)': { gridColumn: 'span 5' } } as any} className="lg:col-span-5">
+              <div className="grid-col-12 lg:col-span-5">
                 <div style={{
                   backgroundColor: '#ffffff',
                   borderRadius: '1.25rem',
