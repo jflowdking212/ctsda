@@ -77,7 +77,7 @@ export function AccreditedLogosCarousel() {
           Accredited Institutions &amp; Partners
         </h2>
         <p style={{ color: '#64748b', fontSize: '0.95rem', marginTop: '0.5rem', marginBottom: 0 }}>
-          Empowering world-class standards across round, square, and enterprise institution partners
+          Empowering world-class educational standards across accredited institution partners worldwide
         </p>
       </div>
 
@@ -162,28 +162,14 @@ export function AccreditedLogosCarousel() {
                 )}
               </div>
 
-              {/* Institution Title & Country Badge */}
+              {/* Institution Title & Country Location */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
                 <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.925rem', lineHeight: 1.2 }}>
                   {item.name}
                 </span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 500 }}>
-                    {item.country || 'Global Partner'}
-                  </span>
-                  <span style={{
-                    fontSize: '0.65rem',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
-                    padding: '0.1rem 0.4rem',
-                    borderRadius: '4px',
-                    backgroundColor: item.format === 'round' ? '#eff6ff' : item.format === 'square' ? '#f0fdf4' : '#fef3c7',
-                    color: item.format === 'round' ? '#1d4ed8' : item.format === 'square' ? '#15803d' : '#b45309',
-                  }}>
-                    {item.format || 'accredited'}
-                  </span>
-                </div>
+                <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 500 }}>
+                  {item.country || 'Global Partner'}
+                </span>
               </div>
             </div>
           ))}
