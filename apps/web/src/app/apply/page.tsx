@@ -201,7 +201,13 @@ export default function ApplyPage() {
         <form className="content-panel content-form" onSubmit={handleVerifyOtp}>
           <h3>Step 2: Verify Email</h3>
           {success && <p className="status-message success">{success}</p>}
-          <p>Please enter the 6-digit code sent to <strong>{applicantForm.email}</strong></p>
+          <p style={{ margin: '0.5rem 0 1rem 0', color: '#475569', fontSize: '0.95rem', lineHeight: 1.5 }}>
+            Please enter the 6-digit code sent to <strong>{applicantForm.email}</strong>. 
+            <br />
+            <span style={{ color: '#d97706', fontSize: '0.85rem', fontWeight: 500, display: 'inline-block', marginTop: '0.35rem' }}>
+              💡 If you don't see the email in your inbox, please check your <strong>Spam / Junk</strong> folder.
+            </span>
+          </p>
           <label className="full-width">
             Verification Code *
             <input required value={otp} onChange={e => setOtp(e.target.value)} disabled={loading} style={{letterSpacing: '0.1em', fontFamily: 'monospace'}} />
