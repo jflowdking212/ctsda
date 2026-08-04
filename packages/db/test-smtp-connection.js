@@ -1,4 +1,9 @@
-const nodemailer = require('nodemailer');
+let nodemailer;
+try {
+  nodemailer = require('nodemailer');
+} catch (e) {
+  nodemailer = require('../../apps/api/node_modules/nodemailer');
+}
 
 async function main() {
   console.log('Testing SMTP connection to mail.acecoterieconsulting.com:587...');
