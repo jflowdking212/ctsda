@@ -18,7 +18,8 @@ export class NotificationsService {
       const siteSettings = await this.prisma.siteSetting.findMany();
       const getSetting = (k: string) => {
         const val = siteSettings.find(s => s.key === k)?.value;
-        return val && val.trim() !== '' ? val : undefined;
+        const strVal = val !== null && val !== undefined ? String(val).trim() : '';
+        return strVal !== '' ? strVal : undefined;
       };
 
       const host = getSetting('smtpHost') || process.env.SMTP_HOST || 'mail.acecoterieconsulting.com';
@@ -29,9 +30,9 @@ export class NotificationsService {
       const rawSecure = getSetting('smtpSecure');
 
       let isSecure = false;
-      if (rawSecure === 'true' || rawSecure === true || rawSecure === 'ssl') {
+      if (rawSecure === 'true' || rawSecure === 'ssl') {
         isSecure = true;
-      } else if (rawSecure === 'false' || rawSecure === false || rawSecure === 'tls') {
+      } else if (rawSecure === 'false' || rawSecure === 'tls') {
         isSecure = false;
       } else {
         isSecure = port === 465;
