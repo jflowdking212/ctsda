@@ -6,6 +6,14 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
   const [settings, setSettings] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  function notify(message: string, type: 'success' | 'error' = 'success') {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(prev => (prev?.message === message ? null : prev));
+    }, 4000);
+  }
 
   useEffect(() => {
     loadSettings();
@@ -62,12 +70,12 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
       
       if (!testRes.ok) {
         const err = await testRes.json().catch(() => ({}));
-        alert(`SMTP Test Failed: ${err.message || 'Unknown error'}`);
+        notify(`SMTP Test Failed: ${err.message || 'Unknown error'}`, 'error');
       } else {
-        alert('SMTP Test Successful!');
+        notify('SMTP Test Successful!', 'success');
       }
     } catch (error: any) {
-      alert(`SMTP Test Failed: ${error.message}`);
+      notify(`SMTP Test Failed: ${error.message}`, 'error');
     } finally {
       setSaving(false);
     }
@@ -83,21 +91,62 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
     }
 
     try {
-
       await api('/settings', {
         method: 'PUT',
         body: JSON.stringify(payload),
       });
-      alert('Settings saved successfully!');
+      notify('Settings saved successfully!', 'success');
     } catch (error: any) {
-      alert(`Failed to save settings: ${error.message}`);
+      notify(`Failed to save settings: ${error.message}`, 'error');
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className="admin-panel" style={{ padding: '2rem', maxWidth: '900px', backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+    <div className="admin-panel" style={{ padding: '2rem', maxWidth: '900px', backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', position: 'relative' }}>
+      {toast && (
+        <div style={{
+          position: 'fixed',
+          top: '2rem',
+          right: '2rem',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          padding: '0.85rem 1.25rem',
+          borderRadius: '0.5rem',
+          backgroundColor: toast.type === 'success' ? '#059669' : '#dc2626',
+          color: '#ffffff',
+          boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2), 0 8px 10px -6px rgba(0,0,0,0.1)',
+          fontWeight: 500,
+          fontSize: '0.9rem',
+          animation: 'fadeIn 0.2s ease-in-out',
+        }}>
+          {toast.type === 'success' ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          )}
+          <span>{toast.message}</span>
+          <button
+            onClick={() => setToast(null)}
+            type="button"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#ffffff',
+              cursor: 'pointer',
+              marginLeft: '0.5rem',
+              opacity: 0.8,
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      )}
       <header style={{ marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '1px solid #e2e8f0' }}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 600, color: '#0f172a', marginBottom: '0.5rem' }}>Global Platform Settings</h2>
         <p style={{ color: '#64748b' }}>Manage site branding, SEO metadata, contact details, SMTP email gateway, and accreditation fees.</p>
