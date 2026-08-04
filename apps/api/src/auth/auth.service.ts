@@ -52,25 +52,82 @@ export class AuthService {
     };
   }
 
+  async requestOtp(email: string) {
+    const existingUser = await this.prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+    if (existingUser && existingUser.isActive) {
+      throw new BadRequestException('User with this email already exists and is active.');
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+
+    await this.prisma.emailVerificationOTP.create({
+      data: {
+        email: email.toLowerCase(),
+        otp,
+        expiresAt,
+      },
+    });
+
+    await this.notificationsService.enqueueEmail({
+      to: email,
+      subject: 'Verify your CTSDA Email',
+      html: `
+        <h1>Email Verification</h1>
+        <p>Your one-time password (OTP) is:</p>
+        <h2 style="padding: 10px; background-color: #f4f4f4; border-radius: 5px; display: inline-block;">${otp}</h2>
+        <p>This code expires in 15 minutes.</p>
+      `,
+      userId: 'system',
+    });
+
+    return { success: true, message: 'OTP sent successfully.' };
+  }
+
+  async verifyOtp(email: string, otp: string) {
+    const record = await this.prisma.emailVerificationOTP.findFirst({
+      where: {
+        email: email.toLowerCase(),
+        otp,
+        isUsed: false,
+        expiresAt: { gt: new Date() },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!record) {
+      throw new BadRequestException('Invalid or expired OTP');
+    }
+
+    await this.prisma.emailVerificationOTP.update({
+      where: { id: record.id },
+      data: { isUsed: true },
+    });
+
+    return { success: true, message: 'Email verified successfully.' };
+  }
+
   async registerApplicant(data: {
     email: string;
-    password: string;
     firstName: string;
     lastName: string;
     phone?: string;
   }) {
-    const emailVerificationToken = randomBytes(32).toString('base64url');
+    const existingUser = await this.prisma.user.findUnique({ where: { email: data.email.toLowerCase() } });
+    if (existingUser && existingUser.isActive) {
+      throw new BadRequestException('User already exists');
+    }
 
     const user = await this.prisma.user.create({
       data: {
         email: data.email.toLowerCase(),
-        passwordHash: await this.hashPassword(data.password),
         firstName: data.firstName,
         lastName: data.lastName,
         phone: data.phone,
         role: 'applicant',
-        isEmailVerified: false,
-        emailVerificationToken,
+        isEmailVerified: true,
+        isActive: false, // Remains inactive until payment
+        passwordHash: null,
       },
       select: {
         id: true,
@@ -78,7 +135,7 @@ export class AuthService {
         firstName: true,
         lastName: true,
         role: true,
-        isEmailVerified: true,
+        isActive: true,
       },
     });
 
@@ -87,43 +144,10 @@ export class AuthService {
       action: 'user_created',
       entityType: 'user',
       entityId: user.id,
-      metadata: { emailVerificationPending: true },
+      metadata: { pendingPayment: true },
     });
 
-    const settings = await this.settingsService.getAll();
-    if (settings.adminNotificationEmail) {
-      await this.notificationsService.enqueueEmail({
-        to: settings.adminNotificationEmail,
-        subject: 'New User Registration',
-        html: `<p>A new user has registered: ${user.firstName} ${user.lastName} (${user.email})</p>`,
-        userId: user.id,
-      });
-    }
-
-    return { user, emailVerificationToken };
-  }
-
-  async verifyEmail(token: string) {
-    const user = await this.prisma.user.findFirst({
-      where: { emailVerificationToken: token },
-    });
-    if (!user) {
-      throw new BadRequestException('Invalid verification token');
-    }
-
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { isEmailVerified: true, emailVerificationToken: null },
-    });
-
-    await this.auditService.log({
-      userId: user.id,
-      action: 'email_verified',
-      entityType: 'user',
-      entityId: user.id,
-    });
-
-    return { success: true };
+    return { user };
   }
 
   async requestPasswordReset(email: string) {
@@ -182,6 +206,28 @@ export class AuthService {
       entityType: 'user',
       entityId: user.id,
       metadata: { resetFlow: true },
+    });
+
+    return { success: true };
+  }
+
+  async setupAccount(token: string, password: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { emailVerificationToken: token },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Invalid or expired account setup token');
+    }
+
+    const passwordHash = await this.hashPassword(password);
+    
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash,
+        emailVerificationToken: null, // Clear token
+      },
     });
 
     return { success: true };

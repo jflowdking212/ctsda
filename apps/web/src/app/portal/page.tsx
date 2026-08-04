@@ -39,11 +39,38 @@ export default function PortalDashboard() {
       <section className="content-panel">
         <h2>Applications</h2>
         {applications.length === 0 && <p>No applications yet.</p>}
-        <div className="content-list">
+        <div className="content-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {applications.map((app) => (
-            <div className="content-list-card" key={app.id}>
-              <h3>{app.institution?.name || 'Application'}</h3>
-              <p className="meta-line">{app.status}</p>
+            <div className="content-list-card" key={app.id} style={{ padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '0.5rem', backgroundColor: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h3 style={{ margin: '0 0 0.25rem 0', color: '#0f172a' }}>{app.institution?.name || 'Application'}</h3>
+                <p className="meta-line" style={{ fontSize: '0.875rem', color: '#64748b', margin: 0, textTransform: 'capitalize' }}>
+                  Status: {app.status.replace(/_/g, ' ')}
+                </p>
+              </div>
+              
+              {app.status === 'approved' && app.accreditation?.certificateNumber && (
+                <div>
+                  <a 
+                    href={`/verify-certificate?certNumber=${app.accreditation.certificateNumber}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="button-primary"
+                    style={{ 
+                      display: 'inline-block', 
+                      backgroundColor: '#2563eb', 
+                      color: 'white', 
+                      padding: '0.5rem 1rem', 
+                      borderRadius: '0.375rem', 
+                      textDecoration: 'none',
+                      fontSize: '0.875rem',
+                      fontWeight: 500
+                    }}
+                  >
+                    View / Download Certificate
+                  </a>
+                </div>
+              )}
             </div>
           ))}
         </div>

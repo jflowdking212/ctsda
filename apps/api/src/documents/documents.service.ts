@@ -59,6 +59,44 @@ export class DocumentsService {
     });
   }
 
+  async publicUploadDocument(applicationId: string, token: string, file: StoredFile, type: { mime: string; ext: string }) {
+    const application = await this.prisma.application.findUnique({
+      where: { id: applicationId },
+      include: { applicant: true },
+    });
+
+    if (!application || application.applicant.emailVerificationToken !== token) {
+      throw new ForbiddenException('Invalid upload token');
+    }
+
+    await this.scanForMalware(file.buffer, file.originalname);
+
+    const key = this.storageService.generateStorageKey(file);
+    const result = await this.storageService.upload(file, key, type.mime);
+
+    // Also update the institution's logo URL if it is an image
+    if (type.mime.startsWith('image/')) {
+      await this.prisma.institution.update({
+        where: { id: application.institutionId },
+        data: { logoUrl: result.key },
+      });
+    }
+
+    return this.prisma.applicationDocument.create({
+      data: {
+        applicationId,
+        uploaderId: application.applicantId,
+        documentType: DocumentType.other,
+        storageKey: result.key,
+        fileName: file.originalname,
+        mimeType: type.mime,
+        fileSize: result.size,
+        version: 1,
+        status: 'pending',
+      },
+    });
+  }
+
   async findById(id: string) {
     return this.prisma.applicationDocument.findUnique({ where: { id } });
   }

@@ -483,6 +483,8 @@ export class AdminService {
 
     const [
       totalApplications,
+      pendingApplications,
+      approvedApplicationsCount,
       newApplications,
       applicationsByStatus,
       decisionsByStatus,
@@ -499,6 +501,10 @@ export class AdminService {
       totalBlogPosts,
     ] = await Promise.all([
       this.prisma.application.count(),
+      this.prisma.application.count({
+        where: { status: { in: ['submitted', 'resubmitted', 'under_review', 'final_review', 'initial_screening'] } },
+      }),
+      this.prisma.application.count({ where: { status: 'approved' } }),
       this.prisma.application.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
       this.prisma.application.groupBy({ by: ['status'], _count: { _all: true } }),
       this.prisma.application.groupBy({
@@ -582,6 +588,8 @@ export class AdminService {
       generatedAt: now.toISOString(),
       pipeline: {
         totalApplications,
+        pendingApplications,
+        approvedApplications: approvedApplicationsCount,
         newApplications30d: newApplications,
         applicationsByStatus: applicationsByStatus.map((item) => ({
           status: item.status,
@@ -757,5 +765,20 @@ export class AdminService {
     }
     pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
     return Buffer.from(pdf);
+  }
+
+  async getNotifications(userId: string) {
+    return this.prisma.notification.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+  }
+
+  async markNotificationsRead(userId: string) {
+    return this.prisma.notification.updateMany({
+      where: { userId, isRead: false },
+      data: { isRead: true },
+    });
   }
 }

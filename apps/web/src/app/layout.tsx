@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { GlobalPreloader } from '../components/global-preloader';
 import './globals.css';
 import './styles/premium.css';
 
@@ -76,7 +75,6 @@ export default function RootLayout({
         />
       </head>
       <body className="premium-layout" suppressHydrationWarning>
-        <GlobalPreloader />
         {children}
       </body>
     </html>

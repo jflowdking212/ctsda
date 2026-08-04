@@ -1,5 +1,4 @@
-import { config } from 'dotenv';
-config({ path: '../../.env' });
+// dotenv removed because env is passed directly
 import { PrismaClient, ApplicationStatus } from '@prisma/client';
 import argon2 from 'argon2';
 
@@ -88,9 +87,7 @@ async function main() {
         status: 'active',
         issuedAt: new Date(),
         expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-        certificateToken: 'CTSDA-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
         accreditationCode: 'ACC-' + Math.random().toString(36).substring(2, 6).toUpperCase(),
-        decisionBy: reviewer.id,
       }
     });
     console.log('Created Approved application & accreditation for Global Transport Academy');

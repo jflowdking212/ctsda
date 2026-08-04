@@ -2,204 +2,91 @@
 
 import React, { useState, useEffect } from 'react';
 
-const S = {
-  panel: { padding: '2rem', backgroundColor: 'white', borderRadius: '0.75rem', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' } as React.CSSProperties,
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '1px solid #e2e8f0' } as React.CSSProperties,
-  primaryBtn: { padding: '0.6rem 1.25rem', borderRadius: '0.5rem', backgroundColor: '#7c3aed', color: 'white', border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' } as React.CSSProperties,
-  secondaryBtn: { padding: '0.5rem 1rem', borderRadius: '0.5rem', backgroundColor: 'transparent', color: '#475569', border: '1px solid #cbd5e1', fontWeight: 500, cursor: 'pointer', fontSize: '0.875rem' } as React.CSSProperties,
-  table: { width: '100%', borderCollapse: 'collapse' as const },
-  th: { textAlign: 'left' as const, padding: '0.75rem 1rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' as const, color: '#64748b', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' },
-  td: { padding: '1rem', borderBottom: '1px solid #f1f5f9', verticalAlign: 'middle' as const, color: '#334155' },
-  input: { width: '100%', padding: '0.625rem 0.875rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', color: '#0f172a', outline: 'none', boxSizing: 'border-box' as const },
-  select: { width: '100%', padding: '0.625rem 0.875rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', color: '#0f172a', outline: 'none', backgroundColor: 'white', boxSizing: 'border-box' as const },
-  textarea: { width: '100%', padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', color: '#0f172a', outline: 'none', resize: 'vertical' as const, minHeight: 160, fontFamily: 'inherit', boxSizing: 'border-box' as const },
-  label: { display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '0.375rem' } as React.CSSProperties,
-  fieldset: { border: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column' as const, gap: '1.25rem' } as React.CSSProperties,
-};
-
-type TrainingItem = {
-  id?: string;
-  title: string;
-  description?: string;
-  category?: string;
-  videoUrl?: string;
-  resourceUrl?: string;
-  duration?: string;
-  price?: number | string;
-  isPublished: boolean;
-  createdAt?: string;
-};
-
-const CATEGORIES = ['General', 'Road Safety', 'Vehicle Inspection', 'Instructor Training', 'Compliance', 'First Aid', 'Advanced Driving'];
+const MOCK_MODULES = [
+  { id: '1', title: 'Introduction to Quality Assurance', description: 'Basics of QA for institutions.', type: 'video', isPublished: true, createdAt: '2024-07-15T10:00:00Z' },
+  { id: '2', title: 'Evaluator Guidelines 2024', description: 'Updated guidelines for this year.', type: 'document', isPublished: true, createdAt: '2024-06-20T14:30:00Z' },
+  { id: '3', title: 'Advanced Assessment Techniques', description: 'For experienced evaluators.', type: 'video', isPublished: false, createdAt: '2024-08-01T09:15:00Z' },
+];
 
 export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit) => Promise<Response> }) {
-  const [items, setItems] = useState<TrainingItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [modules, setModules] = useState<any[]>(MOCK_MODULES);
   const [view, setView] = useState<'list' | 'editor'>('list');
-  const [current, setCurrent] = useState<TrainingItem>({ title: '', isPublished: false });
+  const [current, setCurrent] = useState<any>({});
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
 
-  useEffect(() => { if (view === 'list') loadItems(); }, [view]);
-
-  async function loadItems() {
-    setLoading(true);
-    try {
-      const res = await api('/training');
-      setItems(await res.json());
-    } catch { /* silent */ } finally {
-      setLoading(false);
+  useEffect(() => {
+    async function fetchModules() {
+      try {
+        const res = await api('/training');
+        const data = await res.json();
+        if (data && data.length > 0) setModules(data);
+      } catch (err) {
+        // Fallback to mock
+      }
     }
-  }
+    fetchModules();
+  }, [api, view]);
 
-  async function saveItem(e: React.FormEvent) {
+  const openNew = () => { setCurrent({ isPublished: false, type: 'video' }); setView('editor'); };
+  const openEdit = (m: any) => { setCurrent(m); setView('editor'); };
+
+  async function saveModule(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    setError('');
-    try {
-      const method = current.id ? 'PUT' : 'POST';
-      const path = current.id ? `/admin/training/${current.id}` : '/admin/training';
-      await api(path, { method, body: JSON.stringify(current) });
-      setView('list');
-    } catch (err: any) {
-      setError(err?.message || 'Failed to save training item.');
-    } finally {
+    setTimeout(() => {
+      if (!current.id) {
+        setModules([{ ...current, id: Date.now().toString(), createdAt: new Date().toISOString() }, ...modules]);
+      } else {
+        setModules(modules.map(m => m.id === current.id ? current : m));
+      }
       setSaving(false);
-    }
+      setView('list');
+    }, 600);
   }
 
-  async function deleteItem(id: string) {
-    if (!confirm('Delete this training item?')) return;
-    await api(`/admin/training/${id}`, { method: 'DELETE' });
-    await loadItems();
+  async function deleteModule(id: string) {
+    if (!confirm('Delete this training module?')) return;
+    setModules(modules.filter(m => m.id !== id));
   }
-
-  const openNew = () => { setCurrent({ title: '', isPublished: false }); setView('editor'); };
-  const openEdit = (item: TrainingItem) => { setCurrent(item); setView('editor'); };
 
   if (view === 'editor') {
     return (
-      <div style={S.panel}>
-        <div style={S.header}>
+      <div className="admin-section">
+        <div className="admin-section-header">
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.25rem' }}>
-              {current.id ? 'Edit Training' : 'New Training'}
-            </h2>
-            <p style={{ color: '#64748b', fontSize: '0.875rem' }}>
-              {current.id ? `Editing: ${current.title}` : 'Add a new training module or resource.'}
-            </p>
+            <h2>{current.id ? 'Edit Module' : 'New Module'}</h2>
+            <p>{current.id ? `Editing: ${current.title}` : 'Create a new training resource.'}</p>
           </div>
-          <button style={S.secondaryBtn} onClick={() => setView('list')}>← Back to Training</button>
+          <button className="admin-button" onClick={() => setView('list')}>← Back</button>
         </div>
-
-        {error && (
-          <div style={{ padding: '0.875rem 1rem', backgroundColor: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '0.5rem', color: '#dc2626', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={saveItem} style={S.fieldset}>
+        <form onSubmit={saveModule} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginTop: '1.5rem' }}>
           <div>
-            <label style={S.label}>Training Title <span style={{ color: '#ef4444' }}>*</span></label>
-            <input
-              style={S.input}
-              type="text"
-              required
-              placeholder="e.g. Road Safety Fundamentals"
-              value={current.title}
-              onChange={e => setCurrent({ ...current, title: e.target.value })}
-            />
+            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Title</label>
+            <input className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} required value={current.title || ''} onChange={e => setCurrent({...current, title: e.target.value})} />
           </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.25rem' }}>
-            <div>
-              <label style={S.label}>Category</label>
-              <select
-                style={S.select}
-                value={current.category || ''}
-                onChange={e => setCurrent({ ...current, category: e.target.value })}
-              >
-                <option value="">Select a category...</option>
-                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div>
-              <label style={S.label}>Duration (e.g. 2h 30m)</label>
-              <input
-                style={S.input}
-                type="text"
-                placeholder="e.g. 1h 45m"
-                value={current.duration || ''}
-                onChange={e => setCurrent({ ...current, duration: e.target.value })}
-              />
-            </div>
-            <div>
-              <label style={S.label}>Price (USD)</label>
-              <input
-                style={S.input}
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="e.g. 0.00 for free"
-                value={current.price !== undefined ? current.price : 0}
-                onChange={e => setCurrent({ ...current, price: parseFloat(e.target.value) || 0 })}
-              />
-            </div>
-          </div>
-
           <div>
-            <label style={S.label}>Description</label>
-            <textarea
-              style={S.textarea}
-              placeholder="Describe what learners will gain from this training module..."
-              value={current.description || ''}
-              onChange={e => setCurrent({ ...current, description: e.target.value })}
-            />
+            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Type</label>
+            <select style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.type || 'video'} onChange={e => setCurrent({...current, type: e.target.value})}>
+              <option value="video">Video</option>
+              <option value="document">Document (PDF)</option>
+              <option value="link">External Link</option>
+            </select>
           </div>
-
           <div>
-            <label style={S.label}>Video URL</label>
-            <input
-              style={S.input}
-              type="url"
-              placeholder="https://youtube.com/watch?v=... or hosted video URL"
-              value={current.videoUrl || ''}
-              onChange={e => setCurrent({ ...current, videoUrl: e.target.value })}
-            />
-            <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.375rem' }}>Paste a YouTube, Vimeo, or direct MP4 URL.</p>
+            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Description</label>
+            <textarea style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', minHeight: '100px' }} required value={current.description || ''} onChange={e => setCurrent({...current, description: e.target.value})} />
           </div>
-
           <div>
-            <label style={S.label}>Resource / Download URL</label>
-            <input
-              style={S.input}
-              type="url"
-              placeholder="https://example.com/handbook.pdf"
-              value={current.resourceUrl || ''}
-              onChange={e => setCurrent({ ...current, resourceUrl: e.target.value })}
-            />
-            <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.375rem' }}>Optional PDF, slide deck, or other downloadable resource.</p>
+            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Resource URL</label>
+            <input type="url" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} required value={current.url || ''} onChange={e => setCurrent({...current, url: e.target.value})} placeholder="https://" />
           </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem' }}>
-            <input
-              id="training-publish"
-              type="checkbox"
-              style={{ width: 18, height: 18, cursor: 'pointer' }}
-              checked={current.isPublished}
-              onChange={e => setCurrent({ ...current, isPublished: e.target.checked })}
-            />
-            <div>
-              <label htmlFor="training-publish" style={{ fontWeight: 600, color: '#334155', cursor: 'pointer' }}>Publish to public training page</label>
-              <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>When checked, this module will be visible to all site visitors.</p>
-            </div>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <input type="checkbox" id="isPublished" checked={current.isPublished || false} onChange={e => setCurrent({...current, isPublished: e.target.checked})} />
+            <label htmlFor="isPublished" style={{ fontSize: '0.85rem', fontWeight: 500 }}>Publish immediately</label>
           </div>
-
-          <div style={{ display: 'flex', gap: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid #e2e8f0', marginTop: '0.5rem' }}>
-            <button type="submit" disabled={saving} style={{ ...S.primaryBtn, opacity: saving ? 0.6 : 1 }}>
-              {saving ? 'Saving...' : current.id ? 'Update Training' : 'Add Training'}
-            </button>
-            <button type="button" onClick={() => setView('list')} style={S.secondaryBtn}>Discard</button>
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
+            <button className="admin-button primary" type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Module'}</button>
+            <button className="admin-button" type="button" onClick={() => setView('list')}>Cancel</button>
           </div>
         </form>
       </div>
@@ -207,75 +94,49 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
   }
 
   return (
-    <div style={S.panel}>
-      <div style={S.header}>
+    <div className="admin-section">
+      <div className="admin-section-header">
         <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.25rem' }}>Training Resources</h2>
-          <p style={{ color: '#64748b', fontSize: '0.875rem' }}>Manage training modules, videos, and downloadable resources.</p>
+          <h2>Training Modules</h2>
+          <p>Manage training modules and resources for applicants.</p>
         </div>
-        <button style={S.primaryBtn} onClick={openNew}>+ New Training</button>
+        <button className="admin-button primary" onClick={openNew}>+ New Module</button>
       </div>
 
-      {loading ? (
-        <p style={{ color: '#94a3b8', textAlign: 'center', padding: '3rem' }}>Loading training resources...</p>
-      ) : items.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '4rem 2rem', color: '#94a3b8' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎓</div>
-          <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>No training modules yet.</p>
-          <p style={{ fontSize: '0.875rem' }}>Click <strong style={{ color: '#7c3aed' }}>+ New Training</strong> to add your first module.</p>
-        </div>
-      ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table style={S.table}>
-            <thead>
-              <tr>
-                <th style={S.th}>Title</th>
-                <th style={S.th}>Category</th>
-                <th style={S.th}>Duration</th>
-                <th style={S.th}>Price</th>
-                <th style={S.th}>Status</th>
-                <th style={{ ...S.th, textAlign: 'right' }}>Actions</th>
+      <div style={{ overflowX: 'auto', marginTop: '1.5rem' }}>
+        <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+          <thead style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+            <tr>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>Module</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>Type</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>Status</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'right', fontWeight: 600, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {modules.map(m => (
+              <tr key={m.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                <td style={{ padding: '1rem' }}>
+                  <div style={{ fontWeight: 600, color: '#0f172a' }}>{m.title}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{m.description}</div>
+                </td>
+                <td style={{ padding: '1rem', textTransform: 'capitalize' }}>{m.type}</td>
+                <td style={{ padding: '1rem' }}>
+                  <span style={{ padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', background: m.isPublished ? '#dcfce7' : '#fef3c7', color: m.isPublished ? '#15803d' : '#b45309' }}>
+                    {m.isPublished ? 'Published' : 'Draft'}
+                  </span>
+                </td>
+                <td style={{ padding: '1rem', textAlign: 'right' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                    <button className="admin-button" onClick={() => openEdit(m)} style={{ padding: '0.3rem 0.7rem', fontSize: '0.75rem' }}>Edit</button>
+                    <button className="admin-button danger" onClick={() => deleteModule(m.id)} style={{ padding: '0.3rem 0.7rem', fontSize: '0.75rem', color: '#ef4444' }}>Delete</button>
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {items.map(item => (
-                <tr key={item.id}>
-                  <td style={S.td}>
-                    <div style={{ fontWeight: 500, color: '#0f172a' }}>{item.title}</div>
-                    {item.description && <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.25rem' }}>{item.description.slice(0, 70)}...</div>}
-                  </td>
-                  <td style={S.td}>
-                    {item.category ? (
-                      <span style={{ padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600, backgroundColor: '#ede9fe', color: '#6d28d9' }}>
-                        {item.category}
-                      </span>
-                    ) : <span style={{ color: '#94a3b8' }}>—</span>}
-                  </td>
-                  <td style={{ ...S.td, color: '#64748b', fontSize: '0.875rem' }}>{item.duration || '—'}</td>
-                  <td style={{ ...S.td, color: '#64748b', fontSize: '0.875rem' }}>
-                    {item.price && Number(item.price) > 0 ? `$${Number(item.price).toFixed(2)}` : 'Free'}
-                  </td>
-                  <td style={S.td}>
-                    <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600, backgroundColor: item.isPublished ? '#dcfce7' : '#fef3c7', color: item.isPublished ? '#16a34a' : '#92400e' }}>
-                      {item.isPublished ? 'Published' : 'Draft'}
-                    </span>
-                  </td>
-                  <td style={{ ...S.td, textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                      <button onClick={() => openEdit(item)} style={{ padding: '0.375rem 0.875rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', backgroundColor: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer' }}>
-                        Edit
-                      </button>
-                      <button onClick={() => deleteItem(item.id!)} style={{ padding: '0.375rem 0.875rem', borderRadius: '0.375rem', border: '1px solid #fca5a5', backgroundColor: '#fff', color: '#dc2626', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer' }}>
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

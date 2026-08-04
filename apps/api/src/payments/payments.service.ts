@@ -267,8 +267,8 @@ export class PaymentsService {
         });
 
         const verificationToken = crypto.randomBytes(32).toString('base64url');
-        const verificationBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-        const qrCodeUrl = await QRCode.toDataURL(`${verificationBaseUrl}/verify?token=${verificationToken}`);
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        const qrCodeUrl = await QRCode.toDataURL(`${frontendUrl}/verify?token=${verificationToken}`);
         
         const certificate = await this.prisma.certificate.create({
           data: {
@@ -282,6 +282,15 @@ export class PaymentsService {
           },
         });
 
+        const accountSetupToken = crypto.randomBytes(32).toString('base64url');
+        
+        await this.prisma.user.update({
+          where: { id: application.applicantId },
+          data: { emailVerificationToken: accountSetupToken, isActive: true }, // Reusing this column for account setup
+        });
+
+        const user = await this.prisma.user.findUnique({ where: { id: application.applicantId } });
+
         await this.prisma.notification.create({
           data: {
             userId: application.applicantId,
@@ -291,6 +300,21 @@ export class PaymentsService {
             metadata: { applicationId: application.id, accreditationId: acc.id },
           },
         });
+
+        if (user) {
+          await this.notificationsService.enqueueEmail({
+            to: user.email,
+            subject: 'Set up your CTSDA Account',
+            html: `
+              <h1>Welcome to CTSDA</h1>
+              <p>Hi ${user.firstName},</p>
+              <p>We have received your payment, and your certificate has been issued!</p>
+              <p>Please click the link below to set up your password and access your dashboard.</p>
+              <a href="${frontendUrl}/setup-account?token=${accountSetupToken}" style="display:inline-block;padding:10px 20px;background-color:#007bff;color:#fff;text-decoration:none;border-radius:5px;">Set Up Account</a>
+            `,
+            userId: user.id,
+          });
+        }
 
         await this.paymentQueue.add(
           'generate-certificate-pdf',

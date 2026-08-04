@@ -96,7 +96,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {/* Content */}
             <div style={{ padding: 'clamp(2rem, 5vw, 3.5rem)' }}>
               {post.excerpt && (
-                <p style={{ fontSize: '1.2rem', lineHeight: 1.7, color: '#334155', borderLeft: '4px solid #10b981', paddingLeft: '1.25rem', marginBottom: '2.5rem', fontStyle: 'italic' }}>
+                <p style={{ fontSize: '1.2rem', lineHeight: 1.7, color: '#334155', borderLeft: '4px solid #2563eb', paddingLeft: '1.25rem', marginBottom: '2.5rem', fontStyle: 'italic' }}>
                   {post.excerpt}
                 </p>
               )}
@@ -109,7 +109,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           {/* Author / CTA Card */}
           <div style={{ marginTop: '2.5rem', padding: '2rem', backgroundColor: '#f0fdf4', border: '1px solid #86efac', borderRadius: '1rem', display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #10b981, #059669)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '1.2rem', flexShrink: 0 }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '1.2rem', flexShrink: 0 }}>
               C
             </div>
             <div>

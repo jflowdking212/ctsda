@@ -23,84 +23,81 @@ export default async function BlogPage() {
   return (
     <PublicPage>
       <main style={{ backgroundColor: '#f8fafc', minHeight: '100vh', paddingBottom: '6rem' }}>
-        {/* Hero */}
+        {/* Hero Section - Contact Hero Gradient */}
         <section
           style={{
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-            color: 'white',
-            padding: '6rem 2rem 5rem',
+            background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)',
+            color: '#ffffff',
+            padding: '5rem 2rem 4.25rem',
             textAlign: 'center',
             position: 'relative',
             overflow: 'hidden',
           }}
         >
-          {/* Subtle dot pattern */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              opacity: 0.05,
-              backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)',
-              backgroundSize: '24px 24px',
-            }}
-          />
           <div style={{ position: 'relative', zIndex: 10, maxWidth: '800px', margin: '0 auto' }}>
             <span
               style={{
                 display: 'inline-block',
-                padding: '0.25rem 1rem',
-                background: 'rgba(16,185,129,0.2)',
-                color: '#34d399',
+                padding: '0.35rem 1.25rem',
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                color: '#fbbf24',
                 borderRadius: '999px',
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                letterSpacing: '0.05em',
-                marginBottom: '1.5rem',
+                fontSize: '0.85rem',
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                marginBottom: '1rem',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
               }}
             >
-              RESOURCES & UPDATES
+              Latest News & Insights
             </span>
             <h1
               style={{
-                fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                fontSize: 'clamp(2.4rem, 5vw, 3.25rem)',
                 fontWeight: 800,
-                marginBottom: '1.5rem',
-                lineHeight: 1.1,
+                color: '#ffffff',
+                marginBottom: '1rem',
+                lineHeight: 1.15,
                 letterSpacing: '-0.02em',
               }}
             >
-              The <span style={{ color: '#38bdf8' }}>CTSDA</span> Blog
+              CTSDA Knowledge Center
             </h1>
-            <p style={{ fontSize: '1.25rem', color: '#94a3b8', lineHeight: 1.6 }}>
-              Expert insights, industry news, and comprehensive guides dedicated to advancing professional driver
-              training and road safety standards.
+            <p
+              style={{
+                fontSize: '1.15rem',
+                color: '#cbd5e1',
+                maxWidth: '600px',
+                margin: '0 auto',
+                lineHeight: 1.6,
+              }}
+            >
+              Articles, announcements, and expert perspectives on accreditation standards and educational quality assurance.
             </p>
           </div>
         </section>
 
-        {/* Grid */}
-        <div
-          style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '4rem 2rem 5rem',
-          }}
-        >
+        {/* Content */}
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '4rem 1.5rem 0' }}>
           {posts.length === 0 ? (
             <div
               style={{
-                backgroundColor: 'white',
-                padding: '4rem',
-                borderRadius: '1rem',
                 textAlign: 'center',
-                boxShadow: '0 10px 30px -10px rgba(0,0,0,0.1)',
+                padding: '5rem 2rem',
+                backgroundColor: 'white',
+                borderRadius: '1.5rem',
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)',
               }}
             >
-              <span style={{ fontSize: '3rem', display: 'block', marginBottom: '1rem' }}>📝</span>
-              <h2 style={{ fontSize: '1.5rem', color: '#0f172a', fontWeight: 600, marginBottom: '0.5rem' }}>
-                No articles published yet
+              <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>📰</div>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem' }}>
+                No posts published yet
               </h2>
-              <p style={{ color: '#64748b' }}>Check back soon for the latest insights from our experts.</p>
+              <p style={{ color: '#64748b', maxWidth: '400px', margin: '0 auto' }}>
+                Check back soon for the latest news, regulatory updates, and educational insights from CTSDA.
+              </p>
             </div>
           ) : (
             <div

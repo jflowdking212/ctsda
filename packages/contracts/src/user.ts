@@ -19,6 +19,15 @@ export const CreateUserSchema = z.object({
 
 export type CreateUserSchema = z.infer<typeof CreateUserSchema>;
 
+export const RegisterApplicantSchema = z.object({
+  email: z.string().email().max(255),
+  firstName: z.string().min(1).max(100),
+  lastName: z.string().min(1).max(100),
+  phone: z.string().max(20).optional(),
+});
+
+export type RegisterApplicantSchema = z.infer<typeof RegisterApplicantSchema>;
+
 export const UpdateUserSchema = z.object({
   firstName: z.string().min(1).max(100).optional(),
   lastName: z.string().min(1).max(100).optional(),
@@ -108,3 +117,14 @@ export const SessionResponseSchema = z.object({
 });
 
 export type SessionResponseSchema = z.infer<typeof SessionResponseSchema>;
+
+export const RequestOtpSchema = z.object({
+  email: z.string().email().max(255),
+});
+export type RequestOtpSchema = z.infer<typeof RequestOtpSchema>;
+
+export const VerifyOtpSchema = z.object({
+  email: z.string().email().max(255),
+  otp: z.string().length(6),
+});
+export type VerifyOtpSchema = z.infer<typeof VerifyOtpSchema>;

@@ -35,10 +35,13 @@ const ALLOWED_TRANSITIONS: Record<string, ApplicationStatus[]> = {
   withdrawn: [],
 };
 
+import { NotificationsService } from '../notifications/notifications.service';
+
 @Injectable()
 export class ReviewsService {
   constructor(
     private prisma: PrismaService,
+    private notificationsService: NotificationsService,
     @InjectQueue('certificates') private certificateQueue: Queue,
   ) {}
 
@@ -156,6 +159,7 @@ export class ReviewsService {
 
     const app = await this.prisma.application.findUnique({
       where: { id: applicationId },
+      include: { applicant: true },
     });
     if (!app) throw new BadRequestException('Application not found');
 
@@ -220,7 +224,7 @@ export class ReviewsService {
 
           if ((workflow === 'review_first' || workflow === 'hybrid') && accreditationFee > 0) {
             // Post-approval invoicing
-            await tx.invoice.create({
+            const invoice = await tx.invoice.create({
               data: {
                 invoiceNumber: `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
                 applicationId,
@@ -242,6 +246,21 @@ export class ReviewsService {
                 metadata: { applicationId },
               },
             });
+
+            const paymentLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/payment/${invoice.id}`;
+            await this.notificationsService.enqueueEmail({
+              to: app.applicant.email,
+              subject: 'CTSDA Accreditation Approved - Payment Required',
+              html: `
+                <h1>Congratulations!</h1>
+                <p>Hi ${app.applicant.firstName},</p>
+                <p>Your application for CTSDA accreditation has been approved!</p>
+                <p>To finalize your accreditation and generate your certificate, please pay the accreditation fee.</p>
+                <a href="${paymentLink}" style="display:inline-block;padding:10px 20px;background-color:#007bff;color:#fff;text-decoration:none;border-radius:5px;">Pay Now</a>
+              `,
+              userId: app.applicantId,
+            });
+
           } else {
             // Immediate issuance (Pay Upfront or zero fee)
             const acc = await tx.accreditation.create({
@@ -257,7 +276,7 @@ export class ReviewsService {
 
             const verificationToken = this.generateVerificationToken();
             const verificationBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-            const qrCodeUrl = await QRCode.toDataURL(`${verificationBaseUrl}/verify?token=${verificationToken}`);
+            const qrCodeUrl = await QRCode.toDataURL(verificationBaseUrl + '/verify?token=' + verificationToken);
             const certificate = await tx.certificate.create({
               data: {
                 accreditationId: acc.id,
@@ -280,7 +299,47 @@ export class ReviewsService {
                 metadata: { applicationId, accreditationId: acc.id },
               },
             });
+
+            await this.notificationsService.enqueueEmail({
+              to: app.applicant.email,
+              subject: 'CTSDA Accreditation Approved',
+              html: \`
+                <h1>Congratulations!</h1>
+                <p>Hi \${app.applicant.firstName},</p>
+                <p>Your application for CTSDA accreditation has been approved, and your certificate has been issued!</p>
+                <p>You can view your dashboard to download your certificate.</p>
+              \`,
+              userId: app.applicantId,
+            });
           }
+        } else if (newStatus === 'rejected') {
+          await this.notificationsService.enqueueEmail({
+            to: app.applicant.email,
+            subject: 'Update on your CTSDA Application',
+            html: \`
+              <h1>Application Update</h1>
+              <p>Hi \${app.applicant.firstName},</p>
+              <p>We have reviewed your application. Unfortunately, it has been rejected at this time.</p>
+              \${metadata?.reason ? \`<p><strong>Reason:</strong> \${metadata.reason}</p>\` : ''}
+              \${metadata?.comments ? \`<p><strong>Comments:</strong> \${metadata.comments}</p>\` : ''}
+              <p>Please contact support for more details.</p>
+            \`,
+            userId: app.applicantId,
+          });
+        } else if (newStatus === 'changes_requested') {
+          await this.notificationsService.enqueueEmail({
+            to: app.applicant.email,
+            subject: 'Action Required: CTSDA Application',
+            html: \`
+              <h1>Action Required</h1>
+              <p>Hi \${app.applicant.firstName},</p>
+              <p>We need some changes or additional information before we can proceed with your application.</p>
+              \${metadata?.reason ? \`<p><strong>Reason:</strong> \${metadata.reason}</p>\` : ''}
+              \${metadata?.comments ? \`<p><strong>Comments:</strong> \${metadata.comments}</p>\` : ''}
+              <p>Please log in to your dashboard to make the necessary updates.</p>
+            \`,
+            userId: app.applicantId,
+          });
         }
 
         return next;
@@ -300,7 +359,8 @@ export class ReviewsService {
   }
 
   private generateAccreditationCode(): string {
-    return `CTSDA-${randomBytes(4).toString('hex').toUpperCase()}`;
+    const bytes = randomBytes(4);
+    return `CTSDA-${bytes.toString('hex').toUpperCase()}`;
   }
 
   private generateCertificateNumber(): string {

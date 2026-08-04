@@ -1,40 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 const navItems = [
   { href: '/about', label: 'About' },
-  {
-    label: 'Services & Accreditation',
-    children: [
-      { href: '/services', label: 'Our Services' },
-      { href: '/accreditation-info', label: 'Accreditation Info' },
-    ],
-  },
-  {
-    label: 'Directory & Verify',
-    children: [
-      { href: '/directory', label: 'Directory' },
-      { href: '/verify', label: 'Verify Certificate' },
-    ],
-  },
+  { href: '/services', label: 'Services' },
+  { href: '/directory', label: 'Directory' },
   { href: '/training', label: 'Training' },
   { href: '/blog', label: 'Blog' },
   { href: '/contact', label: 'Contact' },
 ];
 
 export function PremiumHeader() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -48,25 +27,11 @@ export function PremiumHeader() {
     };
   }, [isMobileMenuOpen]);
 
-  // Close menu on escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsMobileMenuOpen(false);
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, []);
-
-  const closeMenu = useCallback(() => setIsMobileMenuOpen(false), []);
-
   return (
-    <header
-      className={`premium-site-header ${isScrolled ? 'scrolled' : ''}`}
-      data-menu-open={isMobileMenuOpen}
-    >
+    <header className="premium-site-header" style={{ position: 'relative', backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
       <div className="container premium-header-shell">
-        <Link className="brand-mark" href="/" aria-label="CTSDA home" onClick={closeMenu}>
-          <img className="brand-logo" src="/images/logo-ctsda.png" alt="" loading="eager" />
+        <Link className="brand-mark" href="/" aria-label="CTSDA home">
+          <img className="brand-logo" src="/images/logo-ctsda.png" alt="CTSDA Logo" loading="eager" />
           <span className="brand-text">
             <strong>CTSDA</strong>
             <small>Council for Training, Skills &amp; Development America</small>
@@ -75,46 +40,25 @@ export function PremiumHeader() {
 
         {/* Desktop Navigation */}
         <nav className="site-nav-desktop" aria-label="Primary navigation">
-          {navItems.map((item) => {
-            if ('children' in item && item.children) {
-              return (
-                <div key={item.label} className="nav-dropdown-group">
-                  <Link className="nav-dropdown-trigger" href={item.children[0].href}>
-                    {item.label}
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginLeft: '0.25rem' }}>
-                      <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </Link>
-                  <div className="nav-dropdown-menu">
-                    {item.children.map((child) => (
-                      <Link key={child.href} href={child.href} className="nav-dropdown-link">
-                        {child.label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              );
-            }
-            return (
-              <Link key={(item as any).href} href={(item as any).href}>
-                {item.label}
-              </Link>
-            );
-          })}
+          {navItems.map((item) => (
+            <Link key={item.href} href={item.href} style={{ color: '#334155', fontWeight: 600 }}>
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
+        {/* Action Button & Mobile Toggle */}
         <div className="header-actions">
-          <Link className="header-action" href="/portal/register">
+          <Link className="header-action" href="/portal/register" style={{ backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 700 }}>
             Apply Now
           </Link>
 
-          {/* Mobile Menu Toggle */}
           <button
-            className="mobile-menu-toggle"
             type="button"
-            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            className="mobile-menu-toggle"
             aria-expanded={isMobileMenuOpen}
             aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             <span className="hamburger-line" />
             <span className="hamburger-line" />
@@ -123,73 +67,58 @@ export function PremiumHeader() {
         </div>
       </div>
 
-      {/* Mobile Navigation Overlay */}
-      <div
-        className={`mobile-nav-overlay ${isMobileMenuOpen ? 'is-open' : ''}`}
-        onClick={closeMenu}
-        aria-hidden="true"
-      />
-
-      {/* Mobile Navigation Drawer */}
-      <nav
-        className={`mobile-nav-drawer ${isMobileMenuOpen ? 'is-open' : ''}`}
-        aria-label="Mobile navigation"
-      >
-        <div className="mobile-nav-header">
-          <span className="mobile-nav-title">Menu</span>
-          <button
-            className="mobile-nav-close"
-            type="button"
-            onClick={closeMenu}
-            aria-label="Close navigation menu"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="mobile-nav-items">
-          {navItems.flatMap((item, i) => {
-            if ('children' in item && item.children) {
-              return [
-                <div key={`group-${i}`} className="mobile-nav-group-label">{item.label}</div>,
-                ...item.children.map((child) => (
-                  <Link
-                    key={child.href}
-                    href={child.href}
-                    className="mobile-nav-link mobile-nav-link--child"
-                    onClick={closeMenu}
-                  >
-                    {child.label}
-                  </Link>
-                )),
-              ];
-            }
-            return [
+      {/* Mobile Drawer */}
+      {isMobileMenuOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: '#ffffff',
+            zIndex: 999,
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '2rem',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <span style={{ fontWeight: 800, fontSize: '1.2rem', color: '#0f172a' }}>Menu</span>
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}
+            >
+              ✕
+            </button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {navItems.map((item) => (
               <Link
-                key={(item as any).href}
-                href={(item as any).href}
-                className="mobile-nav-link"
-                onClick={closeMenu}
+                key={item.href}
+                href={item.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a', textDecoration: 'none' }}
               >
                 {item.label}
-              </Link>,
-            ];
-          })}
+              </Link>
+            ))}
+            <Link
+              href="/portal/register"
+              onClick={() => setIsMobileMenuOpen(false)}
+              style={{
+                marginTop: '1.5rem',
+                backgroundColor: '#2563eb',
+                color: '#ffffff',
+                textAlign: 'center',
+                fontWeight: 700,
+                padding: '0.85rem',
+                borderRadius: '0.5rem',
+                textDecoration: 'none',
+              }}
+            >
+              Apply Now
+            </Link>
+          </div>
         </div>
-
-        <div className="mobile-nav-footer">
-          <Link
-            className="mobile-nav-cta"
-            href="/portal/register"
-            onClick={closeMenu}
-          >
-            Apply Now
-          </Link>
-        </div>
-      </nav>
+      )}
     </header>
   );
 }

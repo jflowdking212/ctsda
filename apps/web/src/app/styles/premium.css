@@ -11,8 +11,8 @@
   --color-white: #ffffff;
   
   /* Accent Colors */
-  --color-emerald: #10b981;
-  --color-green: #059669;
+  --color-emerald: #2563eb;
+  --color-green: #1d4ed8;
   --color-amber: #f59e0b;
   --color-gold: #d97706;
   --color-red: #dc2626;
@@ -29,7 +29,7 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-premium: 0 25px 50px -12px rgba(10, 25, 47, 0.25);
-  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.4);
+  --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.4);
   
   /* Typography */
   --font-primary: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -135,7 +135,7 @@ button, input, textarea, select {
 }
 
 .premium-site-header.scrolled .site-nav-desktop a:hover {
-  color: var(--color-white);
+  color: #0f172a;
 }
 
 .premium-site-header.scrolled .site-nav-desktop .nav-dropdown-menu a {
@@ -149,7 +149,7 @@ button, input, textarea, select {
 
 .premium-site-header.scrolled .header-action {
   background: var(--gradient-primary);
-  color: var(--color-white);
+  color: #ffffff;
 }
 
 /* Dark header background when mobile menu is open */
@@ -158,11 +158,11 @@ button, input, textarea, select {
 }
 
 .premium-site-header[data-menu-open="true"] .brand-text strong {
-  color: var(--color-white);
+  color: #0f172a;
 }
 
 .premium-site-header[data-menu-open="true"] .brand-text small {
-  color: rgba(255, 255, 255, 0.7);
+  color: #475569;
 }
 
 .premium-header-shell {
@@ -236,7 +236,7 @@ button, input, textarea, select {
 
 .site-nav-desktop a:hover {
   color: var(--color-navy);
-  background: rgba(16, 185, 129, 0.08);
+  background: rgba(37, 99, 235, 0.08);
 }
 
 .site-nav-desktop a::after {
@@ -280,7 +280,7 @@ button, input, textarea, select {
 
 .nav-dropdown-trigger:hover {
   color: var(--color-navy);
-  background: rgba(16, 185, 129, 0.08);
+  background: rgba(37, 99, 235, 0.08);
 }
 
 .nav-dropdown-menu {
@@ -365,7 +365,7 @@ button, input, textarea, select {
   padding: 0 1rem;
   font-weight: 600;
   font-size: 0.8125rem;
-  color: var(--color-white);
+  color: #ffffff;
   background: var(--gradient-primary);
   border-radius: 0.5rem;
   white-space: nowrap;
@@ -402,11 +402,11 @@ button, input, textarea, select {
 }
 
 .mobile-menu-toggle:hover {
-  background: rgba(16, 185, 129, 0.08);
+  background: rgba(37, 99, 235, 0.08);
 }
 
 [data-menu-open="true"] .mobile-menu-toggle:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: #e2e8f0;
 }
 
 .hamburger-line {
@@ -504,7 +504,7 @@ button, input, textarea, select {
 
 .mobile-nav-close:hover {
   color: var(--color-navy);
-  background: rgba(16, 185, 129, 0.08);
+  background: rgba(37, 99, 235, 0.08);
 }
 
 .mobile-nav-items {
@@ -529,12 +529,12 @@ button, input, textarea, select {
 .mobile-nav-link:hover,
 .mobile-nav-link:focus-visible {
   color: var(--color-emerald);
-  background: rgba(16, 185, 129, 0.06);
+  background: rgba(37, 99, 235, 0.06);
   border-left-color: var(--color-emerald);
 }
 
 .mobile-nav-link:active {
-  background: rgba(16, 185, 129, 0.12);
+  background: rgba(37, 99, 235, 0.12);
 }
 
 .mobile-nav-footer {
@@ -551,7 +551,7 @@ button, input, textarea, select {
   padding: 0.875rem 1.5rem;
   font-weight: 700;
   font-size: 1rem;
-  color: var(--color-white);
+  color: #0f172a;
   background: var(--gradient-primary);
   border-radius: 0.75rem;
   transition: var(--transition-normal);
@@ -575,7 +575,12 @@ button, input, textarea, select {
   display: flex;
   align-items: center;
   overflow: hidden;
-  background: var(--gradient-hero);
+  background-image: 
+    linear-gradient(90deg, rgba(7, 18, 35, 0.94) 0%, rgba(7, 18, 35, 0.82) 45%, rgba(7, 18, 35, 0.45) 75%, rgba(7, 18, 35, 0.2) 100%),
+    url('/images/hero_professional_trainee.png');
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
 }
 
 .home-hero::before {
@@ -583,7 +588,7 @@ button, input, textarea, select {
   position: absolute;
   inset: 0;
   background: 
-    radial-gradient(ellipse at top left, rgba(16, 185, 129, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at top left, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
     radial-gradient(ellipse at bottom right, rgba(79, 70, 229, 0.12) 0%, transparent 60%);
   z-index: 0;
 }
@@ -627,7 +632,7 @@ button, input, textarea, select {
   padding: 0.5rem 1rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-white);
+  color: #0f172a;
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -928,7 +933,7 @@ button, input, textarea, select {
 .feature-card-icon svg {
   width: 1.75rem;
   height: 1.75rem;
-  color: var(--color-white);
+  color: #0f172a;
 }
 
 .feature-card h3 {
@@ -977,7 +982,7 @@ button, input, textarea, select {
   width: 3rem;
   height: 3rem;
   background: var(--gradient-primary);
-  color: var(--color-white);
+  color: #ffffff;
   font-weight: 700;
   font-size: 1rem;
   border-radius: 50%;
@@ -1054,7 +1059,7 @@ button, input, textarea, select {
   position: absolute;
   inset: 0;
   background: 
-    radial-gradient(ellipse at top, rgba(16, 185, 129, 0.2), transparent 50%),
+    radial-gradient(ellipse at top, rgba(37, 99, 235, 0.2), transparent 50%),
     radial-gradient(ellipse at bottom, rgba(79, 70, 229, 0.15), transparent 50%);
   z-index: 0;
 }
@@ -1071,7 +1076,7 @@ button, input, textarea, select {
 .cta-title {
   font-size: clamp(1.6rem, 3vw, 2.15rem);
   font-weight: 700;
-  color: var(--color-white);
+  color: #ffffff;
   max-width: 40rem;
   line-height: 1.2;
   letter-spacing: 0;
@@ -1096,7 +1101,7 @@ button, input, textarea, select {
 
 .cta-button.primary {
   background: var(--gradient-primary);
-  color: var(--color-white);
+  color: #ffffff;
   box-shadow: var(--shadow-sm);
 }
 
@@ -1107,12 +1112,12 @@ button, input, textarea, select {
 
 .cta-button.outline {
   background: transparent;
-  color: var(--color-white);
+  color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .cta-button.outline:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: #e2e8f0;
 }
 
 /* === ANIMATIONS === */
@@ -1299,10 +1304,15 @@ button, input, textarea, select {
   .home-hero {
     min-height: 90vh;
   }
+
+  .hero-content {
+    max-width: 42rem;
+  }
   
   .hero-cards {
     display: flex;
     position: absolute;
+    z-index: 5;
     top: 50%;
     right: 5%;
     transform: translateY(-50%);
@@ -1404,7 +1414,7 @@ button, input, textarea, select {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
 }
 
 .article-body ol {
@@ -1421,7 +1431,7 @@ button, input, textarea, select {
   left: 0;
   top: 0.4rem;
   font-weight: 700;
-  color: #10b981;
+  color: #2563eb;
   font-size: 0.875rem;
 }
 
@@ -1433,7 +1443,7 @@ button, input, textarea, select {
   margin: 2rem 0;
   padding: 1.25rem 1.5rem 1.25rem 2rem;
   background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
-  border-left: 4px solid #10b981;
+  border-left: 4px solid #2563eb;
   border-radius: 0 0.5rem 0.5rem 0;
 }
 
@@ -1473,10 +1483,11 @@ button, input, textarea, select {
 
 /* === FOOTER === */
 .site-footer {
-  background: var(--color-navy);
-  color: var(--color-white);
+  background: #f8fafc;
+  color: #1e293b;
   padding: 4rem 0 2rem;
   position: relative;
+  border-top: 1px solid #e2e8f0;
 }
 
 .site-footer::before {
@@ -1502,7 +1513,7 @@ button, input, textarea, select {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--color-white);
+  color: #0f172a;
   margin-bottom: 1rem;
 }
 
@@ -1511,12 +1522,12 @@ button, input, textarea, select {
   display: block;
   margin-top: 0.75rem;
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #475569;
   transition: var(--transition-fast);
 }
 
 .footer-column a:hover {
-  color: var(--color-white);
+  color: #2563eb;
   transform: translateX(5px);
 }
 
@@ -1525,9 +1536,9 @@ button, input, textarea, select {
   justify-content: space-between;
   gap: 1.5rem;
   padding-top: 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid #e2e8f0;
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: #64748b;
 }
 
 .social-link {
@@ -1536,7 +1547,7 @@ button, input, textarea, select {
   justify-content: center;
   width: 2.5rem;
   height: 2.5rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: #e2e8f0;
   border-radius: 0.5rem;
   transition: var(--transition-normal);
 }
@@ -1551,7 +1562,7 @@ button, input, textarea, select {
 .footer-socials .social-link {
   display: inline-flex;
   margin-top: 0;
-  color: var(--color-white);
+  color: #0f172a;
 }
 
 .social-link:hover {
@@ -1574,7 +1585,7 @@ button, input, textarea, select {
 
 .button.primary {
   background: var(--gradient-primary);
-  color: var(--color-white);
+  color: #ffffff;
   box-shadow: var(--shadow-sm);
 }
 
@@ -1611,7 +1622,7 @@ button, input, textarea, select {
 /* === PAGE HERO === */
 .page-hero {
   padding: 4.75rem 0 3.5rem;
-  color: var(--color-white);
+  color: #0f172a;
   background: var(--gradient-hero);
 }
 
@@ -2013,4 +2024,416 @@ button, input, textarea, select {
   .container-narrow {
     width: min(100% - 1.5rem, 800px);
   }
+}
+
+
+/* Explicit High Contrast Footer Overrides */
+.site-footer {
+}
+
+.site-footer *,
+.site-footer p,
+.site-footer span,
+.site-footer a,
+.site-footer small,
+.site-footer strong,
+.site-footer h2,
+.site-footer div {
+  color: #334155;
+}
+
+.site-footer .brand-text strong,
+.site-footer .footer-column h2,
+.site-footer h2 {
+}
+
+.site-footer .brand-text small,
+.site-footer p,
+.site-footer .footer-column p {
+}
+
+.site-footer a:not(.brand-mark) {
+}
+
+.site-footer a:not(.brand-mark):hover {
+}
+
+.site-footer .footer-bottom,
+.site-footer .footer-bottom span,
+.site-footer .footer-bottom a {
+}
+
+.site-footer .footer-icon-badge {
+}
+
+.site-footer .footer-icon-badge svg {
+}
+
+
+/* High Contrast CTA Band Styles */
+.cta-band {
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-band p {
+}
+
+.cta-title {
+  max-width: 40rem;
+  letter-spacing: 0;
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cta-button.primary {
+}
+
+.cta-button.primary:hover {
+}
+
+.cta-button.outline {
+}
+
+.cta-button.outline:hover {
+}
+
+
+/* Global Button Color Fixes */
+.button.primary,
+.cta-button.primary {
+}
+
+.button.primary:hover,
+.cta-button.primary:hover {
+}
+
+.button.secondary,
+.button.outline,
+.cta-button.outline {
+}
+
+
+/* Universal Pure White Inner Text & Icons for Blue Badges */
+.process-number,
+.process-card .process-number,
+.process-card:hover .process-number {
+}
+
+.footer-icon-badge,
+.site-footer .footer-icon-badge {
+}
+
+.footer-icon-badge svg,
+.site-footer .footer-icon-badge svg {
+}
+
+.service-item-icon {
+}
+
+.service-item-icon path {
+}
+
+
+/* =========================================================
+   EXHAUSTIVE UNIVERSAL WHITE TEXT ON ALL BLUE BUTTONS
+   ========================================================= */
+
+.button.primary,
+.cta-button.primary,
+.header-action,
+.mobile-nav-cta,
+button[type="submit"],
+.btn-primary,
+.bg-blue-600,
+.bg-blue-700,
+.bg-blue-800 {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.button.primary *,
+.cta-button.primary *,
+.header-action *,
+.mobile-nav-cta *,
+button[type="submit"] * {
+  color: #ffffff !important;
+}
+
+.button.primary:hover,
+.cta-button.primary:hover,
+.header-action:hover,
+.mobile-nav-cta:hover,
+button[type="submit"]:hover {
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+/* Form inputs and buttons */
+button.button,
+a.button,
+a.header-action {
+  color: #ffffff !important;
+}
+
+
+/* === HIGH CONTRAST ACCESSIBILITY FIXES === */
+.page-hero {
+  background: var(--gradient-hero, linear-gradient(135deg, #0a192f 0%, #1b263b 100%)) !important;
+  color: #ffffff !important;
+}
+
+.page-hero h1 {
+  color: #ffffff !important;
+}
+
+.page-hero .eyebrow {
+  color: #f59e0b !important;
+  font-weight: 800 !important;
+}
+
+.page-hero-copy p {
+  color: #cbd5e1 !important;
+}
+
+/* Secondary Button High Contrast Fix (White Button, Dark Navy Text) */
+.button.secondary,
+a.button.secondary,
+button.button.secondary {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+}
+
+.button.secondary *,
+a.button.secondary *,
+button.button.secondary * {
+  color: #0f172a !important;
+}
+
+.button.secondary:hover,
+a.button.secondary:hover,
+button.button.secondary:hover {
+  background-color: #f8fafc !important;
+  color: #1d4ed8 !important;
+  border-color: #94a3b8 !important;
+}
+
+.button.secondary:hover *,
+a.button.secondary:hover *,
+button.button.secondary:hover * {
+  color: #1d4ed8 !important;
+}
+
+
+/* =========================================================
+   UNIFIED CONTACT HERO BANNER GRADIENT ACROSS ALL PAGES
+   ========================================================= */
+
+:root {
+  --gradient-hero: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important;
+}
+
+.page-hero,
+.home-hero,
+.ab-hero,
+.cta-band {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important;
+  color: #ffffff !important;
+}
+
+.page-hero h1,
+.home-hero h1,
+.hero-title,
+.ab-hero h1 {
+  color: #ffffff !important;
+}
+
+.page-hero .eyebrow,
+.home-hero .eyebrow,
+.ab-eyebrow.on-dark {
+  color: #fbbf24 !important;
+  font-weight: 800 !important;
+}
+
+.page-hero-copy p,
+.hero-description,
+.ab-hero-lead {
+  color: #cbd5e1 !important;
+}
+
+
+/* =========================================================
+   RESTORE HOMEPAGE HERO BACKGROUND PICTURE WITH CONTACT GRADIENT
+   ========================================================= */
+
+.home-hero {
+  background: 
+    linear-gradient(90deg, rgba(30, 58, 138, 0.92) 0%, rgba(37, 99, 235, 0.78) 45%, rgba(15, 23, 42, 0.45) 85%),
+    url('/images/ctsda-hero-training.png') !important;
+  background-size: cover !important;
+  background-position: center right !important;
+  background-repeat: no-repeat !important;
+  color: #ffffff !important;
+}
+
+.home-hero h1,
+.home-hero .hero-title {
+  color: #ffffff !important;
+}
+
+.home-hero .hero-description {
+  color: #cbd5e1 !important;
+}
+
+
+/* Explicit White Color for Hero Badge Text */
+.hero-badge,
+.hero-badge span {
+  color: #ffffff !important;
+}
+
+
+/* =========================================================
+   ENFORCE PERFECT CENTER ALIGNMENT ACROSS ALL HERO BANNERS
+   ========================================================= */
+
+.page-hero,
+.page-hero .container-narrow,
+.home-hero .hero-content,
+.ab-hero,
+.services-hero,
+.training-hero,
+.blog-hero {
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.page-hero h1,
+.home-hero h1,
+.hero-title,
+.ab-hero h1,
+.services-hero h1 {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  width: 100% !important;
+}
+
+.page-hero .eyebrow,
+.home-hero .hero-badge,
+.hero-badge {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.page-hero-copy,
+.page-hero-copy p,
+.hero-description,
+.ab-hero-lead {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+
+/* =========================================================
+   ENFORCE PERFECT CENTER ALIGNMENT ACROSS ALL HERO BANNERS
+   ========================================================= */
+
+.page-hero,
+.page-hero .container-narrow,
+.home-hero .hero-content,
+.ab-hero,
+.services-hero,
+.training-hero,
+.blog-hero {
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.page-hero h1,
+.home-hero h1,
+.hero-title,
+.ab-hero h1,
+.services-hero h1 {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  width: 100% !important;
+}
+
+.page-hero .eyebrow,
+.home-hero .hero-badge,
+.hero-badge {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.page-hero-copy,
+.page-hero-copy p,
+.hero-description,
+.ab-hero-lead {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+
+/* =========================================================
+   ENFORCE PURELY STATIC HEADER LIKE OLD CTSDA SITE
+   ========================================================= */
+
+.premium-site-header,
+.site-header,
+header {
+  position: relative !important;
+  top: auto !important;
+  z-index: 50 !important;
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.premium-site-header.scrolled,
+.site-header.scrolled {
+  position: relative !important;
+  top: auto !important;
+  background: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.premium-site-header.scrolled .site-nav-desktop a,
+.site-header.scrolled .site-nav-desktop a {
+  color: #334155 !important;
+}
+
+
+/* Explicit Center Alignment for Training Hero h1 */
+.training-hero h1,
+main h1 {
+  text-align: center !important;
 }

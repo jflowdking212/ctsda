@@ -15,6 +15,16 @@ export class AdminController {
     return { ...profile, sessionId: user.sessionId };
   }
 
+  @Get('notifications')
+  async getNotifications(@CurrentUser() user: any) {
+    return this.adminService.getNotifications(user.userId);
+  }
+
+  @Post('notifications/read')
+  async markNotificationsRead(@CurrentUser() user: any) {
+    return this.adminService.markNotificationsRead(user.userId);
+  }
+
   @Get('applications')
   async listApplications(
     @CurrentUser() user: any,
@@ -34,6 +44,11 @@ export class AdminController {
   @Post('applications/:id/approve')
   async approve(@CurrentUser() user: any, @Param('id') id: string, @Body() body: { reason?: string; comments?: string }) {
     return this.adminService.transitionApplication(user.userId, id, 'approved', body);
+  }
+
+  @Post('applications/:id/start-review')
+  async startReview(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.adminService.transitionApplication(user.userId, id, 'under_review', { reason: 'Review started' });
   }
 
   @Post('applications/:id/reject')

@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { v4 as uuidv4 } from 'uuid';
+import { ZodError } from 'zod';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -42,6 +43,28 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           message = 'Validation failed';
           code = 'VALIDATION_ERROR';
         }
+      }
+    } else if (exception instanceof ZodError) {
+      status = HttpStatus.BAD_REQUEST;
+      code = 'VALIDATION_ERROR';
+      message = 'Validation failed';
+      details = exception.errors.map(err => ({
+        path: err.path.join('.'),
+        message: err.message,
+      }));
+    } else if (
+      exception && 
+      typeof exception === 'object' && 
+      (exception as any).name === 'PrismaClientKnownRequestError'
+    ) {
+      const prismaError = exception as any;
+      if (prismaError.code === 'P2002') {
+        status = HttpStatus.CONFLICT;
+        code = 'UNIQUE_CONSTRAINT_FAILED';
+        const target = prismaError.meta?.target || 'Record';
+        message = `An account with this ${Array.isArray(target) ? target.join(', ') : target} already exists.`;
+      } else {
+        message = prismaError.message;
       }
     } else if (exception instanceof Error) {
       message = exception.message;

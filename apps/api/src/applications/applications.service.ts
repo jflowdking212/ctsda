@@ -21,6 +21,9 @@ export class ApplicationsService {
         invoices: {
           where: { status: 'sent' },
           select: { id: true, amount: true, description: true }
+        },
+        accreditation: {
+          select: { id: true, certificateNumber: true, status: true }
         }
       },
       orderBy: { createdAt: 'desc' },
@@ -60,17 +63,55 @@ export class ApplicationsService {
       }
     }
 
-    // Otherwise, transition straight to submitted
+    // Transition to submitted
     await this.prisma.application.update({
       where: { id: applicationId },
       data: { status: 'submitted', submittedAt: new Date() },
     });
 
+    // Notify all admin users in DB + adminNotificationEmail
+    const adminUsers = await this.prisma.user.findMany({
+      where: {
+        role: { in: ['super_admin', 'support_officer'] },
+        isActive: true,
+      },
+      select: { id: true, email: true },
+    });
+
+    const instName = application.institution?.name || 'an institution';
+
+    // 1. Create in-app notification for each admin
+    for (const admin of adminUsers) {
+      await this.prisma.notification.create({
+        data: {
+          userId: admin.id,
+          type: 'application_submitted' as any,
+          title: 'New Application Submitted',
+          body: `An application for "${instName}" has been submitted and is pending review.`,
+          metadata: { applicationId, institutionId: application.institutionId },
+        },
+      });
+    }
+
+    // 2. Collect unique admin emails to notify
+    const recipientEmails = new Set<string>();
+    adminUsers.forEach((u) => {
+      if (u.email) recipientEmails.add(u.email);
+    });
     if (settings.adminNotificationEmail) {
+      recipientEmails.add(settings.adminNotificationEmail);
+    }
+
+    // 3. Send email notifications
+    for (const email of Array.from(recipientEmails)) {
       await this.notificationsService.enqueueEmail({
-        to: settings.adminNotificationEmail,
-        subject: 'New Application Pending Review',
-        html: `<p>A new application has been submitted by ${application.institution?.name} and is pending review.</p>`,
+        to: email,
+        subject: `New Application Submitted: ${instName}`,
+        html: `
+          <h2>New Application Pending Review</h2>
+          <p>An application for <strong>${instName}</strong> has been submitted by an applicant and is pending administrative review.</p>
+          <p><a href="${process.env.FRONTEND_URL || 'https://ctsda.acecoterieconsulting.com'}/admin/queue?appId=${applicationId}" style="display:inline-block;padding:10px 18px;background:#0d9488;color:#ffffff;text-decoration:none;border-radius:6px;">Review Application</a></p>
+        `,
         userId: userId,
       });
     }

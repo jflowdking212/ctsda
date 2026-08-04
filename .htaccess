@@ -1,0 +1,8 @@
+RewriteEngine On
+DirectoryIndex disabled
+
+RewriteRule ^api/(.*)$ http://127.0.0.1:4000/$1 [P,L]
+RewriteRule ^api$ http://127.0.0.1:4000/ [P,L]
+
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteRule ^(.*)$ http://127.0.0.1:4005/$1 [P,L]

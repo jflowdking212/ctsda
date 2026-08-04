@@ -6,16 +6,32 @@ import { VerifyTotpDto } from './dto/totp.dto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { AuthGuard } from '../common/guards/auth.guard';
 
+import { RequestOtpSchema, VerifyOtpSchema, RegisterApplicantSchema } from '@ctsda/contracts';
+
 @Controller('auth')
 export class AuthController {
+
   constructor(private authService: AuthService) {}
+
+  @Post('request-otp')
+  @HttpCode(200)
+  async requestOtp(@Body() body: unknown) {
+    const dto = RequestOtpSchema.parse(body);
+    return this.authService.requestOtp(dto.email);
+  }
+
+  @Post('verify-otp')
+  @HttpCode(200)
+  async verifyOtp(@Body() body: unknown) {
+    const dto = VerifyOtpSchema.parse(body);
+    return this.authService.verifyOtp(dto.email, dto.otp);
+  }
 
   @Post('register')
   async register(@Body() body: unknown) {
-    const dto = CreateUserSchema.parse(body);
+    const dto = RegisterApplicantSchema.parse(body);
     const result = await this.authService.registerApplicant({
       email: dto.email,
-      password: dto.password,
       firstName: dto.firstName,
       lastName: dto.lastName,
       phone: dto.phone,
@@ -23,15 +39,17 @@ export class AuthController {
 
     return {
       user: result.user,
-      message: 'Account created. Verify your email before submitting applications.',
-      // TODO(M7): replace this with an email notification job.
-      verificationToken: result.emailVerificationToken,
+      message: 'Account created in pending state. Proceed to payment.',
     };
   }
 
-  @Post('verify-email')
-  async verifyEmail(@Body() body: { token: string }) {
-    return this.authService.verifyEmail(body.token);
+  @Post('setup-account')
+  @HttpCode(200)
+  async setupAccount(@Body() body: any) {
+    if (!body.token || !body.password) {
+      throw new UnauthorizedException('Token and password are required');
+    }
+    return this.authService.setupAccount(body.token, body.password);
   }
 
   @Post('forgot-password')

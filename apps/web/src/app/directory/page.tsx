@@ -50,7 +50,7 @@ export default async function DirectoryPage({
             Country
             <input name="country" defaultValue={filters.country || ''} placeholder="Country" />
           </label>
-          <button className="button primary full-width" type="submit">
+          <button className="button primary full-width md:col-span-2" type="submit">
             Filter directory
           </button>
         </form>

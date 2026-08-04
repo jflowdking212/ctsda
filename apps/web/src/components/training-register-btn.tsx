@@ -82,7 +82,7 @@ export function TrainingRegisterBtn({ trainingId, price, title: _title }: { trai
         style={{
           width: '100%',
           padding: '0.75rem',
-          backgroundColor: isFree ? '#10b981' : '#0ea5e9',
+          backgroundColor: isFree ? '#2563eb' : '#0ea5e9',
           color: 'white',
           border: 'none',
           borderRadius: '0.5rem',

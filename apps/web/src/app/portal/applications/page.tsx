@@ -40,17 +40,19 @@ export default function ApplicationsPage() {
     setMessage('');
     setPayingId(applicationId);
     try {
+      const storedSession = window.localStorage.getItem(PORTAL_SESSION_KEY) || '';
       const response = await fetch(`${apiUrl}/applications/${applicationId}/submit`, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          ...(window.localStorage.getItem(PORTAL_SESSION_KEY) ? { 'X-Session-Id': window.localStorage.getItem(PORTAL_SESSION_KEY) || '' } : {}),
+          ...(storedSession ? { 'X-Session-Id': storedSession } : {}),
         },
+        body: JSON.stringify({}),
       });
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(result.message || 'Unable to submit application');
+        throw new Error(result.error?.message || result.message || 'Unable to submit application');
       }
       if (result.paymentUrl) {
         window.location.href = result.paymentUrl;
@@ -61,7 +63,7 @@ export default function ApplicationsPage() {
       const res = await fetch(`${apiUrl}/applications/me`, {
         credentials: 'include',
         headers: {
-          ...(window.localStorage.getItem(PORTAL_SESSION_KEY) ? { 'X-Session-Id': window.localStorage.getItem(PORTAL_SESSION_KEY) || '' } : {}),
+          ...(storedSession ? { 'X-Session-Id': storedSession } : {}),
         },
       });
       if (res.ok) {
@@ -78,18 +80,19 @@ export default function ApplicationsPage() {
     setMessage('');
     setPayingId(applicationId);
     try {
+      const storedSession = window.localStorage.getItem(PORTAL_SESSION_KEY) || '';
       const response = await fetch(`${apiUrl}/payments/create-checkout`, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          ...(window.localStorage.getItem(PORTAL_SESSION_KEY) ? { 'X-Session-Id': window.localStorage.getItem(PORTAL_SESSION_KEY) || '' } : {}),
+          ...(storedSession ? { 'X-Session-Id': storedSession } : {}),
         },
         body: JSON.stringify({ applicationId }),
       });
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(result.message || 'Unable to start checkout');
+        throw new Error(result.error?.message || result.message || 'Unable to start checkout');
       }
       if (result.url) {
         window.location.href = result.url;

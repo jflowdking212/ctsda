@@ -32,6 +32,27 @@ export class InstitutionsService {
     return preRegistration;
   }
 
+  async findAll() {
+    return this.prisma.institution.findMany({
+      select: {
+        id: true,
+        name: true,
+        registrationNumber: true,
+        institutionType: true,
+        country: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  async getTrainingAreas() {
+    return this.prisma.trainingArea.findMany({
+      where: { isActive: true },
+      select: { id: true, name: true, code: true, description: true },
+      orderBy: { name: 'asc' },
+    });
+  }
+
   async findOne(id: string) {
     return this.prisma.institution.findUnique({
       where: { id },
@@ -142,6 +163,21 @@ export class InstitutionsService {
         );
       }
 
+      // Filter and sanitize valid trainingAreaIds to prevent UUID format errors
+      let validTrainingAreaIds: string[] = [];
+      if (data.trainingAreaIds && data.trainingAreaIds.length > 0) {
+        const existingAreas = await tx.trainingArea.findMany({
+          where: {
+            OR: [
+              { id: { in: data.trainingAreaIds.filter((id) => /^[0-9a-fA-F-]{36}$/.test(id)) } },
+              { code: { in: data.trainingAreaIds } },
+            ],
+          },
+          select: { id: true },
+        });
+        validTrainingAreaIds = existingAreas.map((a) => a.id);
+      }
+
       const application = await tx.application.create({
         data: {
           institutionId: data.institutionId,
@@ -151,8 +187,8 @@ export class InstitutionsService {
           deliveryMethods: data.deliveryMethods,
           staffingCount: data.staffingCount,
           operationalInfo: data.operationalInfo,
-          trainingAreas: data.trainingAreaIds.length
-            ? { create: data.trainingAreaIds.map((trainingAreaId) => ({ trainingAreaId })) }
+          trainingAreas: validTrainingAreaIds.length
+            ? { create: validTrainingAreaIds.map((trainingAreaId) => ({ trainingAreaId })) }
             : undefined,
           offeredCertificates: data.certificatesOffered.length
             ? { create: data.certificatesOffered.map((name) => ({ name })) }
@@ -197,5 +233,24 @@ export class InstitutionsService {
         ...(data.operationalInfo && { operationalInfo: data.operationalInfo }),
       },
     });
+  }
+
+  async updateApplicationStatus(id: string, status: any) {
+    return this.prisma.application.update({
+      where: { id },
+      data: { status, submittedAt: new Date() },
+    });
+  }
+
+  async generateUploadToken(applicationId: string) {
+    const token = randomBytes(32).toString('base64url');
+    const application = await this.prisma.application.findUnique({ where: { id: applicationId } });
+    if (application) {
+      await this.prisma.user.update({
+        where: { id: application.applicantId },
+        data: { emailVerificationToken: token }, // Reuse this column for upload token
+      });
+    }
+    return token;
   }
 }

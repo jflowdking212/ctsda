@@ -4,11 +4,11 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { AuthGuard } from '../common/guards/auth.guard';
 
 @Controller('documents')
-@UseGuards(AuthGuard)
 export class DocumentsController {
   constructor(private documentsService: DocumentsService) {}
 
   @Post('upload/:applicationId')
+  @UseGuards(AuthGuard)
   async upload(@CurrentUser() user: any, @Param('applicationId') applicationId: string, @Request() req: any) {
     const multipart = await req.file();
     if (!multipart) throw new BadRequestException('No file provided');
@@ -27,6 +27,7 @@ export class DocumentsController {
   }
 
   @Get(':id/download')
+  @UseGuards(AuthGuard)
   async getDownloadUrl(@CurrentUser() user: any, @Param('id') id: string) {
     const document = await this.documentsService.findById(id);
     if (!document) throw new BadRequestException('Document not found');
@@ -37,6 +38,7 @@ export class DocumentsController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   async delete(@CurrentUser() user: any, @Param('id') id: string) {
     const document = await this.documentsService.findById(id);
     if (!document) throw new BadRequestException('Document not found');
@@ -44,5 +46,25 @@ export class DocumentsController {
 
     await this.documentsService.softDelete(id);
     return { success: true };
+  }
+  @Post('public-upload/:applicationId/:token')
+  async publicUpload(
+    @Param('applicationId') applicationId: string,
+    @Param('token') token: string,
+    @Request() req: any
+  ) {
+    const multipart = await req.file();
+    if (!multipart) throw new BadRequestException('No file provided');
+
+    const buffer = await multipart.toBuffer();
+    const file = {
+      buffer,
+      originalname: multipart.filename,
+      size: buffer.length,
+    };
+
+    const type = this.documentsService.detectFileType(file);
+
+    return this.documentsService.publicUploadDocument(applicationId, token, file, type);
   }
 }

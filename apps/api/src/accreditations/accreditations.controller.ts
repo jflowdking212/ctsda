@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards, Request, BadRequestException } from '@nestjs/common';
 import { AccreditationsService } from './accreditations.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { AuthGuard } from '../common/guards/auth.guard';
@@ -7,9 +7,35 @@ import { AuthGuard } from '../common/guards/auth.guard';
 export class AccreditationsController {
   constructor(private accreditationsService: AccreditationsService) {}
 
+  @Post(':id/upload-certificate')
+  @UseGuards(AuthGuard)
+  async uploadCertificate(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Request() req: any
+  ) {
+    const multipart = await req.file();
+    if (!multipart) throw new BadRequestException('No file provided');
+
+    const buffer = await multipart.toBuffer();
+    const file = {
+      buffer,
+      originalname: multipart.filename,
+      size: buffer.length,
+      mimetype: multipart.mimetype,
+    };
+
+    return this.accreditationsService.uploadCertificate(id, user.userId, file);
+  }
+
   @Get()
   async listActive() {
     return this.accreditationsService.listActive();
+  }
+
+  @Get('verify/:certificateNumber')
+  async verifyCertificate(@Param('certificateNumber') certificateNumber: string) {
+    return this.accreditationsService.verifyCertificate(certificateNumber);
   }
 
   @Get(':id')
