@@ -154,7 +154,7 @@ export default function Home() {
                   <form action="/verify" method="GET" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
                     <input
                       name="q"
-                      placeholder="E.G. CTSDA-2026-889104"
+                      placeholder="E.G. CTSDA-125346-AB"
                       style={{
                         width: '100%',
                         padding: '0.85rem 1rem',
@@ -208,23 +208,6 @@ export default function Home() {
                 </div>
               </div>
 
-            </div>
-          </div>
-        </section>
-
-        {/* Certificate Verification */}
-        <section className="home-verify-section" aria-labelledby="home-verify-title">
-          <div className="container">
-            <div className="home-verify-panel">
-              <div>
-                <p className="eyebrow">Public verification</p>
-                <h2 id="home-verify-title">Verify a Certificate</h2>
-                <p>
-                  Enter a CTSDA certificate token to confirm accreditation status and certificate
-                  details.
-                </p>
-              </div>
-              <CertificateVerifier compact />
             </div>
           </div>
         </section>
