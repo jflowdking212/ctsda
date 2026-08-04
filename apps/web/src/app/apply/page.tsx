@@ -173,7 +173,7 @@ export default function ApplyPage() {
   };
 
   return (
-    <main className="content-page narrow">
+    <main className="content-page narrow px-4 sm:px-6 py-6 sm:py-10 max-w-4xl mx-auto">
       <header className="content-header p-5 sm:p-8" style={{
         backgroundColor: '#ffffff',
         borderRadius: '0.75rem',
