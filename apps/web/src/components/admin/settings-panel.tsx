@@ -86,7 +86,14 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
     e.preventDefault();
     setSaving(true);
     try {
-      const payload = { ...settings };
+      const payload: Record<string, any> = {
+        smtpHost: settings.smtpHost,
+        smtpPort: settings.smtpPort,
+        smtpUser: settings.smtpUser,
+        smtpPassword: settings.smtpPassword,
+        smtpFrom: settings.smtpFrom,
+        smtpSecure: settings.smtpSecure,
+      };
       if (!payload.smtpPassword) {
         delete payload.smtpPassword;
       }
