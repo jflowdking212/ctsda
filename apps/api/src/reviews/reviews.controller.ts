@@ -97,6 +97,6 @@ export class ReviewsController {
 
   @Get('institutions')
   async listInstitutions() {
-    return this.reviewsService.listInstitutions();
+    return [];
   }
 }

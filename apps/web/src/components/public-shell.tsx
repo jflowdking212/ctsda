@@ -5,7 +5,6 @@ import { PremiumHeader } from './premium-header';
 const navItems = [
   { href: '/about', label: 'About' },
   { href: '/services', label: 'Services' },
-  { href: '/directory', label: 'Directory' },
   { href: '/training', label: 'Training' },
   { href: '/blog', label: 'Blog' },
   { href: '/contact', label: 'Contact' },
@@ -59,7 +58,6 @@ export function PublicFooter() {
           <div className="footer-column">
             <h2>Explore</h2>
             <Link href="/services">Services</Link>
-            <Link href="/directory">Accredited directory</Link>
             <Link href="/verify">Certificate verification</Link>
             <Link href="/privacy-policy">Privacy Policy</Link>
             <Link href="/terms-of-service">Terms of Service</Link>
