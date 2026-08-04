@@ -85,31 +85,32 @@ export function IsolatedCertificateVerifier({
         style={{
           backgroundColor: '#021a42',
           color: '#ffffff',
-          padding: hasResult ? '3rem 2rem 10rem' : '5rem 2rem 10rem',
-          textAlign: hasResult ? 'left' : 'center',
+          padding: '5rem 2rem 10rem',
+          textAlign: 'center',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
         <div style={{ position: 'relative', zIndex: 10, maxWidth: '1000px', margin: '0 auto' }}>
           {hasResult && (
-            <div style={{ marginBottom: '1.5rem', fontSize: '0.9rem', color: '#93c5fd' }}>
+            <div style={{ marginBottom: '1.5rem', fontSize: '0.9rem', color: '#93c5fd', textAlign: 'center' }}>
               <Link href="/" style={{ color: '#ffffff', textDecoration: 'none' }}>Home</Link> &gt; Verify Certificate
             </div>
           )}
           <h1
             style={{
-              fontSize: 'clamp(2.2rem, 5vw, 2.5rem)',
-              fontWeight: 700,
+              fontSize: 'clamp(2.2rem, 5vw, 2.8rem)',
+              fontWeight: 800,
               marginBottom: '1rem',
               color: '#ffffff',
+              textAlign: 'center',
             }}
           >
             {hasResult ? 'Certificate Verification Result' : 'Verify Your Certificate'}
           </h1>
-          <p style={{ fontSize: '1.05rem', color: '#cbd5e1', maxWidth: hasResult ? '100%' : '600px', margin: hasResult ? '0' : '0 auto', lineHeight: 1.6 }}>
+          <p style={{ fontSize: '1.1rem', color: '#cbd5e1', maxWidth: '650px', margin: '0 auto', lineHeight: 1.6, textAlign: 'center' }}>
             {hasResult 
-              ? 'Your certificate has been successfully verified.' 
+              ? 'Your certificate has been successfully verified in the official CTSDA database.' 
               : 'Enter your certificate number to verify its authenticity and confirm it was issued by the Council for Training Skills and Development America.'}
           </p>
         </div>
