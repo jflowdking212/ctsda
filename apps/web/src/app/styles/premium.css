@@ -2433,7 +2433,6 @@ header {
 
 
 /* Explicit Center Alignment for Training Hero h1 */
-.training-hero h1,
-main h1 {
+.training-hero h1 {
   text-align: center !important;
 }

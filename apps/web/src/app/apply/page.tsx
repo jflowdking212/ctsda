@@ -162,10 +162,23 @@ export default function ApplyPage() {
 
   return (
     <main className="content-page narrow">
-      <header className="content-header">
-        <p className="eyebrow">Accreditation</p>
-        <h1>Apply for CTSDA Accreditation</h1>
-        <p>Complete the form below to begin the application process.</p>
+      <header className="content-header" style={{
+        backgroundColor: '#ffffff',
+        padding: '2rem 2.5rem',
+        borderRadius: '0.75rem',
+        border: '1px solid #e2e8f0',
+        borderLeft: '5px solid #2563eb',
+        boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)',
+        marginBottom: '2rem',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        textAlign: 'left',
+        width: '100%',
+      }}>
+        <p className="eyebrow" style={{ color: '#d97706', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '0.75rem', marginBottom: '0.5rem', textAlign: 'left', alignSelf: 'flex-start' }}>Accreditation</p>
+        <h1 style={{ textAlign: 'left', color: '#0f172a', fontSize: 'clamp(1.75rem, 3vw, 2.25rem)', fontWeight: 800, margin: '0 0 0.5rem 0', lineHeight: 1.2, alignSelf: 'flex-start' }}>Apply for CTSDA Accreditation</h1>
+        <p style={{ textAlign: 'left', color: '#64748b', fontSize: '1rem', margin: 0, lineHeight: 1.5, alignSelf: 'flex-start' }}>Complete the form below to begin the application process.</p>
       </header>
 
       {step === 1 && (
