@@ -32,25 +32,53 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
     }
   }
 
+  function resizeImage(file: File, maxWidth: number, maxHeight: number, callback: (dataUrl: string) => void) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        if (height > maxHeight) {
+          width = Math.round((width * maxHeight) / height);
+          height = maxHeight;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL('image/png', 0.85);
+          callback(compressed);
+        }
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
   function handleLogoFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSettings(prev => ({ ...prev, logoUrl: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      resizeImage(file, 400, 150, (dataUrl) => {
+        setSettings(prev => ({ ...prev, logoUrl: dataUrl }));
+      });
     }
   }
 
   function handleFaviconFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSettings(prev => ({ ...prev, faviconUrl: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      resizeImage(file, 96, 96, (dataUrl) => {
+        setSettings(prev => ({ ...prev, faviconUrl: dataUrl }));
+      });
     }
   }
 
@@ -91,11 +119,16 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
     }
 
     try {
-      await api('/settings', {
+      const res = await api('/settings', {
         method: 'POST',
         body: JSON.stringify(payload),
       });
-      notify('Settings saved successfully!', 'success');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        notify(`Failed to save settings: ${err.message || 'Server returned status ' + res.status}`, 'error');
+      } else {
+        notify('Settings saved successfully!', 'success');
+      }
     } catch (error: any) {
       notify(`Failed to save settings: ${error.message}`, 'error');
     } finally {
