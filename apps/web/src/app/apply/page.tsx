@@ -389,7 +389,7 @@ export default function ApplyPage() {
                           backgroundColor: isChecked ? '#2563eb' : 'transparent',
                           display: 'flex',
                           alignItems: 'center',
-                          justify: 'center',
+                          justifyContent: 'center',
                           transition: 'all 0.15s ease',
                         }}>
                           {isChecked && (
