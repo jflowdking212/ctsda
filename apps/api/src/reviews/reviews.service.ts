@@ -424,7 +424,13 @@ export class ReviewsService {
 
   async findCertificateByToken(token: string) {
     return this.prisma.certificate.findFirst({
-      where: { verificationToken: token },
+      where: {
+        OR: [
+          { verificationToken: token },
+          { certificateNumber: token },
+          { accreditation: { accreditationCode: token } },
+        ],
+      },
       include: {
         accreditation: {
           include: {
