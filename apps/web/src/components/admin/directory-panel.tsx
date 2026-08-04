@@ -242,7 +242,8 @@ export function DirectoryPanel({
 
       {/* Directory Table */}
       <div className="admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.5rem', overflow: 'hidden' }}>
-        <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem', textAlign: 'left' }}>
+        <div style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
+          <table className="admin-table" style={{ width: '100%', minWidth: '650px', borderCollapse: 'collapse', fontSize: '0.875rem', textAlign: 'left' }}>
           <thead style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
             <tr>
               <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Institution</th>
@@ -309,6 +310,7 @@ export function DirectoryPanel({
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Detail / Edit Modal */}

@@ -324,8 +324,8 @@ export function IsolatedCertificateVerifier({
               </div>
             </div>
 
-            {/* Grid for Details and Image */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', marginBottom: '3rem' }}>
+            {/* Grid for Details and Image (Stacks on mobile) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12" style={{ display: 'grid', gap: '2rem', marginBottom: '3rem' }}>
               {/* Left Column: Details */}
               <div>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a', marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem' }}>

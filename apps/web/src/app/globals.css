@@ -2960,8 +2960,9 @@ a.header-action {
 .admin-button.primary:hover { background: #1d4ed8; }
 .admin-button.danger { background: #ef4444; color: white; }
 .admin-button.danger:hover { background: #dc2626; }
-.admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem; }
-.admin-table th { padding: 1rem; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; text-align: left; }
+.admin-table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 0.5rem; border: 1px solid #e2e8f0; margin-top: 1rem; margin-bottom: 1rem; }
+.admin-table { width: 100%; min-width: 600px; border-collapse: collapse; text-align: left; font-size: 0.875rem; }
+.admin-table th { padding: 1rem; background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; text-align: left; white-space: nowrap; }
 .admin-table td { padding: 1rem; border-bottom: 1px solid #f1f5f9; color: #334155; text-align: left; }
 .admin-table tr:hover { background-color: #f8fafc; }
 .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
@@ -2973,4 +2974,57 @@ a.header-action {
 .admin-message.error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 .admin-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1.5rem; }
 .admin-detail { margin-top: 1rem; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; }
+
+/* Responsive Mobile & Tablet Overrides for Admin Dashboard & Public Components */
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    position: fixed !important;
+    top: 70px;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    background: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    box-shadow: 10px 0 25px rgba(0, 0, 0, 0.15);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 9999 !important;
+  }
+  .admin-sidebar.is-open {
+    transform: translateX(0) !important;
+  }
+  .admin-sidebar-overlay {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9990;
+    display: block;
+  }
+  .admin-main-content {
+    padding: 1rem !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-section {
+    padding: 1rem !important;
+    border-radius: 0.5rem !important;
+  }
+  .metric-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  .admin-table th, .admin-table td {
+    padding: 0.75rem 0.5rem !important;
+  }
+  .admin-header-title {
+    display: none !important;
+  }
+}
+
 
