@@ -278,8 +278,8 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
         credentials: 'include',
         headers,
       });
-    } catch {
-      throw new Error('Admin API is not reachable. Please make sure the backend server is running.');
+    } catch (err: any) {
+      throw new Error(err?.message ? `Network request failed: ${err.message}` : 'Admin API is not reachable. Please make sure the backend server is running.');
     }
 
     if (!response.ok) {
