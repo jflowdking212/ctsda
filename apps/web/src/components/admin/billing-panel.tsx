@@ -38,28 +38,21 @@ export function BillingPanel({ api }: { api: (path: string, init?: RequestInit) 
 
   const handleMarkAsPaidConfirm = async () => {
     if (!markPaidInvoice) return;
-    if (!paymentRef.trim()) {
-      setMessage({ text: 'Please enter a valid payment reference number.', type: 'error' });
-      return;
-    }
-    
     try {
-      // await api(`/admin/invoices/${markPaidInvoice.id}/pay`, { method: 'POST', body: JSON.stringify({ reference: paymentRef.trim() }) });
-      const updated = invoices.map(inv =>
-        inv.id === markPaidInvoice.id
-          ? { ...inv, status: 'paid' as const, referenceNo: paymentRef.trim() }
-          : inv
-      );
-      setInvoices(updated);
+      const res = await api(`/payments/invoices/${markPaidInvoice.id}/verify-manual`, { method: 'POST' });
+      if (!res.ok) {
+        throw new Error('Failed to verify payment');
+      }
+      setInvoices(prev => prev.map(inv => inv.id === markPaidInvoice.id ? { ...inv, status: 'paid' } : inv));
       setMessage({
-        text: `Invoice ${markPaidInvoice.id} successfully marked as PAID (Ref: ${paymentRef.trim()}). (API connection pending)`,
+        text: `Invoice ${markPaidInvoice.invoiceNumber || markPaidInvoice.id} verified as PAID. Accreditation certificate generated & institution activated successfully!`,
         type: 'success',
       });
+      setMarkPaidInvoice(null);
+      setPaymentRef('');
     } catch (e) {
-      setMessage({ text: 'Failed to mark as paid', type: 'error' });
+      setMessage({ text: 'Failed to verify manual payment', type: 'error' });
     }
-    setMarkPaidInvoice(null);
-    setPaymentRef('');
   };
 
   const handleSendReminder = (inv: any) => {

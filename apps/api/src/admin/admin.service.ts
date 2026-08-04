@@ -768,11 +768,31 @@ export class AdminService {
   }
 
   async getNotifications(userId: string) {
-    return this.prisma.notification.findMany({
+    const notifications = await this.prisma.notification.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
       take: 20,
     });
+
+    const pendingApps = await this.prisma.application.findMany({
+      where: { status: { in: ['submitted', 'resubmitted'] } },
+      include: { institution: true },
+      orderBy: { submittedAt: 'desc' },
+      take: 10,
+    });
+
+    const pendingNotifs = pendingApps.map((app) => ({
+      id: `pending-${app.id}`,
+      userId,
+      type: 'pending_verification',
+      title: 'Pending Verification',
+      body: `${app.institution?.name || 'New Institution'} submitted an accreditation application.`,
+      metadata: { applicationId: app.id, status: app.status },
+      isRead: false,
+      createdAt: app.submittedAt || app.createdAt,
+    }));
+
+    return [...pendingNotifs, ...notifications];
   }
 
   async markNotificationsRead(userId: string) {

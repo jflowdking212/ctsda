@@ -159,7 +159,7 @@ export class ReviewsService {
 
     const app = await this.prisma.application.findUnique({
       where: { id: applicationId },
-      include: { applicant: true },
+      include: { applicant: true, institution: true },
     });
     if (!app) throw new BadRequestException('Application not found');
 
@@ -237,29 +237,44 @@ export class ReviewsService {
               },
             });
 
-            await tx.notification.create({
-              data: {
-                userId: app.applicantId!,
-                type: 'approved_pending_payment' as any,
-                title: 'Application Approved - Payment Required',
-                body: 'Your CTSDA accreditation application has been approved. Please complete payment of the accreditation fee to receive your certificate.',
-                metadata: { applicationId },
-              },
-            });
+            if (app.applicantId) {
+              await tx.notification.create({
+                data: {
+                  userId: app.applicantId,
+                  type: 'approved_pending_payment' as any,
+                  title: 'Application Approved - Payment Required',
+                  body: 'Your CTSDA accreditation application has been approved. Please complete payment of the accreditation fee to receive your certificate.',
+                  metadata: { applicationId },
+                },
+              });
+            }
 
             const paymentLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/payment/${invoice.id}`;
-            await this.notificationsService.enqueueEmail({
-              to: (app.applicantEmail || app.applicant?.email || ""),
-              subject: 'CTSDA Accreditation Approved - Payment Required',
-              html: `
-                <h1>Congratulations!</h1>
-                <p>Hi ${(app.applicantFirstName || app.applicant?.firstName)},</p>
-                <p>Your application for CTSDA accreditation has been approved!</p>
-                <p>To finalize your accreditation and generate your certificate, please pay the accreditation fee.</p>
-                <a href="${paymentLink}" style="display:inline-block;padding:10px 20px;background-color:#007bff;color:#fff;text-decoration:none;border-radius:5px;">Pay Now</a>
-              `,
-              userId: app.applicantId!,
-            });
+            const targetEmail = app.applicantEmail || app.applicant?.email;
+            if (targetEmail) {
+              await this.notificationsService.enqueueEmail({
+                to: targetEmail,
+                subject: `CTSDA Accreditation Approved - ${app.institution?.name || 'Institution'}`,
+                html: `
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <h2 style="color: #10b981; margin-bottom: 5px;">Congratulations! Application Approved</h2>
+                    <p>Dear ${app.applicantFirstName || app.applicant?.firstName || 'Applicant'},</p>
+                    <p>We are pleased to inform you that the accreditation application for <strong>${app.institution?.name || 'your institution'}</strong> has been <strong>APPROVED</strong> by the CTSDA Accreditation Board!</p>
+                    <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #10b981; border-radius: 4px; margin: 20px 0;">
+                      <p style="margin: 0; font-weight: bold; color: #1e293b;">Accreditation Fee & Certificate Issuance:</p>
+                      <p style="margin: 5px 0 0 0; color: #475569;">To finalize your accreditation and issue your official CTSDA Certificate, please complete payment of your accreditation fee.</p>
+                    </div>
+                    <p style="text-align: center; margin: 25px 0;">
+                      <a href="${paymentLink}" style="background-color: #2563eb; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Complete Payment Now</a>
+                    </p>
+                    <p style="font-size: 0.85rem; color: #64748b;">If paying via manual bank transfer, our finance team will verify your receipt and immediately activate your accreditation credentials.</p>
+                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 25px 0 15px 0;" />
+                    <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} CTSDA - Council for Training, Skills & Development America.</p>
+                  </div>
+                `,
+                userId: app.applicantId || 'system',
+              });
+            }
 
           } else {
             // Immediate issuance (Pay Upfront or zero fee)
@@ -290,56 +305,92 @@ export class ReviewsService {
             });
             certificateId = certificate.id;
 
-            await tx.notification.create({
-              data: {
-                userId: app.applicantId!,
-                type: 'approved',
-                title: 'Application approved',
-                body: 'Your CTSDA accreditation application has been approved.',
-                metadata: { applicationId, accreditationId: acc.id },
-              },
-            });
+            if (app.applicantId) {
+              await tx.notification.create({
+                data: {
+                  userId: app.applicantId,
+                  type: 'approved',
+                  title: 'Application approved',
+                  body: 'Your CTSDA accreditation application has been approved.',
+                  metadata: { applicationId, accreditationId: acc.id },
+                },
+              });
+            }
 
+            const targetEmail = app.applicantEmail || app.applicant?.email;
+            if (targetEmail) {
+              await this.notificationsService.enqueueEmail({
+                to: targetEmail,
+                subject: `CTSDA Accreditation Approved - ${app.institution?.name}`,
+                html: `
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <h2 style="color: #10b981; margin-bottom: 5px;">Congratulations! Application Approved</h2>
+                    <p>Dear ${app.applicantFirstName || app.applicant?.firstName || 'Applicant'},</p>
+                    <p>Your application for CTSDA accreditation for <strong>${app.institution?.name}</strong> has been approved, and your official certificate has been issued!</p>
+                    <p>You can access your portal to view and download your accreditation credentials.</p>
+                  </div>
+                `,
+                userId: app.applicantId || 'system',
+              });
+            }
+          }
+        } else if (newStatus === 'under_review') {
+          const targetEmail = app.applicantEmail || app.applicant?.email;
+          if (targetEmail) {
             await this.notificationsService.enqueueEmail({
-              to: (app.applicantEmail || app.applicant?.email || ""),
-              subject: 'CTSDA Accreditation Approved',
+              to: targetEmail,
+              subject: `CTSDA Application Status Update: Under Review`,
               html: `
-                <h1>Congratulations!</h1>
-                <p>Hi ${(app.applicantFirstName || app.applicant?.firstName)},</p>
-                <p>Your application for CTSDA accreditation has been approved, and your certificate has been issued!</p>
-                <p>You can view your dashboard to download your certificate.</p>
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                  <h2 style="color: #2563eb; margin-bottom: 5px;">Application Status Update: Under Review</h2>
+                  <p>Dear ${app.applicantFirstName || app.applicant?.firstName || 'Applicant'},</p>
+                  <p>Your accreditation application for <strong>${app.institution?.name || 'your institution'}</strong> has been moved to <strong>Under Review</strong> by the CTSDA Accreditation Board.</p>
+                  <p>Our review committee is actively evaluating your institution profile and compliance documentation. You will receive further updates as our review progresses.</p>
+                  <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 25px 0 15px 0;" />
+                  <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} CTSDA - Council for Training, Skills & Development America.</p>
+                </div>
               `,
-              userId: app.applicantId!,
+              userId: app.applicantId || 'system',
             });
           }
         } else if (newStatus === 'rejected') {
-          await this.notificationsService.enqueueEmail({
-              to: (app.applicantEmail || app.applicant?.email || ""),
-            subject: 'Update on your CTSDA Application',
-            html: `
-              <h1>Application Update</h1>
-              <p>Hi ${(app.applicantFirstName || app.applicant?.firstName)},</p>
-              <p>We have reviewed your application. Unfortunately, it has been rejected at this time.</p>
-              ${metadata?.reason ? `<p><strong>Reason:</strong> ${metadata.reason}</p>` : ''}
-              ${metadata?.comments ? `<p><strong>Comments:</strong> ${metadata.comments}</p>` : ''}
-              <p>Please contact support for more details.</p>
-            `,
-            userId: app.applicantId!,
-          });
+          const targetEmail = app.applicantEmail || app.applicant?.email;
+          if (targetEmail) {
+            await this.notificationsService.enqueueEmail({
+              to: targetEmail,
+              subject: `Update on your CTSDA Accreditation Application`,
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                  <h2 style="color: #b91c1c; margin-bottom: 5px;">Application Status Update</h2>
+                  <p>Dear ${app.applicantFirstName || app.applicant?.firstName || 'Applicant'},</p>
+                  <p>We have completed the review of your application for <strong>${app.institution?.name || 'your institution'}</strong>. Unfortunately, your application has not been approved at this time.</p>
+                  ${metadata?.reason ? `<p><strong>Reason:</strong> ${metadata.reason}</p>` : ''}
+                  ${metadata?.comments ? `<p><strong>Comments:</strong> ${metadata.comments}</p>` : ''}
+                  <p>If you have questions or require further clarification, please contact our support team at <a href="mailto:management@ctsdamerica.com">management@ctsdamerica.com</a>.</p>
+                </div>
+              `,
+              userId: app.applicantId || 'system',
+            });
+          }
         } else if (newStatus === 'changes_requested') {
-          await this.notificationsService.enqueueEmail({
-              to: (app.applicantEmail || app.applicant?.email || ""),
-            subject: 'Action Required: CTSDA Application',
-            html: `
-              <h1>Action Required</h1>
-              <p>Hi ${(app.applicantFirstName || app.applicant?.firstName)},</p>
-              <p>We need some changes or additional information before we can proceed with your application.</p>
-              ${metadata?.reason ? `<p><strong>Reason:</strong> ${metadata.reason}</p>` : ''}
-              ${metadata?.comments ? `<p><strong>Comments:</strong> ${metadata.comments}</p>` : ''}
-              <p>Please log in to your dashboard to make the necessary updates.</p>
-            `,
-            userId: app.applicantId!,
-          });
+          const targetEmail = app.applicantEmail || app.applicant?.email;
+          if (targetEmail) {
+            await this.notificationsService.enqueueEmail({
+              to: targetEmail,
+              subject: `Action Required: CTSDA Accreditation Application`,
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                  <h2 style="color: #c2410c; margin-bottom: 5px;">Action Required</h2>
+                  <p>Dear ${app.applicantFirstName || app.applicant?.firstName || 'Applicant'},</p>
+                  <p>Our review team requires additional information or updates regarding your application for <strong>${app.institution?.name || 'your institution'}</strong>.</p>
+                  ${metadata?.reason ? `<p><strong>Reason:</strong> ${metadata.reason}</p>` : ''}
+                  ${metadata?.comments ? `<p><strong>Comments:</strong> ${metadata.comments}</p>` : ''}
+                  <p>Please respond or submit the requested updates to <a href="mailto:management@ctsdamerica.com">management@ctsdamerica.com</a>.</p>
+                </div>
+              `,
+              userId: app.applicantId || 'system',
+            });
+          }
         }
 
         return next;

@@ -172,12 +172,25 @@ export class PaymentsService {
       throw new BadRequestException('Missing invoice or training metadata');
     }
 
+  async verifyManualPayment(invoiceId: string, actorId: string) {
+    const invoice = await this.prisma.invoice.findUnique({
+      where: { id: invoiceId },
+    });
+
+    if (!invoice) {
+      throw new BadRequestException('Invoice not found');
+    }
+
+    if (invoice.status === 'paid') {
+      return { success: true, message: 'Invoice is already marked as paid.' };
+    }
+
     return this.handleProviderPayment({
-      eventId: event.id,
+      eventId: `manual-${invoiceId}-${Date.now()}`,
       invoiceId,
-      providerPaymentId: typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id,
-      provider: 'stripe',
-      idempotencyKey: `stripe:${event.id}`,
+      providerPaymentId: `manual-transfer-${Date.now()}`,
+      provider: 'manual_bank_transfer',
+      idempotencyKey: `manual:${invoiceId}`,
     });
   }
 
