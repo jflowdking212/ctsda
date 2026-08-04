@@ -62,6 +62,7 @@ export class AdminService {
         applicant: { select: { id: true, email: true, firstName: true, lastName: true } },
         reviewer: { select: { id: true, email: true, firstName: true, lastName: true } },
         checklistItems: true,
+        accreditations: { select: { id: true, expiresAt: true, status: true } },
         comments: { orderBy: { createdAt: 'desc' }, take: 3 },
       },
       orderBy: { updatedAt: 'desc' },

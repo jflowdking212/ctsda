@@ -245,7 +245,20 @@ export function QueuePanel({
                   <td style={{ padding: '0.75rem 1rem', color: '#64748b', textAlign: 'left' }}>
                     {app.submittedAt ? new Date(app.submittedAt).toLocaleDateString() : (app.createdAt ? new Date(app.createdAt).toLocaleDateString() : '')}
                   </td>
-                  <td style={{ padding: '0.75rem 1rem', textAlign: 'left' }}>{getStatusBadge(app.status)}</td>
+                  <td style={{ padding: '0.75rem 1rem', textAlign: 'left' }}>
+                    {getStatusBadge(app.status)}
+                    {app.status === 'approved' && (
+                      <div style={{ fontSize: '0.72rem', color: '#047857', fontWeight: 600, marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                        <span>📅 Expiry:</span>
+                        <span>
+                          {app.accreditations?.[0]?.expiresAt
+                            ? new Date(app.accreditations[0].expiresAt).toLocaleDateString()
+                            : new Date(new Date(app.reviewedAt || app.updatedAt || Date.now()).setFullYear(new Date(app.reviewedAt || app.updatedAt || Date.now()).getFullYear() + 1)).toLocaleDateString()}
+                        </span>
+                        <span style={{ fontSize: '0.65rem', backgroundColor: '#dcfce7', padding: '0.1rem 0.35rem', borderRadius: '4px', border: '1px solid #86efac' }}>Yearly</span>
+                      </div>
+                    )}
+                  </td>
                   <td style={{ padding: '0.75rem 1rem', textAlign: 'left' }}>
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                       <button
