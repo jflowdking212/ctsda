@@ -11,83 +11,203 @@ export default function Home() {
       <PremiumHeader />
 
       <main>
-        {/* Hero Section - Premium Redesign */}
-        <section className="home-hero">
-          {/* Animated Particles Background */}
-          <div className="hero-particles">
-            <span className="particle" />
-            <span className="particle" />
-            <span className="particle" />
-            <span className="particle" />
-            <span className="particle" />
-            <span className="particle" />
-            <span className="particle" />
-            <span className="particle" />
-          </div>
-          
-          <div className="container relative z-10">
-            <div className="hero-content">
-              {/* Badge with explicit WHITE text */}
-              <span
-                className="hero-badge"
-                style={{
-                  color: '#ffffff',
-                  backgroundColor: 'rgba(255, 255, 255, 0.18)',
-                  border: '1px solid rgba(255, 255, 255, 0.35)',
-                  fontWeight: 700,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.4rem 1rem',
-                  borderRadius: '999px',
-                  marginBottom: '1.25rem',
-                }}
-              >
-                <svg className="hero-badge-icon" style={{ color: '#fbbf24', width: '1.1rem', height: '1.1rem' }} fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0110 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                <span style={{ color: '#ffffff', fontWeight: 700, fontSize: '0.875rem' }}>
-                  Setting Global Standards in Education
-                </span>
-              </span>
+        {/* Hero Section - Executive 2-Column Redesign */}
+        <section
+          style={{
+            position: 'relative',
+            minHeight: '85vh',
+            backgroundColor: '#021a42',
+            backgroundImage: 'linear-gradient(135deg, rgba(2, 26, 66, 0.95) 0%, rgba(2, 26, 66, 0.88) 50%, rgba(2, 26, 66, 0.65) 100%), url("/images/hero_professional_trainee.png")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center right',
+            color: '#ffffff',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '5rem 0',
+            overflow: 'hidden',
+          }}
+        >
+          <div className="container" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 1.5rem', width: '100%', position: 'relative', zIndex: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '3rem', alignItems: 'center' }}>
               
-              <h1 className="hero-title" style={{ color: '#ffffff', fontWeight: 800 }}>
-                Council for Training Skills and Development America (CTSDA)
-              </h1>
-              
-              <p className="hero-description" style={{ color: '#cbd5e1' }}>
-                The Council for Training, Skills, and Development, America (CTSDA) is a leading American accreditation body, renowned for providing comprehensive accreditation services to institutions, trainers, and educational and training service providers.
-              </p>
-              <p className="hero-description text-sm opacity-90 mt-3" style={{ color: '#e2e8f0' }}>
-                By gaining CTSDA accreditation, you can strengthen your professional skills, enhance your reputation, and bolster your professional practice.
-              </p>
-              
-              <div className="hero-actions">
-                <Link className="button primary" href="/apply" style={{ backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 700 }}>
-                  Start Accreditation Process
-                </Link>
-                <Link className="button secondary" href="/verify" style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1.5px solid #cbd5e1', fontWeight: 700, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                  Verify Certificate
-                </Link>
+              {/* Left Column (7 cols): Hero Copy & Primary CTAs */}
+              <div style={{ gridColumn: 'span 12', '@media (min-width: 1024px)': { gridColumn: 'span 7' } } as any} className="lg:col-span-7">
+                
+                {/* Top Pill Badge */}
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', backgroundColor: 'rgba(255, 255, 255, 0.12)', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '0.45rem 1.1rem', borderRadius: '50px', backdropFilter: 'blur(10px)', marginBottom: '1.5rem' }}>
+                  <svg style={{ color: '#fbbf24', width: '1.1rem', height: '1.1rem' }} fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0110 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    Official International Accreditation Body
+                  </span>
+                </div>
+
+                {/* Main Headline */}
+                <h1 style={{ fontSize: 'clamp(2.3rem, 4.2vw, 3.25rem)', fontWeight: 800, color: '#ffffff', lineHeight: 1.18, letterSpacing: '-0.02em', marginBottom: '1.25rem' }}>
+                  Council for Training, Skills &amp; Development America <span style={{ color: '#60a5fa' }}>(CTSDA)</span>
+                </h1>
+
+                {/* Subtitle / Value Statement */}
+                <p style={{ fontSize: '1.125rem', color: '#cbd5e1', lineHeight: 1.65, maxWidth: '640px', marginBottom: '2rem', fontWeight: 400 }}>
+                  Empowering global education and workforce training providers with rigorous quality standards, international recognition, and 100% verifiable digital credentials.
+                </p>
+
+                {/* CTAs Row */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', marginBottom: '2.5rem' }}>
+                  <Link
+                    href="/apply"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      backgroundColor: '#2563eb',
+                      color: '#ffffff',
+                      padding: '0.95rem 1.85rem',
+                      borderRadius: '0.625rem',
+                      fontWeight: 700,
+                      fontSize: '1.05rem',
+                      textDecoration: 'none',
+                      boxShadow: '0 8px 25px rgba(37, 99, 235, 0.4)',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    Start Accreditation Process
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </Link>
+
+                  <Link
+                    href="/verify"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.6rem',
+                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                      color: '#ffffff',
+                      border: '1.5px solid rgba(255, 255, 255, 0.3)',
+                      padding: '0.95rem 1.65rem',
+                      borderRadius: '0.625rem',
+                      fontWeight: 700,
+                      fontSize: '1.05rem',
+                      textDecoration: 'none',
+                      backdropFilter: 'blur(8px)',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    Verify Certificate
+                  </Link>
+                </div>
+
+                {/* Trust Pill Ribbon */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap', borderTop: '1px solid rgba(255, 255, 255, 0.15)', paddingTop: '1.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#93c5fd', fontSize: '0.875rem', fontWeight: 600 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    150+ Countries Reached
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#93c5fd', fontSize: '0.875rem', fontWeight: 600 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    2,500+ Accredited Institutions
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#93c5fd', fontSize: '0.875rem', fontWeight: 600 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    95% Satisfaction Rate
+                  </div>
+                </div>
+
               </div>
-            </div>
-            
-            {/* Floating Hero Cards - Visual Enhancement */}
-            <div className="hero-cards">
-              <div className="hero-card">
-                <svg className="hero-card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.692A3.001 3.001 0 004 7.97v8.05a3 3 0 003.807 2.807 9.002 9.002 0 016.331-5.197V7.97a3 3 0 00-3.807-2.807 9.002 9.002 0 01-6.331 5.197z" />
-                </svg>
-                <h3>Global Recognition</h3>
-                <p>2500+ Accredited Institutions</p>
+
+              {/* Right Column (5 cols): Premium Glass Verification Card */}
+              <div style={{ gridColumn: 'span 12', '@media (min-width: 1024px)': { gridColumn: 'span 5' } } as any} className="lg:col-span-5">
+                <div style={{
+                  backgroundColor: '#ffffff',
+                  borderRadius: '1.25rem',
+                  padding: '2rem',
+                  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.1)',
+                  border: '1px solid #e2e8f0',
+                  color: '#0f172a'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#22c55e', boxShadow: '0 0 8px #22c55e' }}></span>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Live Verification Portal
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>CTSDA-V2</span>
+                  </div>
+
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>
+                    Verify Any Certificate
+                  </h3>
+                  <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+                    Enter a certificate or accreditation code to instantly confirm validity and institutional credentials.
+                  </p>
+
+                  {/* Embedded Compact Search Widget */}
+                  <form action="/verify" method="GET" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                    <input
+                      name="q"
+                      placeholder="E.G. CTSDA-2026-889104"
+                      style={{
+                        width: '100%',
+                        padding: '0.85rem 1rem',
+                        borderRadius: '0.5rem',
+                        border: '2px solid #cbd5e1',
+                        fontSize: '0.95rem',
+                        fontWeight: 600,
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        outline: 'none',
+                        color: '#0f172a',
+                        backgroundColor: '#f8fafc',
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      style={{
+                        width: '100%',
+                        padding: '0.85rem',
+                        backgroundColor: '#2563eb',
+                        color: '#ffffff',
+                        fontWeight: 700,
+                        fontSize: '0.95rem',
+                        borderRadius: '0.5rem',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem',
+                        boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                      Verify Certificate Now
+                    </button>
+                  </form>
+
+                  {/* Floating Stat Mini Cards */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                    <div style={{ backgroundColor: '#f8fafc', padding: '0.85rem', borderRadius: '0.625rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#2563eb' }}>2,500+</div>
+                      <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>Accredited Providers</div>
+                    </div>
+                    <div style={{ backgroundColor: '#f8fafc', padding: '0.85rem', borderRadius: '0.625rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#059669' }}>95%</div>
+                      <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>Retention Rate</div>
+                    </div>
+                  </div>
+
+                </div>
               </div>
-              <div className="hero-card">
-                <svg className="hero-card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v13m0-13V6a2 2 0 112 0v3M8 8v13m-4-6h16M3 3h18v18H3z" />
-                </svg>
-                <h3>Satisfaction Rate</h3>
-                <p>95% Client Retention</p>
-              </div>
+
             </div>
           </div>
         </section>
