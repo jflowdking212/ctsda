@@ -31,7 +31,7 @@ export function PremiumHeader() {
     <header className="premium-site-header" style={{ position: 'relative', backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
       <div className="container premium-header-shell">
         <Link className="brand-mark" href="/" aria-label="CTSDA home">
-          <img className="brand-logo" src="/images/logo-ctsda.png" alt="CTSDA Logo" loading="eager" />
+          <img className="brand-logo" src="/images/logo-ctsda.png" alt="CTSDA Logo" loading="eager" style={{ width: '48px', height: '48px', objectFit: 'contain', flexShrink: 0 }} />
           <span className="brand-text">
             <strong>CTSDA</strong>
             <small>Council for Training, Skills &amp; Development America</small>
