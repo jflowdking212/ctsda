@@ -86,12 +86,14 @@ export function QueuePanel({
         className="admin-section-header"
         style={{ borderLeft: '4px solid #2563eb', paddingLeft: '1rem', marginBottom: '1.5rem' }}
       >
-        <div className="admin-kicker" style={{ fontSize: '0.75rem', fontWeight: 600, color: '#2563eb', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-          CTSDA Accreditation System
+        <div>
+          <div className="admin-kicker" style={{ fontSize: '0.75rem', fontWeight: 600, color: '#2563eb', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+            CTSDA Accreditation System
+          </div>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', margin: '0.25rem 0 0 0' }}>
+            Review Queue Panel
+          </h1>
         </div>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', margin: '0.25rem 0 0 0' }}>
-          Review Queue Panel
-        </h1>
       </div>
 
       {/* Metric Cards Row */}

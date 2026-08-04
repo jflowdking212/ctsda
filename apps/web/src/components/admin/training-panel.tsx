@@ -129,7 +129,7 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
                 <td style={{ padding: '1rem', textAlign: 'right' }}>
                   <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                     <button className="admin-button" onClick={() => openEdit(m)} style={{ padding: '0.3rem 0.7rem', fontSize: '0.75rem' }}>Edit</button>
-                    <button className="admin-button danger" onClick={() => deleteModule(m.id)} style={{ padding: '0.3rem 0.7rem', fontSize: '0.75rem', color: '#ef4444' }}>Delete</button>
+                    <button className="admin-button danger" onClick={() => deleteModule(m.id)} style={{ padding: '0.3rem 0.7rem', fontSize: '0.75rem', color: '#ffffff' }}>Delete</button>
                   </div>
                 </td>
               </tr>

@@ -14,6 +14,18 @@ export class SettingsService {
     return result;
   }
 
+  async getPublicSettings() {
+    const settings = await this.getAll();
+    const publicSettings: Record<string, any> = {};
+    const hiddenKeys = ['smtpHost', 'smtpPort', 'smtpUser', 'smtpPassword', 'smtpSecure'];
+    for (const [k, v] of Object.entries(settings)) {
+      if (!hiddenKeys.includes(k)) {
+        publicSettings[k] = v;
+      }
+    }
+    return publicSettings;
+  }
+
   async updateAll(settings: Record<string, any>) {
     for (const [key, value] of Object.entries(settings)) {
       const strValue = String(value);

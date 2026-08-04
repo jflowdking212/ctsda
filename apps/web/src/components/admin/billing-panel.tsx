@@ -113,15 +113,17 @@ export function BillingPanel({ api }: { api: (path: string, init?: RequestInit) 
           marginBottom: '0.5rem',
         }}
       >
-        <span className="admin-kicker" style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2563eb', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-          Financial Management
-        </span>
-        <h2 style={{ margin: '0.25rem 0 0.5rem 0', fontSize: '1.6rem', fontWeight: 800, color: '#0f172a' }}>
-          Billing & Orders Panel
-        </h2>
-        <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>
-          Manage accreditation institution invoices, payments, subscriptions, and financial records.
-        </p>
+        <div>
+          <span className="admin-kicker" style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2563eb', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            Financial Management
+          </span>
+          <h2 style={{ margin: '0.25rem 0 0.5rem 0', fontSize: '1.6rem', fontWeight: 800, color: '#0f172a' }}>
+            Billing & Orders Panel
+          </h2>
+          <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>
+            Manage accreditation institution invoices, payments, subscriptions, and financial records.
+          </p>
+        </div>
       </div>
 
       {/* Message Toast / Alert */}

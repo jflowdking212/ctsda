@@ -119,7 +119,7 @@ export class ReviewsService {
           where: { id: applicationId },
           select: { applicantId: true },
         });
-        if (!app || app.applicantId !== authorId) {
+        if (!app || app.applicantId! !== authorId) {
           throw new ForbiddenException('You cannot comment on this application');
         }
       }
@@ -239,7 +239,7 @@ export class ReviewsService {
 
             await tx.notification.create({
               data: {
-                userId: app.applicantId,
+                userId: app.applicantId!,
                 type: 'approved_pending_payment' as any,
                 title: 'Application Approved - Payment Required',
                 body: 'Your CTSDA accreditation application has been approved. Please complete payment of the accreditation fee to receive your certificate.',
@@ -249,16 +249,16 @@ export class ReviewsService {
 
             const paymentLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/payment/${invoice.id}`;
             await this.notificationsService.enqueueEmail({
-              to: app.applicant.email,
+              to: (app.applicantEmail || app.applicant?.email || ""),
               subject: 'CTSDA Accreditation Approved - Payment Required',
               html: `
                 <h1>Congratulations!</h1>
-                <p>Hi ${app.applicant.firstName},</p>
+                <p>Hi ${(app.applicantFirstName || app.applicant?.firstName)},</p>
                 <p>Your application for CTSDA accreditation has been approved!</p>
                 <p>To finalize your accreditation and generate your certificate, please pay the accreditation fee.</p>
                 <a href="${paymentLink}" style="display:inline-block;padding:10px 20px;background-color:#007bff;color:#fff;text-decoration:none;border-radius:5px;">Pay Now</a>
               `,
-              userId: app.applicantId,
+              userId: app.applicantId!,
             });
 
           } else {
@@ -292,7 +292,7 @@ export class ReviewsService {
 
             await tx.notification.create({
               data: {
-                userId: app.applicantId,
+                userId: app.applicantId!,
                 type: 'approved',
                 title: 'Application approved',
                 body: 'Your CTSDA accreditation application has been approved.',
@@ -301,44 +301,44 @@ export class ReviewsService {
             });
 
             await this.notificationsService.enqueueEmail({
-              to: app.applicant.email,
+              to: (app.applicantEmail || app.applicant?.email || ""),
               subject: 'CTSDA Accreditation Approved',
               html: `
                 <h1>Congratulations!</h1>
-                <p>Hi ${app.applicant.firstName},</p>
+                <p>Hi ${(app.applicantFirstName || app.applicant?.firstName)},</p>
                 <p>Your application for CTSDA accreditation has been approved, and your certificate has been issued!</p>
                 <p>You can view your dashboard to download your certificate.</p>
               `,
-              userId: app.applicantId,
+              userId: app.applicantId!,
             });
           }
         } else if (newStatus === 'rejected') {
           await this.notificationsService.enqueueEmail({
-            to: app.applicant.email,
+              to: (app.applicantEmail || app.applicant?.email || ""),
             subject: 'Update on your CTSDA Application',
             html: `
               <h1>Application Update</h1>
-              <p>Hi ${app.applicant.firstName},</p>
+              <p>Hi ${(app.applicantFirstName || app.applicant?.firstName)},</p>
               <p>We have reviewed your application. Unfortunately, it has been rejected at this time.</p>
               ${metadata?.reason ? `<p><strong>Reason:</strong> ${metadata.reason}</p>` : ''}
               ${metadata?.comments ? `<p><strong>Comments:</strong> ${metadata.comments}</p>` : ''}
               <p>Please contact support for more details.</p>
             `,
-            userId: app.applicantId,
+            userId: app.applicantId!,
           });
         } else if (newStatus === 'changes_requested') {
           await this.notificationsService.enqueueEmail({
-            to: app.applicant.email,
+              to: (app.applicantEmail || app.applicant?.email || ""),
             subject: 'Action Required: CTSDA Application',
             html: `
               <h1>Action Required</h1>
-              <p>Hi ${app.applicant.firstName},</p>
+              <p>Hi ${(app.applicantFirstName || app.applicant?.firstName)},</p>
               <p>We need some changes or additional information before we can proceed with your application.</p>
               ${metadata?.reason ? `<p><strong>Reason:</strong> ${metadata.reason}</p>` : ''}
               ${metadata?.comments ? `<p><strong>Comments:</strong> ${metadata.comments}</p>` : ''}
               <p>Please log in to your dashboard to make the necessary updates.</p>
             `,
-            userId: app.applicantId,
+            userId: app.applicantId!,
           });
         }
 

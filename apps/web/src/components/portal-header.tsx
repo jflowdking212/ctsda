@@ -43,12 +43,8 @@ export function PortalHeader() {
     try {
       await fetch(`${API_BASE}/auth/logout`, {
         method: 'POST',
-        body: JSON.stringify({}),
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          ...headers,
-        },
+        headers,
       });
     } finally {
       auth.logout();

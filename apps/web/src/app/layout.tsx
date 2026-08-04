@@ -2,32 +2,52 @@ import type { Metadata } from 'next';
 import './globals.css';
 import './styles/premium.css';
 
-export const metadata: Metadata = {
-  title: {
-    template: '%s | CTSDA - Council for Training, Skills & Development America',
-    default: 'CTSDA - Global Standards in Education Excellence',
-  },
-  description: 'CTSDA provides comprehensive accreditation services for institutions, trainers, and educational service providers worldwide. Setting global standards in education excellence.',
-  keywords: ['accreditation', 'education', 'training', 'skills development', 'quality assurance'],
-  authors: [{ name: 'CTSDA' }],
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://ctsda.org',
-    title: 'CTSDA - Council for Training, Skills & Development America',
-    description: 'Global standards in education excellence',
-    siteName: 'CTSDA',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'CTSDA - Council for Training, Skills & Development America',
-    description: 'Global standards in education excellence',
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  let settings: Record<string, any> = {};
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    const res = await fetch(`${apiUrl}/settings/public`, { next: { revalidate: 60 } });
+    if (res.ok) {
+      settings = await res.json();
+    }
+  } catch (err) {
+    console.error('Failed to load global settings for metadata', err);
+  }
+
+  const title = settings.siteTitle || 'CTSDA - Global Standards in Education Excellence';
+  const description = settings.siteDescription || settings.metaDescription || 'CTSDA provides comprehensive accreditation services for institutions, trainers, and educational service providers worldwide.';
+  const keywords = settings.metaKeywords ? settings.metaKeywords.split(',').map((k: string) => k.trim()) : ['accreditation', 'education', 'training', 'skills development', 'quality assurance'];
+
+  return {
+    title: {
+      template: `%s | ${title}`,
+      default: title,
+    },
+    description,
+    keywords,
+    authors: [{ name: 'CTSDA' }],
+    openGraph: {
+      type: 'website',
+      locale: 'en_US',
+      url: 'https://ctsda.org',
+      title: title,
+      description,
+      siteName: title,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: title,
+      description,
+    },
+    icons: {
+      icon: settings.faviconUrl || '/favicon.ico',
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
 
 export default function RootLayout({
   children,

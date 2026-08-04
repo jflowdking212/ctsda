@@ -2,10 +2,14 @@ import { Injectable, BadRequestException, ConflictException } from '@nestjs/comm
 import { randomBytes } from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../common/prisma.service';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class InstitutionsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private storageService: StorageService,
+  ) {}
 
   async createPreRegistration(data: { email: string; institutionId?: string }) {
     const token = randomBytes(32).toString('base64url');
@@ -30,6 +34,30 @@ export class InstitutionsService {
     }
 
     return preRegistration;
+  }
+
+  async findPublicAccredited() {
+    const institutions = await this.prisma.institution.findMany({
+      where: {
+        applications: {
+          some: {
+            status: 'approved'
+          }
+        },
+        logoUrl: { not: null }
+      },
+      select: {
+        id: true,
+        name: true,
+        logoUrl: true,
+      },
+      take: 10,
+    });
+
+    return Promise.all(institutions.map(async (inst) => ({
+      ...inst,
+      logoUrl: inst.logoUrl ? await this.storageService.getSignedUrl(inst.logoUrl) : null,
+    })));
   }
 
   async findAll() {
@@ -75,7 +103,7 @@ export class InstitutionsService {
     website?: string;
     yearEstablished?: number;
     description?: string;
-    createdBy: string;
+    createdBy?: string;
     contacts: Array<{
       fullName: string;
       position: string;
@@ -244,13 +272,10 @@ export class InstitutionsService {
 
   async generateUploadToken(applicationId: string) {
     const token = randomBytes(32).toString('base64url');
-    const application = await this.prisma.application.findUnique({ where: { id: applicationId } });
-    if (application) {
-      await this.prisma.user.update({
-        where: { id: application.applicantId },
-        data: { emailVerificationToken: token }, // Reuse this column for upload token
-      });
-    }
+    await this.prisma.application.update({
+      where: { id: applicationId },
+      data: { paymentToken: token },
+    });
     return token;
   }
 }

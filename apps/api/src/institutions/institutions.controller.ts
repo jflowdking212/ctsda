@@ -36,18 +36,9 @@ export class InstitutionsController {
     // 1. Verify OTP
     await this.authService.verifyOtp(body.email, body.otp);
 
-    // 2. Create inactive User
-    const { user } = await this.authService.registerApplicant({
-      email: body.email,
-      firstName: body.firstName,
-      lastName: body.lastName,
-      phone: body.phone,
-    });
-
     // 3. Create Institution
     const institution = await this.institutionsService.createInstitution({
       ...body.institution,
-      createdBy: user.id,
       contacts: [
         {
           fullName: `${body.firstName} ${body.lastName}`,
@@ -62,7 +53,10 @@ export class InstitutionsController {
     // 4. Create Application (with submitted status)
     const application = await this.institutionsService.createApplication({
       institutionId: institution.id,
-      applicantId: user.id,
+      applicantFirstName: body.firstName,
+      applicantLastName: body.lastName,
+      applicantEmail: body.email,
+      applicantPhone: body.phone,
       ...body.application,
     });
 
@@ -106,6 +100,11 @@ export class InstitutionsController {
   @Get('training-areas')
   async getTrainingAreas() {
     return this.institutionsService.getTrainingAreas();
+  }
+
+  @Get('public-accredited')
+  async findPublicAccredited() {
+    return this.institutionsService.findPublicAccredited();
   }
 
   @Get()

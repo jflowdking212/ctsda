@@ -28,7 +28,7 @@ export class PaymentsService {
       throw new BadRequestException('Application not found');
     }
 
-    if (application.applicantId !== userId) {
+    if ((application.applicantId || '') !== userId) {
       throw new ForbiddenException('Not your application');
     }
 
@@ -247,7 +247,7 @@ export class PaymentsService {
             to: settings.adminNotificationEmail,
             subject: 'New Application Pending Review (Fee Paid)',
             html: `<p>A new application has been submitted by ${application.institution?.name} after paying the application fee and is now pending review.</p>`,
-            userId: invoice.createdBy || application.applicantId,
+            userId: invoice.createdBy || (application.applicantId || ''),
           });
         }
       } else if (application && application.status === 'approved' && invoice.description === 'CTSDA Final Accreditation Fee') {
@@ -285,15 +285,15 @@ export class PaymentsService {
         const accountSetupToken = crypto.randomBytes(32).toString('base64url');
         
         await this.prisma.user.update({
-          where: { id: application.applicantId },
+          where: { id: (application.applicantId || '') },
           data: { emailVerificationToken: accountSetupToken, isActive: true }, // Reusing this column for account setup
         });
 
-        const user = await this.prisma.user.findUnique({ where: { id: application.applicantId } });
+        const user = await this.prisma.user.findUnique({ where: { id: (application.applicantId || '') } });
 
         await this.prisma.notification.create({
           data: {
-            userId: application.applicantId,
+            userId: (application.applicantId || ''),
             type: 'approved',
             title: 'Application approved - Certificate Issued',
             body: 'We have received your accreditation fee. Your CTSDA accreditation application is fully approved and your certificate has been issued.',

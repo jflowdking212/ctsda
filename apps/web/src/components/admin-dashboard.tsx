@@ -15,10 +15,26 @@ import { SettingsPanel } from './admin/settings-panel';
 const ADMIN_SESSION_KEY = 'ctsda_admin_session';
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-const adminNav: Array<{ href: string; section: AdminSection; label: string; roles: string[], isSubmenu?: boolean }> = [
+export type AdminNavItem = {
+  href: string;
+  section: AdminSection;
+  label: string;
+  roles: string[];
+  submenus?: AdminNavItem[];
+};
+
+const adminNav: AdminNavItem[] = [
   { href: '/admin/reports', section: 'reports', label: 'Reports', roles: ['super_admin', 'support_officer', 'finance_officer', 'content_manager', 'auditor'] },
-  { href: '/admin/accreditations', section: 'accreditations', label: 'Accreditations', roles: ['super_admin', 'support_officer'] },
-  { href: '/admin/queue', section: 'queue', label: 'Review Queue', roles: ['super_admin', 'support_officer'], isSubmenu: true },
+  { 
+    href: '#', 
+    section: 'accreditations', 
+    label: 'Accreditations', 
+    roles: ['super_admin', 'support_officer'],
+    submenus: [
+      { href: '/admin/accreditations', section: 'accreditations', label: 'All Accreditations', roles: ['super_admin', 'support_officer'] },
+      { href: '/admin/queue', section: 'queue', label: 'Review Queue', roles: ['super_admin', 'support_officer'] },
+    ]
+  },
   { href: '/admin/institutions', section: 'institutions', label: 'Directory', roles: ['super_admin', 'support_officer', 'content_manager'] },
   { href: '/admin/billing', section: 'billing', label: 'Billing & Orders', roles: ['super_admin', 'finance_officer'] },
   { href: '/admin/users', section: 'users', label: 'Users', roles: ['super_admin'] },
@@ -187,6 +203,13 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
 
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
+  // Expanded menu state (e.g. for submenus)
+  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
+
+  // Profile dropdown state
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
   async function logout() {
     setMessage(' ');
     try {
@@ -233,18 +256,27 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
   async function api(path: string, init?: RequestInit) {
     const storedSession = readStoredSession();
     let response: Response;
-    const isPostOrPut = init?.method && ['POST', 'PUT', 'PATCH'].includes(init.method.toUpperCase());
+    
+    // Check if we have an explicit body or need to send JSON
+    const hasBody = init?.body !== undefined;
+    
+    const headers: Record<string, string> = {
+      ...(storedSession ? { 'X-Session-Id': storedSession } : {}),
+      ...(init?.headers as Record<string, string> || {}),
+    };
+
+    if (hasBody) {
+      if (!headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+      }
+    }
+
     try {
       response = await fetch(`${API_BASE}${path}`, {
         cache: 'no-store',
         ...init,
-        body: init?.body ?? (isPostOrPut ? JSON.stringify({}) : undefined),
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(storedSession ? { 'X-Session-Id': storedSession } : {}),
-          ...(init?.headers || {}),
-        },
+        headers,
       });
     } catch {
       throw new Error('Admin API is not reachable. Please make sure the backend server is running.');
@@ -521,7 +553,7 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
   }
 
   return (
-    <div className="admin-layout" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f0f4f8' }}>
+    <div className="admin-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', backgroundColor: '#f0f4f8' }}>
       
       {/* GLOBAL TOPBAR HEADER */}
       <header style={{ 
@@ -534,9 +566,7 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
         flexShrink: 0, 
         zIndex: 100, 
         height: '70px', 
-        padding: '0 1.25rem',
-        position: 'sticky',
-        top: 0
+        padding: '0 1.25rem'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
@@ -596,12 +626,33 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
             )}
           </button>
 
-          <button className="admin-button secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, padding: '0.4rem 0.75rem' }} type="button" onClick={logout} title="Logout">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
-            </svg>
-            <span className="admin-header-logout-text">Logout</span>
-          </button>
+          {/* PROFILE MENU */}
+          <div ref={profileRef} style={{ position: 'relative' }}>
+            <button
+              className="admin-avatar-trigger"
+              onClick={() => setIsProfileOpen((prev) => !prev)}
+              style={{
+                background: '#e2e8f0',
+                color: '#0f172a',
+                border: 'none',
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '1rem',
+                cursor: 'pointer',
+                padding: 0,
+                margin: 0
+              }}
+              title="Profile menu"
+            >
+              {profile.firstName.charAt(0)}{profile.lastName.charAt(0)}
+            </button>
+          </div>
+
           <button className="admin-sidebar-toggle" style={{ margin: 0 }} type="button" onClick={() => setIsMobileNavOpen((prev) => !prev)} aria-label={isMobileNavOpen ? 'Close menu' : 'Open menu'}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               {isMobileNavOpen ? (
@@ -622,28 +673,11 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
       </header>
 
       {/* DASHBOARD CONTAINER WITH SIDEBAR & CONTENT */}
-      <main className="admin-shell" style={{ flex: 1, minHeight: 'calc(100vh - 70px)' }}>
+      <main className="admin-shell" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         <aside className={`admin-sidebar ${isMobileNavOpen ? 'is-open' : ''}`} style={{ 
-          position: 'sticky',
-          top: '70px',
-          height: 'calc(100vh - 70px)',
           overflowY: 'auto',
-          alignSelf: 'flex-start',
           zIndex: 90
         }}>
-          <div className="admin-profile" style={{ marginTop: '1rem' }}>
-            <div className="admin-avatar" aria-hidden="true">
-              {profile.firstName.charAt(0)}
-              {profile.lastName.charAt(0)}
-            </div>
-            <div className="admin-profile-info">
-              <strong>
-                {profile.firstName} {profile.lastName}
-              </strong>
-              <span>{profile.role.replace(/_/g, ' ')}</span>
-            </div>
-          </div>
-          
           <nav className={`admin-sidebar-nav ${isMobileNavOpen ? 'is-open' : ''}`}>
             {visibleNav.map((item) => {
               const iconPaths: Record<AdminSection, string> = {
@@ -658,21 +692,66 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
                 audit: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
                 accreditations: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'
               };
+
+              const hasSubmenus = item.submenus && item.submenus.length > 0;
+              const isExpanded = expandedMenus[item.section];
+
               return (
-                <Link
-                  className={item.section === section ? 'active' : undefined}
-                  style={item.isSubmenu ? { paddingLeft: '3rem', fontSize: '0.925rem', marginTop: '-0.25rem', marginBottom: '0.25rem' } : {}}
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsMobileNavOpen(false)}
-                >
-                  {!item.isSubmenu && (
-                    <svg className="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={iconPaths[item.section]} />
-                    </svg>
+                <div key={item.section} style={{ display: 'flex', flexDirection: 'column' }}>
+                  <Link
+                    className={item.section === section && !hasSubmenus ? 'active' : undefined}
+                    href={item.href}
+                    onClick={(e) => {
+                      if (hasSubmenus) {
+                        e.preventDefault();
+                        setExpandedMenus(prev => ({ ...prev, [item.section]: !prev[item.section] }));
+                      } else {
+                        setIsMobileNavOpen(false);
+                      }
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <svg className="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={iconPaths[item.section]} />
+                      </svg>
+                      {item.label}
+                    </span>
+                    {hasSubmenus && (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    )}
+                  </Link>
+
+                  {hasSubmenus && isExpanded && (
+                    <div style={{ display: 'flex', flexDirection: 'column', marginTop: '0.25rem', marginBottom: '0.25rem' }}>
+                      {item.submenus!.map(sub => (
+                        <Link
+                          key={sub.href}
+                          href={sub.href}
+                          className={sub.section === section ? 'active' : undefined}
+                          onClick={() => setIsMobileNavOpen(false)}
+                          style={{
+                            paddingLeft: '3rem',
+                            paddingTop: '0.5rem',
+                            paddingBottom: '0.5rem',
+                            fontSize: '0.85rem',
+                            color: sub.section === section ? '#2563eb' : '#475569',
+                            textDecoration: 'none',
+                            fontWeight: sub.section === section ? 600 : 400
+                          }}
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </div>
                   )}
-                  {item.label}
-                </Link>
+                </div>
               );
             })}
           </nav>
@@ -680,15 +759,13 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
 
         {isMobileNavOpen && <div className="admin-sidebar-overlay is-open" onClick={() => setIsMobileNavOpen(false)} aria-hidden="true" />}
 
-        <section className="admin-main">
+        <section className="admin-main" style={{ flex: 1, overflowY: 'auto', minWidth: 0 }}>
           {/* Page Content Header */}
-          <header className="admin-topbar" style={{ textAlign: 'left' }}>
-            <div className="admin-topbar-left" style={{ textAlign: 'left', alignItems: 'flex-start' }}>
-              <div>
-                <p className="admin-kicker" style={{ margin: '0 0 0.5rem 0' }}>{currentSection.eyebrow}</p>
-                <h1 style={{ textAlign: 'left', margin: '0 0 0.25rem 0' }}>{currentSection.title}</h1>
-                <p style={{ textAlign: 'left', margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.95rem', lineHeight: 1.5 }}>{currentSection.description}</p>
-              </div>
+          <header className="admin-topbar" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', textAlign: 'left', width: '100%' }}>
+            <div className="admin-topbar-left" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', flex: 1 }}>
+              <p className="admin-kicker" style={{ margin: '0 0 0.5rem 0', alignSelf: 'flex-start' }}>{currentSection.eyebrow}</p>
+              <h1 style={{ textAlign: 'left', margin: '0 0 0.25rem 0', alignSelf: 'flex-start' }}>{currentSection.title}</h1>
+              <p style={{ textAlign: 'left', margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.95rem', lineHeight: 1.5, alignSelf: 'flex-start' }}>{currentSection.description}</p>
             </div>
             <div className="admin-actions">
               <Link className="admin-button" href="/portal">
@@ -884,6 +961,77 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        </>,
+        document.body
+      )}
+      {/* PROFILE DROPDOWN — portaled to document.body */}
+      {isProfileOpen && typeof document !== 'undefined' && createPortal(
+        <>
+          <div
+            onClick={() => setIsProfileOpen(false)}
+            style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'transparent' }}
+          />
+          <div style={{
+            position: 'fixed',
+            top: (() => {
+              if (profileRef.current) {
+                const rect = profileRef.current.getBoundingClientRect();
+                return rect.bottom + 8;
+              }
+              return 78;
+            })(),
+            right: (() => {
+              if (profileRef.current) {
+                const rect = profileRef.current.getBoundingClientRect();
+                return window.innerWidth - rect.right;
+              }
+              return 24;
+            })(),
+            width: '240px',
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: '12px',
+            boxShadow: '0 20px 60px -12px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.04)',
+            zIndex: 99999,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}>
+            <div style={{ padding: '1rem', borderBottom: '1px solid #f1f5f9' }}>
+              <strong style={{ display: 'block', color: '#0f172a', fontSize: '0.95rem', fontWeight: 600 }}>{profile.firstName} {profile.lastName}</strong>
+              <small style={{ color: '#64748b', fontSize: '0.8rem' }}>{profile.email}</small>
+            </div>
+            <div style={{ padding: '0.5rem', display: 'flex', flexDirection: 'column' }}>
+              <button
+                type="button"
+                onClick={() => { setIsProfileOpen(false); window.location.href = '/admin/settings'; }}
+                style={{ padding: '0.625rem 1rem', textAlign: 'left', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.875rem', color: '#334155', borderRadius: '6px' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#f8fafc'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+              >
+                View / Edit Profile
+              </button>
+              <button
+                type="button"
+                onClick={() => { setIsProfileOpen(false); window.location.href = '/admin/settings'; }}
+                style={{ padding: '0.625rem 1rem', textAlign: 'left', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.875rem', color: '#334155', borderRadius: '6px' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#f8fafc'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+              >
+                Change Password
+              </button>
+              <hr style={{ border: 'none', borderBottom: '1px solid #f1f5f9', margin: '0.25rem 0' }} />
+              <button
+                type="button"
+                onClick={() => { setIsProfileOpen(false); logout(); }}
+                style={{ padding: '0.625rem 1rem', textAlign: 'left', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.875rem', color: '#ef4444', fontWeight: 600, borderRadius: '6px' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#fef2f2'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+              >
+                Logout
+              </button>
             </div>
           </div>
         </>,

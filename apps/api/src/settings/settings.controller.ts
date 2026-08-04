@@ -8,7 +8,14 @@ import { Roles } from '../common/decorators/roles.decorator';
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
+  @Get('public')
+  async getPublicSettings() {
+    return this.settingsService.getPublicSettings();
+  }
+
   @Get()
+  @UseGuards(AuthGuard, RbacGuard)
+  @Roles('super_admin')
   async getSettings() {
     return this.settingsService.getAll();
   }

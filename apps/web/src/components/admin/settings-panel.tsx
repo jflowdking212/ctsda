@@ -46,6 +46,33 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
     }
   }
 
+  async function testSmtp(e: React.MouseEvent) {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const payload = { ...settings };
+      if (!payload.smtpPassword) {
+        delete payload.smtpPassword;
+      }
+      
+      const testRes = await api('/settings/test-smtp', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      
+      if (!testRes.ok) {
+        const err = await testRes.json().catch(() => ({}));
+        alert(`SMTP Test Failed: ${err.message || 'Unknown error'}`);
+      } else {
+        alert('SMTP Test Successful!');
+      }
+    } catch (error: any) {
+      alert(`SMTP Test Failed: ${error.message}`);
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function saveSettings(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -56,18 +83,6 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
     }
 
     try {
-      if (payload.smtpHost) {
-        const testRes = await api('/settings/test-smtp', {
-          method: 'POST',
-          body: JSON.stringify(payload),
-        });
-        if (!testRes.ok) {
-          const err = await testRes.json().catch(() => ({}));
-          alert(`SMTP Test Failed: ${err.message || 'Unknown error'}. Settings were NOT saved.`);
-          setSaving(false);
-          return;
-        }
-      }
 
       await api('/settings', {
         method: 'PUT',
@@ -291,6 +306,16 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
                   style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
                 />
               </div>
+            </div>
+            <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-start' }}>
+              <button 
+                type="button" 
+                onClick={testSmtp}
+                disabled={saving}
+                style={{ backgroundColor: '#f1f5f9', color: '#334155', padding: '0.6rem 1.25rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', fontSize: '0.85rem' }}
+              >
+                Test SMTP Connection
+              </button>
             </div>
           </fieldset>
 

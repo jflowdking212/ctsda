@@ -65,7 +65,7 @@ export class DocumentsService {
       include: { applicant: true },
     });
 
-    if (!application || application.applicant.emailVerificationToken !== token) {
+    if (!application || (application.applicant?.emailVerificationToken || application.paymentToken) !== token) {
       throw new ForbiddenException('Invalid upload token');
     }
 
@@ -85,7 +85,7 @@ export class DocumentsService {
     return this.prisma.applicationDocument.create({
       data: {
         applicationId,
-        uploaderId: application.applicantId,
+        uploaderId: (application.applicantId || ''),
         documentType: DocumentType.other,
         storageKey: result.key,
         fileName: file.originalname,
@@ -121,7 +121,7 @@ export class DocumentsService {
     }
 
     const adminRoles = ['super_admin', 'reviewer', 'support_officer', 'auditor'];
-    if (application.applicantId !== userId && !adminRoles.includes(user?.role || '')) {
+    if ((application.applicantId || '') !== userId && !adminRoles.includes(user?.role || '')) {
       throw new ForbiddenException('You cannot access this application document');
     }
   }

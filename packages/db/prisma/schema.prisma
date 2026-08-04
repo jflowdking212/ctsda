@@ -207,7 +207,7 @@ model Institution {
   yearEstablished    Int?
   description        String?  @db.Text
   isActive           Boolean  @default(true)
-  createdBy          String   @db.Uuid
+  createdBy          String?  @db.Uuid
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -220,7 +220,7 @@ model Institution {
   accreditations   Accreditation[]
   subscriptions    Subscription[]
   orders           Order[]
-  createdByUser    User                      @relation(fields: [createdBy], references: [id])
+  createdByUser    User?                     @relation(fields: [createdBy], references: [id])
 
   @@index([isActive])
   @@index([country])
@@ -310,7 +310,12 @@ model ApplicationTrainingArea {
 model Application {
   id                  String            @id @default(uuid()) @db.Uuid
   institutionId       String            @db.Uuid
-  applicantId         String            @db.Uuid
+  applicantId         String?           @db.Uuid
+  applicantFirstName  String?           @db.VarChar(100)
+  applicantLastName   String?           @db.VarChar(100)
+  applicantEmail      String?           @db.VarChar(255)
+  applicantPhone      String?           @db.VarChar(50)
+  paymentToken        String?           @unique @db.VarChar(200)
   status              ApplicationStatus @default(draft)
   // Compatibility fields retained while the API migrates to the related tables below.
   certificatesOffered String[]          @default([])
@@ -326,7 +331,7 @@ model Application {
 
   // Relations
   institution           Institution                     @relation(fields: [institutionId], references: [id])
-  applicant             User                            @relation("ApplicantApplications", fields: [applicantId], references: [id])
+  applicant             User?                           @relation("ApplicantApplications", fields: [applicantId], references: [id])
   reviewer              User?                           @relation("ReviewerApplications", fields: [reviewedBy], references: [id])
   statusHistory         ApplicationStatusHistory[]
   trainingAreas         ApplicationTrainingArea[]
