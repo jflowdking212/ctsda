@@ -159,7 +159,7 @@ export class ReviewsService {
 
     const app = await this.prisma.application.findUnique({
       where: { id: applicationId },
-      include: { applicant: true, institution: true },
+      include: { applicant: true, institution: { include: { contacts: true } } },
     });
     if (!app) throw new BadRequestException('Application not found');
 
@@ -250,7 +250,7 @@ export class ReviewsService {
             }
 
             const paymentLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/payment/${invoice.id}`;
-            const targetEmail = app.applicantEmail || app.applicant?.email;
+            const targetEmail = app.applicantEmail || app.applicant?.email || app.institution?.email || app.institution?.contacts?.find((c: any) => c.isPrimary)?.email || app.institution?.contacts?.[0]?.email;
             if (targetEmail) {
               await this.notificationsService.enqueueEmail({
                 to: targetEmail,
@@ -335,7 +335,7 @@ export class ReviewsService {
             }
           }
         } else if (newStatus === 'under_review') {
-          const targetEmail = app.applicantEmail || app.applicant?.email;
+          const targetEmail = app.applicantEmail || app.applicant?.email || app.institution?.email || app.institution?.contacts?.find((c: any) => c.isPrimary)?.email || app.institution?.contacts?.[0]?.email;
           if (targetEmail) {
             await this.notificationsService.enqueueEmail({
               to: targetEmail,
@@ -354,7 +354,7 @@ export class ReviewsService {
             });
           }
         } else if (newStatus === 'rejected') {
-          const targetEmail = app.applicantEmail || app.applicant?.email;
+          const targetEmail = app.applicantEmail || app.applicant?.email || app.institution?.email || app.institution?.contacts?.find((c: any) => c.isPrimary)?.email || app.institution?.contacts?.[0]?.email;
           if (targetEmail) {
             await this.notificationsService.enqueueEmail({
               to: targetEmail,
@@ -373,7 +373,7 @@ export class ReviewsService {
             });
           }
         } else if (newStatus === 'changes_requested') {
-          const targetEmail = app.applicantEmail || app.applicant?.email;
+          const targetEmail = app.applicantEmail || app.applicant?.email || app.institution?.email || app.institution?.contacts?.find((c: any) => c.isPrimary)?.email || app.institution?.contacts?.[0]?.email;
           if (targetEmail) {
             await this.notificationsService.enqueueEmail({
               to: targetEmail,
