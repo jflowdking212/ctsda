@@ -452,13 +452,24 @@ export default function ApplyPage() {
       )}
 
       {step === 4 && (
-        <div className="content-panel content-form" style={{textAlign: 'center', padding: '3rem 1rem'}}>
-          <div style={{fontSize: '3rem', color: '#10b981', marginBottom: '1rem'}}>✓</div>
-          <h2>Application Submitted Successfully!</h2>
-          <p style={{maxWidth: '500px', margin: '1rem auto'}}>
-            Your application for CTSDA accreditation is now under review. You will receive updates via email as our team reviews your business information.
+        <div className="content-panel" style={{ textAlign: 'center', padding: '3.5rem 2rem', backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(15,23,42,0.05)' }}>
+          <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#ecfdf5', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', margin: '0 auto 1.5rem auto', border: '2px solid #a7f3d0' }}>✓</div>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.75rem' }}>Application Submitted Successfully!</h2>
+          <p style={{ maxWidth: '560px', margin: '0 auto 1.5rem auto', color: '#475569', fontSize: '1rem', lineHeight: 1.6 }}>
+            Your application for <strong>CTSDA accreditation</strong> is now under review. A confirmation email has been sent to <strong>{applicantForm.email}</strong> with your application details.
           </p>
-          <button className="button secondary" onClick={() => router.push('/')} style={{marginTop: '1rem'}}>
+          
+          <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '0.625rem', padding: '1.25rem', maxWidth: '520px', margin: '0 auto 2rem auto', textAlign: 'left' }}>
+            <p style={{ margin: 0, fontSize: '0.9rem', color: '#334155', lineHeight: 1.5 }}>
+              💡 <strong>Need help or have an enquiry?</strong><br />
+              If you need to make updates or have any questions regarding your application status, please reach out directly to our support team:
+            </p>
+            <p style={{ margin: '0.75rem 0 0 0', fontSize: '0.95rem', fontWeight: 700, color: '#2563eb' }}>
+              ✉️ <a href="mailto:support@ctsda.org" style={{ color: '#2563eb', textDecoration: 'underline' }}>support@ctsda.org</a>
+            </p>
+          </div>
+
+          <button className="button primary" onClick={() => router.push('/')} style={{ padding: '0.875rem 2rem', backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 700, borderRadius: '0.5rem', border: 'none', cursor: 'pointer', fontSize: '0.95rem' }}>
             Return to Homepage
           </button>
         </div>
