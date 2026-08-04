@@ -337,6 +337,10 @@ export function IsolatedCertificateVerifier({
                     <span style={{ color: '#0f172a', fontWeight: 600, fontSize: '0.9rem' }}>{result.certificateNumber}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}>
+                    <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.9rem' }}>Accredited Institution</span>
+                    <span style={{ color: '#00204a', fontWeight: 700, fontSize: '0.9rem', textAlign: 'right' }}>{result.institution || 'The Bliss Tech Academy'}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}>
                     <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.9rem' }}>Recipient Name</span>
                     <span style={{ color: '#00204a', fontWeight: 700, fontSize: '0.9rem' }}>{result.recipientName}</span>
                   </div>
@@ -361,7 +365,7 @@ export function IsolatedCertificateVerifier({
 
               {/* Right Column: Image */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fafafa', borderRadius: '0.75rem', padding: '1.5rem', border: '1px solid #f1f5f9' }}>
-                <div style={{ width: '100%', minHeight: '300px', backgroundColor: '#ffffff', border: '4px solid #f8fafc', borderRadius: '0.25rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(0,0,0,0.08)', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ width: '100%', minHeight: '320px', backgroundColor: '#ffffff', border: '4px solid #f8fafc', borderRadius: '0.25rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(0,0,0,0.08)', position: 'relative', overflow: 'hidden' }}>
                     
                     {/* Certificate Border Details */}
                     <div style={{ position: 'absolute', top: '10px', bottom: '10px', left: '10px', right: '10px', border: '1px solid #cbd5e1' }}></div>
@@ -369,6 +373,37 @@ export function IsolatedCertificateVerifier({
                     
                     <div style={{ position: 'absolute', top: 0, left: 0, width: '60px', height: '60px', backgroundColor: '#00204a', clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}></div>
                     <div style={{ position: 'absolute', bottom: 0, right: 0, width: '60px', height: '60px', backgroundColor: '#00204a', clipPath: 'polygon(100% 100%, 100% 0, 0 100%)' }}></div>
+
+                    {/* Top-Left QR Code Box */}
+                    <div style={{ position: 'absolute', top: '22px', left: '22px', width: '42px', height: '42px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '4px', padding: '3px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 12, boxShadow: '0 2px 4px rgba(0,0,0,0.08)' }}>
+                      <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+                        {/* QR Outer Position Detection Patterns */}
+                        <rect x="2" y="2" width="6" height="6" fill="#00204a" />
+                        <rect x="16" y="2" width="6" height="6" fill="#00204a" />
+                        <rect x="2" y="16" width="6" height="6" fill="#00204a" />
+                        {/* Inner white cutouts */}
+                        <rect x="3.5" y="3.5" width="3" height="3" fill="#ffffff" />
+                        <rect x="17.5" y="3.5" width="3" height="3" fill="#ffffff" />
+                        <rect x="3.5" y="17.5" width="3" height="3" fill="#ffffff" />
+                        {/* Inner dark center squares */}
+                        <rect x="4.5" y="4.5" width="1" height="1" fill="#00204a" />
+                        <rect x="18.5" y="4.5" width="1" height="1" fill="#00204a" />
+                        <rect x="4.5" y="18.5" width="1" height="1" fill="#00204a" />
+                        {/* QR Data Matrix Dots */}
+                        <rect x="10" y="2" width="2" height="2" fill="#00204a" />
+                        <rect x="10" y="6" width="2" height="2" fill="#00204a" />
+                        <rect x="2" y="10" width="2" height="2" fill="#00204a" />
+                        <rect x="6" y="10" width="2" height="2" fill="#00204a" />
+                        <rect x="10" y="10" width="4" height="4" fill="#00204a" />
+                        <rect x="16" y="10" width="2" height="2" fill="#00204a" />
+                        <rect x="20" y="10" width="2" height="2" fill="#00204a" />
+                        <rect x="10" y="16" width="2" height="2" fill="#00204a" />
+                        <rect x="14" y="16" width="4" height="2" fill="#00204a" />
+                        <rect x="20" y="16" width="2" height="4" fill="#00204a" />
+                        <rect x="10" y="20" width="2" height="2" fill="#00204a" />
+                        <rect x="14" y="20" width="2" height="2" fill="#00204a" />
+                      </svg>
+                    </div>
 
                     {/* Certificate Content */}
                     <div style={{ textAlign: 'center', padding: '1.5rem', zIndex: 5, width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
