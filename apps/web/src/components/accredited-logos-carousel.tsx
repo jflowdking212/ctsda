@@ -42,26 +42,32 @@ export function AccreditedLogosCarousel() {
   const [institutions, setInstitutions] = useState<Institution[]>(DEFAULT_ACCREDITED_LIST);
 
   useEffect(() => {
+    let isMounted = true;
     async function loadInstitutions() {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/institutions/public-accredited`);
-        if (response.ok) {
-          const data = await response.json();
-          if (Array.isArray(data) && data.length > 0) {
-            // Map fetched backend institutions while retaining default logos if logoUrl is empty
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const response = await fetch(`${apiUrl}/institutions/public-accredited`, {
+          cache: 'no-store',
+        }).catch(() => null);
+
+        if (response && response.ok) {
+          const data = await response.json().catch(() => null);
+          if (isMounted && Array.isArray(data) && data.length > 0) {
             const mapped = data.map((item: any, idx: number) => ({
               ...item,
               logoUrl: item.logoUrl || DEFAULT_ACCREDITED_LIST[idx % DEFAULT_ACCREDITED_LIST.length].logoUrl,
-              format: DEFAULT_ACCREDITED_LIST[idx % DEFAULT_ACCREDITED_LIST.length].format,
             }));
             setInstitutions(mapped);
           }
         }
-      } catch (err) {
-        console.error('Failed to load accredited logos:', err);
+      } catch {
+        // Silently preserve default logos if network or backend API is unreachable
       }
     }
     loadInstitutions();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Duplicate list for a seamless, continuous infinite carousel
