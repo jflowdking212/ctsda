@@ -222,7 +222,7 @@ export function IsolatedCertificateVerifier({
                       cursor: loading ? 'not-allowed' : 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      justify: 'center',
+                      justifyContent: 'center',
                       gap: '0.6rem',
                       boxShadow: '0 4px 14px rgba(37, 99, 235, 0.3)',
                       transition: 'all 0.2s',
