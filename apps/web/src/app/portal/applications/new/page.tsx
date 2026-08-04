@@ -285,12 +285,16 @@ export default function NewApplicationPage() {
                 value={instForm.institutionType}
                 onChange={(e) => setInstForm({ ...instForm, institutionType: e.target.value })}
                 disabled={loading}
-              >
-                <option value="corporate">Corporate Training Provider / Tech Company</option>
-                <option value="vocational">Vocational & Technical Training</option>
-                <option value="safety_center">Safety & Compliance Institute</option>
-                <option value="higher_education">Higher Education / College</option>
-                <option value="other">Other Educational Provider</option>
+                <option value="tech_software">Tech, Software & Digital Skills Academy</option>
+                <option value="ecommerce_digital">E-Commerce, Digital Business & Marketing Institute</option>
+                <option value="corporate">Corporate Training & Professional Development</option>
+                <option value="vocational">Vocational & Technical Training Institute</option>
+                <option value="safety_compliance">Safety, Health & Compliance Institute</option>
+                <option value="finance_fintech">Finance, Accounting & FinTech Academy</option>
+                <option value="healthcare_medical">Healthcare & Medical Training Center</option>
+                <option value="higher_education">Higher Education / University / College</option>
+                <option value="driving_transport">Transport, Logistics & Automotive Institute</option>
+                <option value="other">Other Training Provider</option>
               </select>
             </label>
 

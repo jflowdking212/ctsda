@@ -297,10 +297,15 @@ export default function ApplyPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Institution Type <span style={{ color: '#ef4444' }}>*</span></label>
                 <select required value={institutionForm.institutionType} onChange={e => setInstitutionForm({...institutionForm, institutionType: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', backgroundColor: '#ffffff', outline: 'none' }}>
-                  <option value="corporate">Corporate Training Provider</option>
-                  <option value="vocational">Vocational & Technical Training</option>
-                  <option value="safety_center">Safety & Compliance Institute</option>
-                  <option value="higher_education">Higher Education Institution</option>
+                  <option value="tech_software">Tech, Software & Digital Skills Academy</option>
+                  <option value="ecommerce_digital">E-Commerce, Digital Business & Marketing Institute</option>
+                  <option value="corporate">Corporate Training & Professional Development</option>
+                  <option value="vocational">Vocational & Technical Training Institute</option>
+                  <option value="safety_compliance">Safety, Health & Compliance Institute</option>
+                  <option value="finance_fintech">Finance, Accounting & FinTech Academy</option>
+                  <option value="healthcare_medical">Healthcare & Medical Training Center</option>
+                  <option value="higher_education">Higher Education / University / College</option>
+                  <option value="driving_transport">Transport, Logistics & Automotive Institute</option>
                   <option value="other">Other Training Provider</option>
                 </select>
               </div>
