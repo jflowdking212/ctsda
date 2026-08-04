@@ -39,7 +39,7 @@ export class AuthService {
 
   async validateUser(email: string, password: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user || !user.isActive) return null;
+    if (!user || !user.isActive || !user.passwordHash) return null;
     const valid = await argon2.verify(user.passwordHash, password);
     if (!valid) return null;
     return {

@@ -66,6 +66,10 @@ export class InstitutionsController {
       ...body.application,
     });
 
+    if (!application) {
+      throw new BadRequestException('Failed to create application');
+    }
+
     // 5. Update Application to 'submitted' directly
     await this.institutionsService.updateApplicationStatus(application.id, 'submitted');
 

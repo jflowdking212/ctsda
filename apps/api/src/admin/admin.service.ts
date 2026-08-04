@@ -453,7 +453,7 @@ export class AdminService {
 
   async changePassword(actorId: string, currentPassword: string, newPassword: string) {
     const user = await this.prisma.user.findUnique({ where: { id: actorId } });
-    if (!user || !(await argon2.verify(user.passwordHash, currentPassword))) {
+    if (!user || !user.passwordHash || !(await argon2.verify(user.passwordHash, currentPassword))) {
       throw new BadRequestException('Current password is incorrect');
     }
 

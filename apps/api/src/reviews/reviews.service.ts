@@ -303,12 +303,12 @@ export class ReviewsService {
             await this.notificationsService.enqueueEmail({
               to: app.applicant.email,
               subject: 'CTSDA Accreditation Approved',
-              html: \`
+              html: `
                 <h1>Congratulations!</h1>
-                <p>Hi \${app.applicant.firstName},</p>
+                <p>Hi ${app.applicant.firstName},</p>
                 <p>Your application for CTSDA accreditation has been approved, and your certificate has been issued!</p>
                 <p>You can view your dashboard to download your certificate.</p>
-              \`,
+              `,
               userId: app.applicantId,
             });
           }
@@ -316,28 +316,28 @@ export class ReviewsService {
           await this.notificationsService.enqueueEmail({
             to: app.applicant.email,
             subject: 'Update on your CTSDA Application',
-            html: \`
+            html: `
               <h1>Application Update</h1>
-              <p>Hi \${app.applicant.firstName},</p>
+              <p>Hi ${app.applicant.firstName},</p>
               <p>We have reviewed your application. Unfortunately, it has been rejected at this time.</p>
-              \${metadata?.reason ? \`<p><strong>Reason:</strong> \${metadata.reason}</p>\` : ''}
-              \${metadata?.comments ? \`<p><strong>Comments:</strong> \${metadata.comments}</p>\` : ''}
+              ${metadata?.reason ? `<p><strong>Reason:</strong> ${metadata.reason}</p>` : ''}
+              ${metadata?.comments ? `<p><strong>Comments:</strong> ${metadata.comments}</p>` : ''}
               <p>Please contact support for more details.</p>
-            \`,
+            `,
             userId: app.applicantId,
           });
         } else if (newStatus === 'changes_requested') {
           await this.notificationsService.enqueueEmail({
             to: app.applicant.email,
             subject: 'Action Required: CTSDA Application',
-            html: \`
+            html: `
               <h1>Action Required</h1>
-              <p>Hi \${app.applicant.firstName},</p>
+              <p>Hi ${app.applicant.firstName},</p>
               <p>We need some changes or additional information before we can proceed with your application.</p>
-              \${metadata?.reason ? \`<p><strong>Reason:</strong> \${metadata.reason}</p>\` : ''}
-              \${metadata?.comments ? \`<p><strong>Comments:</strong> \${metadata.comments}</p>\` : ''}
+              ${metadata?.reason ? `<p><strong>Reason:</strong> ${metadata.reason}</p>` : ''}
+              ${metadata?.comments ? `<p><strong>Comments:</strong> ${metadata.comments}</p>` : ''}
               <p>Please log in to your dashboard to make the necessary updates.</p>
-            \`,
+            `,
             userId: app.applicantId,
           });
         }

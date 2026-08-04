@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 
-export default function SetupAccountPage() {
+function SetupAccountForm() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -111,5 +110,17 @@ export default function SetupAccountPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function SetupAccountPage() {
+  return (
+    <Suspense fallback={
+      <main className="content-page narrow" style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <p>Loading account setup...</p>
+      </main>
+    }>
+      <SetupAccountForm />
+    </Suspense>
   );
 }

@@ -22,8 +22,8 @@ export class ApplicationsService {
           where: { status: 'sent' },
           select: { id: true, amount: true, description: true }
         },
-        accreditation: {
-          select: { id: true, certificateNumber: true, status: true }
+        accreditations: {
+          select: { id: true, status: true }
         }
       },
       orderBy: { createdAt: 'desc' },
