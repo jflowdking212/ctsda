@@ -28,7 +28,7 @@ export class EmailProcessor extends WorkerHost {
       const smtpUser = getSetting('smtpUser');
       const smtpPass = getSetting('smtpPassword');
       const smtpSecureSetting = getSetting('smtpSecure');
-      const supportEmail = getSetting('supportEmail') || 'noreply@ctsda.org';
+      const supportEmail = getSetting('supportEmail') || 'management@ctsdamerica.com';
 
       if (!smtpHost || !smtpUser || !smtpPass) {
         console.warn(`[Email Skipped] SMTP credentials not configured in Admin Settings. Target: ${to}`);

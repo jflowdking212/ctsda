@@ -287,7 +287,7 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
                   value={settings.supportEmail || ''} 
                   onChange={e => setSettings({...settings, supportEmail: e.target.value})} 
                   style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
-                  placeholder="support@ctsda.org"
+                  placeholder="management@ctsdamerica.com"
                 />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>

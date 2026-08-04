@@ -75,7 +75,7 @@ export class InstitutionsController {
     // Send confirmation email to applicant
     try {
       const publicSettings = await this.settingsService.getPublicSettings();
-      const supportEmail = publicSettings.supportEmail || 'support@ctsda.org';
+      const supportEmail = publicSettings.supportEmail || 'management@ctsdamerica.com';
 
       const emailHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">

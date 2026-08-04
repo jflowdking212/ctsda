@@ -465,7 +465,7 @@ export default function ApplyPage() {
               If you need to make updates or have any questions regarding your application status, please reach out directly to our support team:
             </p>
             <p style={{ margin: '0.75rem 0 0 0', fontSize: '0.95rem', fontWeight: 700, color: '#2563eb' }}>
-              ✉️ <a href="mailto:support@ctsda.org" style={{ color: '#2563eb', textDecoration: 'underline' }}>support@ctsda.org</a>
+              ✉️ <a href="mailto:management@ctsdamerica.com" style={{ color: '#2563eb', textDecoration: 'underline' }}>management@ctsdamerica.com</a>
             </p>
           </div>
 
