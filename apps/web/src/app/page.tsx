@@ -244,10 +244,11 @@ export default function Home() {
           <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.06) 0%, rgba(255,255,255,0) 70%)', pointerEvents: 'none' }}></div>
 
           <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '3rem', alignItems: 'center' }}>
+            {/* Responsive Feature Grid: 1 col on mobile, 12 cols on desktop */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               
-              {/* Left Column: Heading & Value Proposition */}
-              <div style={{ gridColumn: 'span 12', '@media (min-width: 1024px)': { gridColumn: 'span 5' } } as any} className="lg:col-span-5">
+              {/* Left Column (5 cols on desktop): Heading & Value Proposition */}
+              <div className="col-span-1 lg:col-span-5">
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', padding: '0.35rem 0.85rem', borderRadius: '50px', marginBottom: '1.25rem' }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#2563eb' }}></span>
                   <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
@@ -255,7 +256,7 @@ export default function Home() {
                   </span>
                 </div>
                 
-                <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#0f172a', lineHeight: 1.2, letterSpacing: '-0.02em', marginBottom: '1.25rem' }}>
+                <h2 style={{ fontSize: 'clamp(1.85rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#0f172a', lineHeight: 1.2, letterSpacing: '-0.02em', marginBottom: '1.25rem' }}>
                   Accreditation that reads as <span style={{ background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>rigorous</span>, transparent, and globally useful.
                 </h2>
                 
@@ -306,9 +307,9 @@ export default function Home() {
                 </Link>
               </div>
 
-              {/* Right Column: 2x2 Feature Cards Grid */}
-              <div style={{ gridColumn: 'span 12', '@media (min-width: 1024px)': { gridColumn: 'span 7' } } as any} className="lg:col-span-7">
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
+              {/* Right Column (7 cols on desktop): 2x2 Feature Cards Grid */}
+              <div className="col-span-1 lg:col-span-7 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   {[
                     { 
                       title: 'Global Recognition', 
