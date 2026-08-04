@@ -208,7 +208,7 @@ export default function ApplyPage() {
         </div>
         <div style={{ flex: 1, height: '2px', backgroundColor: step >= 2 ? '#2563eb' : '#e2e8f0', margin: '0 0.5rem' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 2 ? '#2563eb' : '#e2e8f0', color: step >= 2 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight 700, fontSize: '0.85rem' }}>2</div>
+          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 2 ? '#2563eb' : '#e2e8f0', color: step >= 2 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem' }}>2</div>
           <span className="text-xs sm:text-sm" style={{ fontWeight: step === 2 ? 700 : 500, color: step === 2 ? '#0f172a' : '#64748b' }}>Verify</span>
         </div>
         <div style={{ flex: 1, height: '2px', backgroundColor: step >= 3 ? '#2563eb' : '#e2e8f0', margin: '0 0.5rem' }} />
