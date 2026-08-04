@@ -27,10 +27,11 @@ export default function Home() {
           }}
         >
           <div className="container" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 1.5rem', width: '100%', position: 'relative', zIndex: 10 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '3rem', alignItems: 'center' }}>
+            {/* Responsive Hero Grid: 1 col on mobile, 12 cols on desktop */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               
-              {/* Left Column (7 cols): Hero Copy & Primary CTAs */}
-              <div className="grid-col-12 lg:col-span-7">
+              {/* Left Column (7 cols on desktop): Hero Copy & Primary CTAs */}
+              <div className="col-span-1 lg:col-span-7">
                 
                 {/* Top Pill Badge */}
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', backgroundColor: 'rgba(255, 255, 255, 0.12)', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '0.45rem 1.1rem', borderRadius: '50px', backdropFilter: 'blur(10px)', marginBottom: '1.5rem' }}>
@@ -43,7 +44,7 @@ export default function Home() {
                 </div>
 
                 {/* Main Headline */}
-                <h1 style={{ fontSize: 'clamp(2.3rem, 4.2vw, 3.25rem)', fontWeight: 800, color: '#ffffff', lineHeight: 1.18, letterSpacing: '-0.02em', marginBottom: '1.25rem' }}>
+                <h1 style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.25rem)', fontWeight: 800, color: '#ffffff', lineHeight: 1.18, letterSpacing: '-0.02em', marginBottom: '1.25rem' }}>
                   Council for Training, Skills &amp; Development America <span style={{ color: '#60a5fa' }}>(CTSDA)</span>
                 </h1>
 
@@ -59,6 +60,7 @@ export default function Home() {
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       gap: '0.75rem',
                       backgroundColor: '#2563eb',
                       color: '#ffffff',
@@ -83,6 +85,7 @@ export default function Home() {
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       gap: '0.6rem',
                       backgroundColor: 'rgba(255, 255, 255, 0.08)',
                       color: '#ffffff',
@@ -122,8 +125,8 @@ export default function Home() {
 
               </div>
 
-              {/* Right Column (5 cols): Premium Glass Verification Card */}
-              <div className="grid-col-12 lg:col-span-5">
+              {/* Right Column (5 cols on desktop): Premium Glass Verification Card */}
+              <div className="col-span-1 lg:col-span-5 w-full">
                 <div style={{
                   backgroundColor: '#ffffff',
                   borderRadius: '1.25rem',
