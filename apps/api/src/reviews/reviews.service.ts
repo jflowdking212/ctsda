@@ -241,7 +241,7 @@ export class ReviewsService {
               await tx.notification.create({
                 data: {
                   userId: app.applicantId,
-                  type: 'approved_pending_payment' as any,
+                  type: 'approved',
                   title: 'Application Approved - Payment Required',
                   body: 'Your CTSDA accreditation application has been approved. Please complete payment of the accreditation fee to receive your certificate.',
                   metadata: { applicationId },
