@@ -47,14 +47,30 @@ export class SettingsService {
       pass = existing.smtpPassword;
     }
 
+    const port = Number(config.smtpPort) || 587;
+
+    // Determine security mode: 465 expects implicit SSL (secure: true); 587/25 expect STARTTLS (secure: false)
+    let isSecure = false;
+    if (config.smtpSecure === 'true' || config.smtpSecure === true || config.smtpSecure === 'ssl') {
+      isSecure = true;
+    } else if (config.smtpSecure === 'false' || config.smtpSecure === false || config.smtpSecure === 'tls') {
+      isSecure = false;
+    } else {
+      isSecure = port === 465;
+    }
+
     const transporter = nodemailer.createTransport({
       host: config.smtpHost,
-      port: Number(config.smtpPort),
-      secure: config.smtpSecure === 'true',
+      port: port,
+      secure: isSecure,
       auth: {
         user: config.smtpUser,
         pass: pass,
       },
+      tls: {
+        rejectUnauthorized: false,
+      },
+      connectionTimeout: 10000,
     });
 
     try {

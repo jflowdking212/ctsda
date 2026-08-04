@@ -316,7 +316,7 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
           {/* SECTION 4: SMTP GATEWAY */}
           <fieldset style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.5rem' }}>
             <legend style={{ padding: '0 0.5rem', fontSize: '0.9rem', fontWeight: 600, color: '#475569' }}>SMTP Email Configuration</legend>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>SMTP Host</label>
                 <input 
@@ -324,6 +324,7 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
                   value={settings.smtpHost || ''} 
                   onChange={e => setSettings({...settings, smtpHost: e.target.value})} 
                   style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                  placeholder="e.g. mail.domain.com"
                 />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -333,7 +334,20 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
                   value={settings.smtpPort || ''} 
                   onChange={e => setSettings({...settings, smtpPort: e.target.value})} 
                   style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                  placeholder="587 or 465"
                 />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>Encryption Security</label>
+                <select 
+                  value={settings.smtpSecure ?? 'auto'} 
+                  onChange={e => setSettings({...settings, smtpSecure: e.target.value})} 
+                  style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', backgroundColor: 'white' }}
+                >
+                  <option value="auto">Auto-detect (Port 465 = SSL, 587 = TLS)</option>
+                  <option value="true">SSL / TLS (Port 465)</option>
+                  <option value="false">STARTTLS / Plain (Port 587 / 25)</option>
+                </select>
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1rem' }}>
