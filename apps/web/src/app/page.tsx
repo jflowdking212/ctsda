@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { CertificateVerifier } from '../components/certificate-verifier';
 import { PublicFooter } from '../components/public-shell';
 import { PremiumHeader } from '../components/premium-header';
 import { AccreditedLogosCarousel } from '../components/accredited-logos-carousel';
