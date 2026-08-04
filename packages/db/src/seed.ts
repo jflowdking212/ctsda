@@ -75,6 +75,69 @@ async function main() {
         description: 'Training programs for commercial driver education and assessment',
       },
     }),
+    prisma.trainingArea.upsert({
+      where: { code: 'SOFTWARE-DEV' },
+      update: {},
+      create: {
+        name: 'Software Engineering & Web Development',
+        code: 'SOFTWARE-DEV',
+        description: 'Programs in software development, coding bootcamps, and web engineering',
+      },
+    }),
+    prisma.trainingArea.upsert({
+      where: { code: 'ECOMMERCE-DIGITAL' },
+      update: {},
+      create: {
+        name: 'E-Commerce & Digital Marketing',
+        code: 'ECOMMERCE-DIGITAL',
+        description: 'Training in online retail, digital marketing, and growth strategies',
+      },
+    }),
+    prisma.trainingArea.upsert({
+      where: { code: 'LEADERSHIP-MGMT' },
+      update: {},
+      create: {
+        name: 'Corporate Leadership & Executive Management',
+        code: 'LEADERSHIP-MGMT',
+        description: 'Executive education, business leadership, and organizational development',
+      },
+    }),
+    prisma.trainingArea.upsert({
+      where: { code: 'FINTECH-FINANCE' },
+      update: {},
+      create: {
+        name: 'Financial Management & FinTech',
+        code: 'FINTECH-FINANCE',
+        description: 'Accounting, corporate finance, financial analysis, and FinTech tools',
+      },
+    }),
+    prisma.trainingArea.upsert({
+      where: { code: 'CYBER-SECURITY' },
+      update: {},
+      create: {
+        name: 'Cybersecurity & IT Infrastructure',
+        code: 'CYBER-SECURITY',
+        description: 'Information security, network administration, and cloud infrastructure',
+      },
+    }),
+    prisma.trainingArea.upsert({
+      where: { code: 'HSE-HEALTH' },
+      update: {},
+      create: {
+        name: 'Health, Safety & Environment (HSE)',
+        code: 'HSE-HEALTH',
+        description: 'Occupational health, workplace safety, and environmental compliance',
+      },
+    }),
+    prisma.trainingArea.upsert({
+      where: { code: 'DATA-AI' },
+      update: {},
+      create: {
+        name: 'Data Science & Artificial Intelligence',
+        code: 'DATA-AI',
+        description: 'Data analytics, machine learning, and AI application development',
+      },
+    }),
   ]);
 
   console.log(`Created ${trainingAreas.length} training areas`);
