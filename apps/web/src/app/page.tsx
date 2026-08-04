@@ -133,44 +133,192 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Features Section - Premium Redesign */}
-        <section className="section">
-          <div className="container">
-            <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-              <div className="lg:col-span-5">
-                <p className="text-blue-600 font-semibold uppercase tracking-wider text-sm mb-4">Why institutions choose CTSDA</p>
-                <h2 className="section-title">Accreditation that reads as rigorous, transparent, and globally useful.</h2>
+        {/* Features Section - Executive Redesign */}
+        <section className="section" style={{ backgroundColor: '#f8fafc', padding: '6rem 0', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', position: 'relative', overflow: 'hidden' }}>
+          {/* Subtle background glow circle */}
+          <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.06) 0%, rgba(255,255,255,0) 70%)', pointerEvents: 'none' }}></div>
+
+          <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '3rem', alignItems: 'center' }}>
+              
+              {/* Left Column: Heading & Value Proposition */}
+              <div style={{ gridColumn: 'span 12', '@media (min-width: 1024px)': { gridColumn: 'span 5' } } as any} className="lg:col-span-5">
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', padding: '0.35rem 0.85rem', borderRadius: '50px', marginBottom: '1.25rem' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#2563eb' }}></span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    Why Institutions Choose CTSDA
+                  </span>
+                </div>
+                
+                <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#0f172a', lineHeight: 1.2, letterSpacing: '-0.02em', marginBottom: '1.25rem' }}>
+                  Accreditation that reads as <span style={{ background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>rigorous</span>, transparent, and globally useful.
+                </h2>
+                
+                <p style={{ color: '#475569', fontSize: '1.05rem', lineHeight: 1.65, marginBottom: '2rem' }}>
+                  Our international quality framework empowers educational academies, universities, and specialized training providers with instant global credibility and tamper-proof verification.
+                </p>
+
+                {/* Quick Trust Highlights */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '2.25rem' }}>
+                  {[
+                    '100% Verifiable Digital Credentials & QR Codes',
+                    'Comprehensive Governance & Quality Audits',
+                    'Recognized Across International Jurisdictions'
+                  ].map((point, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#dcfce7', color: '#15803d', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span style={{ fontSize: '0.925rem', fontWeight: 600, color: '#1e293b' }}>{point}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Link
+                  href="/accreditation-info"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.6rem',
+                    backgroundColor: '#00204a',
+                    color: '#ffffff',
+                    padding: '0.85rem 1.65rem',
+                    borderRadius: '0.625rem',
+                    fontWeight: 700,
+                    fontSize: '0.95rem',
+                    textDecoration: 'none',
+                    boxShadow: '0 4px 14px rgba(0, 32, 74, 0.2)',
+                    transition: 'transform 0.2s, background-color 0.2s',
+                  }}
+                >
+                  Explore Framework
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </Link>
               </div>
-              <div className="feature-grid lg:col-span-7">
-                {[
-                  { 
-                    title: 'Global Recognition', 
-                    text: 'Support international collaboration, student mobility, and stronger institutional positioning.',
-                    icon: '🌐'
-                  },
-                  { 
-                    title: 'Rigorous Standards', 
-                    text: 'Evaluate governance, curriculum, faculty qualifications, learner support, and outcomes.',
-                    icon: '📊'
-                  },
-                  { 
-                    title: 'Expert Support', 
-                    text: 'Guide teams through documentation, assessment readiness, and continuous improvement.',
-                    icon: '🎓'
-                  },
-                  { 
-                    title: 'Public Verification', 
-                    text: 'Give students, employers, and partners a direct way to confirm active accreditation status.',
-                    icon: '✅'
-                  },
-                ].map((feature) => (
-                  <article className="feature-card" key={feature.title}>
-                    <span className="feature-card-icon">{feature.icon}</span>
-                    <h3>{feature.title}</h3>
-                    <p>{feature.text}</p>
-                  </article>
-                ))}
+
+              {/* Right Column: 2x2 Feature Cards Grid */}
+              <div style={{ gridColumn: 'span 12', '@media (min-width: 1024px)': { gridColumn: 'span 7' } } as any} className="lg:col-span-7">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
+                  {[
+                    { 
+                      title: 'Global Recognition', 
+                      text: 'Support international collaboration, student mobility, and stronger institutional positioning across international markets.',
+                      badge: 'Global Mobility',
+                      bg: '#eff6ff',
+                      iconColor: '#2563eb',
+                      borderColor: '#dbeafe',
+                      iconSvg: (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="2" y1="12" x2="22" y2="12"></line>
+                          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        </svg>
+                      )
+                    },
+                    { 
+                      title: 'Rigorous Standards', 
+                      text: 'Evaluate governance, curriculum, faculty qualifications, learner support, and measurable educational outcomes.',
+                      badge: 'Quality Audit',
+                      bg: '#ecfdf5',
+                      iconColor: '#059669',
+                      borderColor: '#a7f3d0',
+                      iconSvg: (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                      )
+                    },
+                    { 
+                      title: 'Expert Support', 
+                      text: 'Guide teams step-by-step through documentation, self-assessment readiness, and continuous quality improvement.',
+                      badge: 'Dedicated Mentorship',
+                      bg: '#fffbeb',
+                      iconColor: '#d97706',
+                      borderColor: '#fde68a',
+                      iconSvg: (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                          <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                        </svg>
+                      )
+                    },
+                    { 
+                      title: 'Public Verification', 
+                      text: 'Give students, employers, and regulatory partners a direct, real-time way to confirm active accreditation status.',
+                      badge: 'Instant Lookup',
+                      bg: '#eef2ff',
+                      iconColor: '#4f46e5',
+                      borderColor: '#c7d2fe',
+                      iconSvg: (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                          <path d="m9 12 2 2 4-4"></path>
+                        </svg>
+                      )
+                    },
+                  ].map((feature) => (
+                    <article
+                      key={feature.title}
+                      style={{
+                        backgroundColor: '#ffffff',
+                        padding: '1.85rem 1.65rem',
+                        borderRadius: '1rem',
+                        border: '1px solid #e2e8f0',
+                        boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        transition: 'transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease',
+                        position: 'relative',
+                        overflow: 'hidden',
+                      }}
+                      className="executive-feature-card"
+                    >
+                      {/* Top Accent Line */}
+                      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', backgroundColor: feature.iconColor, opacity: 0.85 }}></div>
+
+                      <div>
+                        {/* Icon Header */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                          <div
+                            style={{
+                              width: '52px',
+                              height: '52px',
+                              borderRadius: '12px',
+                              backgroundColor: feature.bg,
+                              color: feature.iconColor,
+                              border: `1px solid ${feature.borderColor}`,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              boxShadow: `0 4px 10px rgba(0,0,0,0.03)`
+                            }}
+                          >
+                            {feature.iconSvg}
+                          </div>
+                          <span style={{ fontSize: '0.725rem', fontWeight: 700, color: feature.iconColor, backgroundColor: feature.bg, padding: '0.2rem 0.6rem', borderRadius: '50px', border: `1px solid ${feature.borderColor}` }}>
+                            {feature.badge}
+                          </span>
+                        </div>
+
+                        <h3 style={{ fontSize: '1.175rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.65rem', letterSpacing: '-0.01em' }}>
+                          {feature.title}
+                        </h3>
+                        <p style={{ color: '#64748b', fontSize: '0.925rem', lineHeight: 1.6, margin: 0 }}>
+                          {feature.text}
+                        </p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
               </div>
+
             </div>
           </div>
         </section>
