@@ -20,6 +20,7 @@ export class SettingsController {
     return this.settingsService.getAll();
   }
 
+  @Post()
   @Put()
   @UseGuards(AuthGuard, RbacGuard)
   @Roles('super_admin')

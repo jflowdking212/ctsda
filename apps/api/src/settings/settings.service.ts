@@ -41,31 +41,29 @@ export class SettingsService {
   async testSmtp(config: Record<string, any>) {
     const nodemailer = require('nodemailer');
     
-    let pass = config.smtpPassword;
-    if (!pass) {
-      const existing = await this.getAll();
-      pass = existing.smtpPassword;
-    }
+    const existing = await this.getAll();
+    const host = config.smtpHost || existing.smtpHost || process.env.SMTP_HOST || 'mail.acecoterieconsulting.com';
+    const port = Number(config.smtpPort || existing.smtpPort || process.env.SMTP_PORT) || 587;
+    const user = config.smtpUser || existing.smtpUser || process.env.SMTP_USER || 'accounts@acecoterieconsulting.com';
+    const pass = config.smtpPassword || existing.smtpPassword || process.env.SMTP_PASS || 'Preciouskey2030';
+    const rawSecure = config.smtpSecure ?? existing.smtpSecure;
 
-    const port = Number(config.smtpPort) || 587;
-
-    // Determine security mode: 465 expects implicit SSL (secure: true); 587/25 expect STARTTLS (secure: false)
     let isSecure = false;
-    if (config.smtpSecure === 'true' || config.smtpSecure === true || config.smtpSecure === 'ssl') {
+    if (rawSecure === 'true' || rawSecure === true || rawSecure === 'ssl') {
       isSecure = true;
-    } else if (config.smtpSecure === 'false' || config.smtpSecure === false || config.smtpSecure === 'tls') {
+    } else if (rawSecure === 'false' || rawSecure === false || rawSecure === 'tls') {
       isSecure = false;
     } else {
       isSecure = port === 465;
     }
 
     const transporter = nodemailer.createTransport({
-      host: config.smtpHost,
-      port: port,
+      host,
+      port,
       secure: isSecure,
       auth: {
-        user: config.smtpUser,
-        pass: pass,
+        user,
+        pass,
       },
       tls: {
         rejectUnauthorized: false,

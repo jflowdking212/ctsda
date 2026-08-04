@@ -92,7 +92,7 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
 
     try {
       await api('/settings', {
-        method: 'PUT',
+        method: 'POST',
         body: JSON.stringify(payload),
       });
       notify('Settings saved successfully!', 'success');
