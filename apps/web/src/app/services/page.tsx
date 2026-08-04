@@ -129,7 +129,7 @@ export default function ServicesPage() {
                   </div>
                 </div>
                 <div>
-                  <Link href="/portal/register" style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.975rem' }}>
+                  <Link href="/apply" style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.975rem' }}>
                     Learn More →
                   </Link>
                 </div>
@@ -188,7 +188,7 @@ export default function ServicesPage() {
                   </div>
                 </div>
                 <div>
-                  <Link href="/portal/register" style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.975rem' }}>
+                  <Link href="/apply" style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.975rem' }}>
                     Learn More →
                   </Link>
                 </div>
@@ -246,7 +246,7 @@ export default function ServicesPage() {
                   </div>
                 </div>
                 <div>
-                  <Link href="/portal/register" style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.975rem' }}>
+                  <Link href="/apply" style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.975rem' }}>
                     Learn More →
                   </Link>
                 </div>
@@ -521,7 +521,7 @@ export default function ServicesPage() {
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link
-                href="/portal/register"
+                href="/apply"
                 style={{
                   backgroundColor: '#ffffff',
                   color: '#0f172a',

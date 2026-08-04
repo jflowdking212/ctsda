@@ -75,7 +75,7 @@ export default function LoginPage() {
         <button className={loading ? 'button primary is-loading' : 'button primary'} type="submit" disabled={loading}>
           {loading ? (requiresTotp ? 'Verifying...' : 'Signing in...') : 'Login'}
         </button>
-        <a className="text-link" href="/portal/register">Create applicant account</a>
+        <a className="text-link" href="/apply">Apply for accreditation</a>
       </form>
     </main>
   );

@@ -407,7 +407,7 @@ export default function AboutPage() {
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link
-                href="/portal/register"
+                href="/apply"
                 style={{
                   backgroundColor: '#ffffff',
                   color: '#0f172a',

@@ -330,7 +330,7 @@ export default function ContactPage() {
                   Start your institutional profile and self-assessment documentation online in our secure portal.
                 </p>
                 <Link
-                  href="/portal/register"
+                  href="/apply"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',

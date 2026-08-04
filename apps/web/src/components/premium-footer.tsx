@@ -20,7 +20,7 @@ export function PremiumHeader() {
           <Link href="/verify">Verify</Link>
           <Link href="/contact">Contact</Link>
         </nav>
-        <Link className="header-action" href="/portal/register">
+        <Link className="header-action" href="/apply">
           Apply Now
         </Link>
       </div>

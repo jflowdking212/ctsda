@@ -49,7 +49,7 @@ export function PremiumHeader() {
 
         {/* Action Button & Mobile Toggle */}
         <div className="header-actions">
-          <Link className="header-action" href="/portal/register" style={{ backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 700 }}>
+          <Link className="header-action" href="/apply" style={{ backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 700 }}>
             Apply Now
           </Link>
 
@@ -101,7 +101,7 @@ export function PremiumHeader() {
               </Link>
             ))}
             <Link
-              href="/portal/register"
+              href="/apply"
               onClick={() => setIsMobileMenuOpen(false)}
               style={{
                 marginTop: '1.5rem',

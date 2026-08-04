@@ -63,7 +63,7 @@ export default function Home() {
               </p>
               
               <div className="hero-actions">
-                <Link className="button primary" href="/portal/register" style={{ backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 700 }}>
+                <Link className="button primary" href="/apply" style={{ backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 700 }}>
                   Start Accreditation Process
                 </Link>
                 <Link className="button secondary" href="/verify" style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1.5px solid #cbd5e1', fontWeight: 700, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
@@ -245,7 +245,7 @@ export default function Home() {
                   Start your accreditation journey with CTSDA today and join our network of excellence in education.
                 </p>
                 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                  <Link className="cta-button primary" href="/portal/register" style={{ backgroundColor: '#ffffff', color: '#0f172a', fontWeight: 700, padding: '0.875rem 1.75rem', borderRadius: '0.625rem', textDecoration: 'none', boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)' }}>
+                  <Link className="cta-button primary" href="/apply" style={{ backgroundColor: '#ffffff', color: '#0f172a', fontWeight: 700, padding: '0.875rem 1.75rem', borderRadius: '0.625rem', textDecoration: 'none', boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)' }}>
                     Apply Now
                   </Link>
                   <Link className="cta-button outline" href="/contact" style={{ backgroundColor: 'rgba(255, 255, 255, 0.15)', border: '1.5px solid rgba(255, 255, 255, 0.7)', color: '#ffffff', fontWeight: 700, padding: '0.875rem 1.75rem', borderRadius: '0.625rem', textDecoration: 'none' }}>

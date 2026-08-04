@@ -29,7 +29,7 @@ export function PublicHeader() {
             </Link>
           ))}
         </nav>
-        <Link className="header-action" href="/portal/register">
+        <Link className="header-action" href="/apply">
           Apply Now
         </Link>
       </div>
