@@ -3,12 +3,17 @@ import { BullModule } from '@nestjs/bullmq';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 import { PrismaService } from '../common/prisma.service';
-import { ReviewsService } from '../reviews/reviews.service';
+import { ReviewsModule } from '../reviews/reviews.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { AccreditationsService } from '../accreditations/accreditations.service';
 
 @Module({
-  imports: [BullModule.registerQueue({ name: 'certificates' })],
+  imports: [
+    BullModule.registerQueue({ name: 'certificates' }),
+    ReviewsModule,
+    NotificationsModule,
+  ],
   controllers: [AdminController],
-  providers: [AdminService, PrismaService, ReviewsService, AccreditationsService],
+  providers: [AdminService, PrismaService, AccreditationsService],
 })
 export class AdminModule {}
