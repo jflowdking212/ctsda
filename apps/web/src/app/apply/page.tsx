@@ -369,7 +369,7 @@ export default function ApplyPage() {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        justify: 'space-between',
+                        justifyContent: 'space-between',
                         padding: '0.85rem 1.15rem',
                         borderRadius: '0.625rem',
                         border: isChecked ? '2px solid #2563eb' : '1px solid #cbd5e1',
