@@ -173,48 +173,101 @@ export default function ApplyPage() {
   };
 
   return (
-    <main className="section-inner narrow" style={{ paddingTop: '2.5rem', paddingBottom: '3.5rem' }}>
-      <header className="content-header p-5 sm:p-8" style={{
+    <main className="section-inner narrow" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
+      {/* HEADER CARD */}
+      <div style={{
         backgroundColor: '#ffffff',
-        borderRadius: '0.75rem',
+        borderRadius: '1rem',
         border: '1px solid #e2e8f0',
-        borderLeft: '5px solid #2563eb',
-        boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)',
+        boxShadow: '0 4px 20px rgba(15, 23, 42, 0.06)',
         marginBottom: '2rem',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        textAlign: 'left',
-        width: '100%',
-      }}>
-        <p className="eyebrow" style={{ color: '#d97706', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '0.75rem', marginBottom: '0.5rem', textAlign: 'left', alignSelf: 'flex-start' }}>Accreditation</p>
-        <h1 style={{ textAlign: 'left', color: '#0f172a', fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 800, margin: '0 0 0.5rem 0', lineHeight: 1.2, alignSelf: 'flex-start' }}>Apply for CTSDA Accreditation</h1>
-        <p style={{ textAlign: 'left', color: '#64748b', fontSize: '1rem', margin: '0 0 1rem 0', lineHeight: 1.5, alignSelf: 'flex-start' }}>Complete the form below to submit your institutional profile for evaluation.</p>
-        
-        {/* ACCREDITATION FEE NOTICE */}
-        <div style={{ backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '0.5rem', padding: '0.85rem 1.15rem', display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem', alignSelf: 'stretch' }}>
-          <span style={{ fontSize: '1.25rem' }}>💳</span>
-          <p style={{ margin: 0, fontSize: '0.875rem', color: '#1e40af', lineHeight: 1.45, textAlign: 'left' }}>
-            <strong>Accreditation Fee: ${accreditationFee} USD</strong> — Initial application submission is <strong>FREE ($0)</strong>. The accreditation fee is payable only after your institution profile is reviewed and approved by the CTSDA board.
+        overflow: 'hidden',
+        position: 'relative',
+        padding: '1.75rem 1.5rem',
+      }} className="sm:p-8">
+        {/* Left accent bar */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          bottom: 0,
+          width: '6px',
+          backgroundColor: '#2563eb',
+        }} />
+
+        <div style={{ paddingLeft: '0.5rem' }}>
+          <p style={{
+            color: '#d97706',
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            fontSize: '0.75rem',
+            margin: '0 0 0.5rem 0',
+          }}>
+            Accreditation
           </p>
+          <h1 style={{
+            color: '#0f172a',
+            fontSize: 'clamp(1.5rem, 4vw, 2.15rem)',
+            fontWeight: 800,
+            margin: '0 0 0.5rem 0',
+            lineHeight: 1.25,
+          }}>
+            Apply for CTSDA Accreditation
+          </h1>
+          <p style={{
+            color: '#64748b',
+            fontSize: '0.975rem',
+            margin: '0 0 1.25rem 0',
+            lineHeight: 1.5,
+          }}>
+            Complete the form below to submit your institutional profile for evaluation.
+          </p>
+
+          {/* ACCREDITATION FEE NOTICE */}
+          <div style={{
+            backgroundColor: '#eff6ff',
+            border: '1px solid #bfdbfe',
+            borderRadius: '0.625rem',
+            padding: '1rem 1.25rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.85rem',
+          }}>
+            <span style={{ fontSize: '1.35rem', flexShrink: 0 }}>💳</span>
+            <p style={{ margin: 0, fontSize: '0.875rem', color: '#1e40af', lineHeight: 1.5 }}>
+              <strong>Accreditation Fee: ${accreditationFee} USD</strong> — Initial application submission is <strong>FREE ($0)</strong>. The accreditation fee is payable only after your institution profile is reviewed and approved by the CTSDA board.
+            </p>
+          </div>
         </div>
-      </header>
+      </div>
 
       {/* STEP WIZARD BAR */}
-      <div className="flex items-center justify-between mb-8 bg-white p-3 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 1 ? '#2563eb' : '#e2e8f0', color: step >= 1 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem' }}>1</div>
-          <span className="text-xs sm:text-sm" style={{ fontWeight: step === 1 ? 700 : 500, color: step === 1 ? '#0f172a' : '#64748b' }}>Profile</span>
+      <div style={{
+        backgroundColor: '#ffffff',
+        borderRadius: '0.875rem',
+        border: '1px solid #e2e8f0',
+        boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
+        marginBottom: '2rem',
+        padding: '0.875rem 1.25rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        overflow: 'hidden',
+      }} className="sm:p-5">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 1 ? '#2563eb' : '#e2e8f0', color: step >= 1 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>1</div>
+          <span style={{ fontSize: '0.85rem', fontWeight: step === 1 ? 700 : 500, color: step === 1 ? '#0f172a' : '#64748b' }}>Profile</span>
         </div>
-        <div style={{ flex: 1, height: '2px', backgroundColor: step >= 2 ? '#2563eb' : '#e2e8f0', margin: '0 0.5rem' }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 2 ? '#2563eb' : '#e2e8f0', color: step >= 2 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem' }}>2</div>
-          <span className="text-xs sm:text-sm" style={{ fontWeight: step === 2 ? 700 : 500, color: step === 2 ? '#0f172a' : '#64748b' }}>Verify</span>
+        <div style={{ flex: 1, height: '2px', backgroundColor: step >= 2 ? '#2563eb' : '#e2e8f0', margin: '0 0.5rem', minWidth: '12px' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 2 ? '#2563eb' : '#e2e8f0', color: step >= 2 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>2</div>
+          <span style={{ fontSize: '0.85rem', fontWeight: step === 2 ? 700 : 500, color: step === 2 ? '#0f172a' : '#64748b' }}>Verify</span>
         </div>
-        <div style={{ flex: 1, height: '2px', backgroundColor: step >= 3 ? '#2563eb' : '#e2e8f0', margin: '0 0.5rem' }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 3 ? '#2563eb' : '#e2e8f0', color: step >= 3 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem' }}>3</div>
-          <span className="text-xs sm:text-sm" style={{ fontWeight: step === 3 ? 700 : 500, color: step === 3 ? '#0f172a' : '#64748b' }}>Institution</span>
+        <div style={{ flex: 1, height: '2px', backgroundColor: step >= 3 ? '#2563eb' : '#e2e8f0', margin: '0 0.5rem', minWidth: '12px' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 3 ? '#2563eb' : '#e2e8f0', color: step >= 3 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>3</div>
+          <span style={{ fontSize: '0.85rem', fontWeight: step === 3 ? 700 : 500, color: step === 3 ? '#0f172a' : '#64748b' }}>Institution</span>
         </div>
       </div>
 
