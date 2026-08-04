@@ -32,7 +32,7 @@ export default function ApplyPage() {
   const [applicationForm, setApplicationForm] = useState({
     trainingAreaIds: [] as string[],
     certificatesOffered: '',
-    deliveryMethods: '',
+    deliveryMethods: 'Online Live / Virtual',
     staffingCount: '',
     operationalInfo: '',
   });
@@ -98,6 +98,8 @@ export default function ApplyPage() {
         setError(data.error?.message || 'Invalid or expired code.');
         return;
       }
+      setError('');
+      setSuccess('');
       setStep(3);
     } catch (err) {
       setError('Service is temporarily unavailable.');
@@ -408,8 +410,20 @@ export default function ApplyPage() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Delivery Methods (Comma separated) <span style={{ color: '#ef4444' }}>*</span></label>
-                <input required value={applicationForm.deliveryMethods} onChange={e => setApplicationForm({...applicationForm, deliveryMethods: e.target.value})} placeholder="e.g. Online Live, In-person Hybrid" disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none' }} />
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Primary Delivery Method <span style={{ color: '#ef4444' }}>*</span></label>
+                <select
+                  required
+                  value={applicationForm.deliveryMethods || 'Online Live / Virtual'}
+                  onChange={e => setApplicationForm({...applicationForm, deliveryMethods: e.target.value})}
+                  disabled={loading}
+                  style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', backgroundColor: '#ffffff', outline: 'none' }}
+                >
+                  <option value="Online Live / Virtual">Online Live / Virtual Classroom</option>
+                  <option value="In-Person Classroom">In-Person / Physical Classroom</option>
+                  <option value="Hybrid (Online & In-Person)">Hybrid (Online & In-Person)</option>
+                  <option value="Self-Paced E-Learning">Self-Paced E-Learning</option>
+                  <option value="Blended Learning Workshops">Blended Learning Workshops</option>
+                </select>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>

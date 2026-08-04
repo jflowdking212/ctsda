@@ -24,7 +24,7 @@ export class AuthController {
   @HttpCode(200)
   async verifyOtp(@Body() body: unknown) {
     const dto = VerifyOtpSchema.parse(body);
-    return this.authService.verifyOtp(dto.email, dto.otp);
+    return this.authService.verifyOtp(dto.email, dto.otp, false);
   }
 
   @Post('register')

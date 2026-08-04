@@ -84,12 +84,11 @@ export class AuthService {
     return { success: true, message: 'OTP sent successfully.' };
   }
 
-  async verifyOtp(email: string, otp: string) {
+  async verifyOtp(email: string, otp: string, markUsed: boolean = true) {
     const record = await this.prisma.emailVerificationOTP.findFirst({
       where: {
         email: email.toLowerCase(),
         otp,
-        isUsed: false,
         expiresAt: { gt: new Date() },
       },
       orderBy: { createdAt: 'desc' },
@@ -99,10 +98,12 @@ export class AuthService {
       throw new BadRequestException('Invalid or expired OTP');
     }
 
-    await this.prisma.emailVerificationOTP.update({
-      where: { id: record.id },
-      data: { isUsed: true },
-    });
+    if (markUsed && !record.isUsed) {
+      await this.prisma.emailVerificationOTP.update({
+        where: { id: record.id },
+        data: { isUsed: true },
+      });
+    }
 
     return { success: true, message: 'Email verified successfully.' };
   }
