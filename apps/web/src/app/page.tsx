@@ -168,7 +168,7 @@ export default function Home() {
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', backgroundColor: '#f8fafc', padding: '0.75rem 1rem', borderRadius: '0.625rem', border: '1px solid #e2e8f0' }}>
                       <span style={{ fontSize: '1.2rem', marginTop: '0.1rem' }}>🌐</span>
                       <div>
-                        <div style={{ fontSize: '0.875rem', fontWeight 700, color: '#0f172a' }}>Cross-Border Recognition</div>
+                        <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#0f172a' }}>Cross-Border Recognition</div>
                         <div style={{ fontSize: '0.775rem', color: '#64748b' }}>Accepted across 150+ countries worldwide</div>
                       </div>
                     </div>
