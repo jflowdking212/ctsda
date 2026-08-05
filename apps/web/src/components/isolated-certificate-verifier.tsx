@@ -131,7 +131,7 @@ export function IsolatedCertificateVerifier({
       </section>
 
       {/* Content Area */}
-      <div style={{ maxWidth: '1200px', width: '92%', margin: '-7rem auto 0', padding: '0 1rem', position: 'relative', zIndex: 20 }}>
+      <div style={{ maxWidth: '1200px', width: '94%', margin: '-7rem auto 0', padding: '0 0.5rem', position: 'relative', zIndex: 20, boxSizing: 'border-box' }}>
         
         {!hasResult ? (
           /* Search State */
@@ -141,12 +141,14 @@ export function IsolatedCertificateVerifier({
                 backgroundColor: '#ffffff',
                 borderRadius: '1.25rem',
                 boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.12), 0 4px 6px -2px rgba(15, 23, 42, 0.04)',
-                padding: '3.5rem 3rem',
+                padding: 'clamp(1.75rem, 5vw, 3.5rem) clamp(1rem, 4vw, 2.5rem)',
                 maxWidth: '900px',
                 width: '100%',
                 margin: '0 auto 4rem',
                 border: '1px solid #e2e8f0',
                 textAlign: 'center',
+                boxSizing: 'border-box',
+                overflow: 'hidden',
               }}
             >
               <div style={{
@@ -163,21 +165,21 @@ export function IsolatedCertificateVerifier({
                   <line x1="11.5" y1="14.5" x2="14" y2="17"></line>
                 </svg>
               </div>
-              <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>
+              <h2 style={{ fontSize: 'clamp(1.35rem, 4vw, 1.75rem)', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>
                 Certificate Verification
               </h2>
-              <p style={{ color: '#64748b', marginBottom: '2.5rem', fontSize: '1rem', maxWidth: '600px', margin: '0 auto 2.5rem' }}>
+              <p style={{ color: '#64748b', marginBottom: '2.5rem', fontSize: 'clamp(0.9rem, 3vw, 1rem)', maxWidth: '600px', margin: '0 auto 2.5rem', lineHeight: 1.5 }}>
                 Enter the certificate number exactly as it appears on your official CTSDA document.
               </p>
 
-              <form onSubmit={handleSubmit} style={{ textAlign: 'left', maxWidth: '750px', margin: '0 auto' }}>
+              <form onSubmit={handleSubmit} style={{ textAlign: 'left', maxWidth: '750px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
                 <label
                   htmlFor="certificate-number-input"
                   style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                 >
                   Certificate Number
                 </label>
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'stretch', width: '100%', boxSizing: 'border-box' }}>
                   <input
                     id="certificate-number-input"
                     value={token}
@@ -185,9 +187,12 @@ export function IsolatedCertificateVerifier({
                     placeholder="E.G. CTSD-2024-123456"
                     disabled={loading}
                     style={{
-                      flex: '1 1 300px',
-                      padding: '1rem 1.25rem',
-                      fontSize: '1.05rem',
+                      flex: '1 1 200px',
+                      minWidth: 0,
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      padding: '0.9rem 1rem',
+                      fontSize: 'clamp(0.9rem, 3.5vw, 1.05rem)',
                       borderRadius: '0.625rem',
                       border: '2px solid #cbd5e1',
                       backgroundColor: '#ffffff',
@@ -213,11 +218,15 @@ export function IsolatedCertificateVerifier({
                     type="submit"
                     disabled={loading}
                     style={{
-                      padding: '1rem 2rem',
+                      flex: '1 1 180px',
+                      width: '100%',
+                      maxWidth: '100%',
+                      boxSizing: 'border-box',
+                      padding: '0.9rem 1.5rem',
                       backgroundColor: '#2563eb',
                       color: '#ffffff',
                       fontWeight: 700,
-                      fontSize: '1.05rem',
+                      fontSize: '1rem',
                       borderRadius: '0.625rem',
                       border: 'none',
                       cursor: loading ? 'not-allowed' : 'pointer',
@@ -228,7 +237,6 @@ export function IsolatedCertificateVerifier({
                       boxShadow: '0 4px 14px rgba(37, 99, 235, 0.3)',
                       transition: 'all 0.2s',
                       whiteSpace: 'nowrap',
-                      flex: '0 0 auto',
                     }}
                     onMouseOver={(e) => {
                       if (!loading) e.currentTarget.style.backgroundColor = '#1d4ed8';

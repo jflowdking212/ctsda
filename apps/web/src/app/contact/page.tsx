@@ -77,20 +77,22 @@ export default async function ContactPage() {
         </section>
 
         {/* Content Container */}
-        <div style={{ maxWidth: '1140px', margin: '0 auto', padding: '3.5rem 1.5rem 0' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2.5rem', alignItems: 'start' }}>
+        <div style={{ maxWidth: '1140px', margin: '0 auto', padding: 'clamp(1.5rem, 4vw, 3.5rem) 1rem 0', boxSizing: 'border-box' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '2rem', alignItems: 'start' }}>
             
             {/* Form Card */}
             <div
               style={{
                 backgroundColor: '#ffffff',
                 borderRadius: '1.25rem',
-                padding: '2.5rem 2rem',
+                padding: 'clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 3.5vw, 2rem)',
                 boxShadow: '0 10px 30px -10px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.02)',
                 border: '1px solid #e2e8f0',
+                boxSizing: 'border-box',
+                overflow: 'hidden',
               }}
             >
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>
+              <h2 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.5rem)', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>
                 Send Us a Message
               </h2>
               <p style={{ color: '#64748b', fontSize: '0.95rem', marginBottom: '2rem' }}>
@@ -108,6 +110,7 @@ export default async function ContactPage() {
                     required
                     style={{
                       width: '100%',
+                      boxSizing: 'border-box',
                       padding: '0.85rem 1rem',
                       borderRadius: '0.625rem',
                       border: '1px solid #cbd5e1',
@@ -128,6 +131,7 @@ export default async function ContactPage() {
                     required
                     style={{
                       width: '100%',
+                      boxSizing: 'border-box',
                       padding: '0.85rem 1rem',
                       borderRadius: '0.625rem',
                       border: '1px solid #cbd5e1',
@@ -147,6 +151,7 @@ export default async function ContactPage() {
                     placeholder="e.g. Global Academy of Science"
                     style={{
                       width: '100%',
+                      boxSizing: 'border-box',
                       padding: '0.85rem 1rem',
                       borderRadius: '0.625rem',
                       border: '1px solid #cbd5e1',
@@ -165,6 +170,7 @@ export default async function ContactPage() {
                     required
                     style={{
                       width: '100%',
+                      boxSizing: 'border-box',
                       padding: '0.85rem 1rem',
                       borderRadius: '0.625rem',
                       border: '1px solid #cbd5e1',
@@ -193,6 +199,7 @@ export default async function ContactPage() {
                     required
                     style={{
                       width: '100%',
+                      boxSizing: 'border-box',
                       padding: '0.85rem 1rem',
                       borderRadius: '0.625rem',
                       border: '1px solid #cbd5e1',
@@ -217,6 +224,8 @@ export default async function ContactPage() {
                     border: 'none',
                     cursor: 'pointer',
                     boxShadow: '0 4px 14px rgba(37, 99, 235, 0.3)',
+                    width: '100%',
+                    boxSizing: 'border-box',
                   }}
                 >
                   Send Message
@@ -225,108 +234,119 @@ export default async function ContactPage() {
             </div>
 
             {/* Direct Contact Channels Column */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%', boxSizing: 'border-box' }}>
               
               {/* Info Cards Grid */}
               <div
                 style={{
                   backgroundColor: '#ffffff',
                   borderRadius: '1.25rem',
-                  padding: '2rem',
+                  padding: 'clamp(1.25rem, 4vw, 2rem) clamp(1rem, 3.5vw, 1.5rem)',
                   boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
                   border: '1px solid #e2e8f0',
+                  boxSizing: 'border-box',
+                  overflow: 'hidden',
                 }}
               >
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: 'clamp(1.15rem, 4vw, 1.25rem)', fontWeight: 800, color: '#0f172a', marginBottom: '1.5rem' }}>
                   Direct Contact Information
                 </h3>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   {/* Email */}
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start', width: '100%', boxSizing: 'border-box' }}>
                     <div
                       style={{
-                        width: '2.75rem',
-                        height: '2.75rem',
+                        width: '2.5rem',
+                        height: '2.5rem',
                         backgroundColor: '#eff6ff',
                         color: '#2563eb',
                         borderRadius: '0.75rem',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '1.25rem',
+                        fontSize: '1.15rem',
                         flexShrink: 0,
                       }}
                     >
                       ✉️
                     </div>
-                    <div>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
+                    <div style={{ minWidth: 0, flex: '1 1 auto' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                         Email Inquiries
                       </div>
                       <a
                         href={`mailto:${email}`}
-                        style={{ fontSize: '1rem', fontWeight: 700, color: '#2563eb', textDecoration: 'none' }}
+                        style={{
+                          fontSize: 'clamp(0.875rem, 3.5vw, 1rem)',
+                          fontWeight: 700,
+                          color: '#2563eb',
+                          textDecoration: 'none',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'anywhere',
+                          display: 'inline-block',
+                          maxWidth: '100%',
+                        }}
                       >
                         {email}
                       </a>
-                      <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0.25rem 0 0' }}>
+                      <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0.25rem 0 0', lineHeight: 1.45 }}>
                         For general support, application guidance, and institutional inquiries.
                       </p>
                     </div>
                   </div>
 
                   {/* Address */}
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start', width: '100%', boxSizing: 'border-box' }}>
                     <div
                       style={{
-                        width: '2.75rem',
-                        height: '2.75rem',
+                        width: '2.5rem',
+                        height: '2.5rem',
                         backgroundColor: '#eff6ff',
                         color: '#2563eb',
                         borderRadius: '0.75rem',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '1.25rem',
+                        fontSize: '1.15rem',
                         flexShrink: 0,
                       }}
                     >
                       📍
                     </div>
-                    <div>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
+                    <div style={{ minWidth: 0, flex: '1 1 auto' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                         United States Headquarters
                       </div>
-                      <div style={{ fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>
+                      <div style={{ fontSize: 'clamp(0.875rem, 3.5vw, 0.975rem)', fontWeight: 700, color: '#0f172a', wordBreak: 'break-word', overflowWrap: 'anywhere', lineHeight: 1.4 }}>
                         {address}
                       </div>
                     </div>
                   </div>
 
                   {/* Hours */}
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start', width: '100%', boxSizing: 'border-box' }}>
                     <div
                       style={{
-                        width: '2.75rem',
-                        height: '2.75rem',
+                        width: '2.5rem',
+                        height: '2.5rem',
                         backgroundColor: '#eff6ff',
                         color: '#2563eb',
                         borderRadius: '0.75rem',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '1.25rem',
+                        fontSize: '1.15rem',
                         flexShrink: 0,
                       }}
                     >
                       🕒
                     </div>
-                    <div>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
+                    <div style={{ minWidth: 0, flex: '1 1 auto' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                         Business Hours
                       </div>
-                      <div style={{ fontSize: '0.975rem', fontWeight: 600, color: '#334155' }}>
+                      <div style={{ fontSize: 'clamp(0.875rem, 3.5vw, 0.975rem)', fontWeight: 600, color: '#334155', wordBreak: 'break-word', overflowWrap: 'anywhere', lineHeight: 1.4 }}>
                         {hours}
                       </div>
                     </div>
