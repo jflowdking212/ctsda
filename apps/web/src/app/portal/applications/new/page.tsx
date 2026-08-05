@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { CountrySelect } from '../../../../components/country-select';
 
 interface Institution {
   id: string;
@@ -27,10 +28,10 @@ export default function NewApplicationPage() {
   
   // Institution details form
   const [instForm, setInstForm] = useState({
-    name: 'Jay Bliss Tech',
+    name: '',
     registrationNumber: '',
     institutionType: 'corporate',
-    country: 'Nigeria',
+    country: '',
     address: '',
     email: '',
     phone: '',
@@ -131,7 +132,7 @@ export default function NewApplicationPage() {
             name: instForm.name.trim(),
             registrationNumber: instForm.registrationNumber.trim(),
             institutionType: instForm.institutionType,
-            country: instForm.country.trim() || 'Nigeria',
+            country: instForm.country.trim(),
             address: instForm.address.trim() || 'N/A',
             phone: instForm.phone.trim() || 'N/A',
             email: instForm.email.trim(),
@@ -269,11 +270,11 @@ export default function NewApplicationPage() {
             </label>
 
             <label>
-              Registration / RC Number *
+              Company Registration No/LLC/LTD/CIN etc *
               <input
                 value={instForm.registrationNumber}
                 onChange={(e) => setInstForm({ ...instForm, registrationNumber: e.target.value })}
-                placeholder="e.g. RC-1029384"
+                placeholder="e.g. RC-1029384, LLC-482, CIN-9821"
                 required
                 disabled={loading}
               />
@@ -299,14 +300,13 @@ export default function NewApplicationPage() {
               </select>
             </label>
 
-            <label>
-              Country
-              <input
+            <label style={{ display: 'block' }}>
+              Country *
+              <CountrySelect
                 value={instForm.country}
-                onChange={(e) => setInstForm({ ...instForm, country: e.target.value })}
-                placeholder="e.g. Nigeria"
-                required
+                onChange={(val) => setInstForm({ ...instForm, country: val })}
                 disabled={loading}
+                required
               />
             </label>
 

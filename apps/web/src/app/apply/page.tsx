@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { CountrySelect } from '../../components/country-select';
 
 export default function ApplyPage() {
   const [step, setStep] = useState(1);
@@ -21,7 +22,7 @@ export default function ApplyPage() {
     name: '',
     registrationNumber: '',
     institutionType: 'corporate',
-    country: 'Nigeria',
+    country: '',
     address: '',
     phone: '',
     email: '',
@@ -360,8 +361,8 @@ export default function ApplyPage() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Registration / RC Number <span style={{ color: '#ef4444' }}>*</span></label>
-                <input required value={institutionForm.registrationNumber} onChange={e => setInstitutionForm({...institutionForm, registrationNumber: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%' }} placeholder="e.g. RC-982341" />
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Company Registration No/LLC/LTD/CIN etc <span style={{ color: '#ef4444' }}>*</span></label>
+                <input required value={institutionForm.registrationNumber} onChange={e => setInstitutionForm({...institutionForm, registrationNumber: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%' }} placeholder="e.g. RC-982341, LLC-1029, CIN-4091" />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -382,7 +383,7 @@ export default function ApplyPage() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Country <span style={{ color: '#ef4444' }}>*</span></label>
-                <input required value={institutionForm.country} onChange={e => setInstitutionForm({...institutionForm, country: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%' }} />
+                <CountrySelect value={institutionForm.country} onChange={(val) => setInstitutionForm({ ...institutionForm, country: val })} disabled={loading} required />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
