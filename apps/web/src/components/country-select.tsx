@@ -195,7 +195,7 @@ interface CountrySelectProps {
   required?: boolean;
 }
 
-export function CountrySelect({ value, onChange, disabled, _required }: CountrySelectProps) {
+export function CountrySelect({ value, onChange, disabled, required }: CountrySelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -216,6 +216,7 @@ export function CountrySelect({ value, onChange, disabled, _required }: CountryS
 
   return (
     <div ref={wrapperRef} style={{ position: 'relative', width: '100%' }}>
+      <input type="text" value={value} required={required} readOnly style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: '100%', height: '100%' }} tabIndex={-1} />
       <button
         type="button"
         disabled={disabled}
