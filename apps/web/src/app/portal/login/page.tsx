@@ -76,15 +76,10 @@ export default function LoginPage() {
           {loading ? (requiresTotp ? 'Verifying...' : 'Signing in...') : 'Login to Portal'}
         </button>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0', fontSize: '0.875rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <a className="text-link" href="/setup-account" style={{ color: '#2563eb', fontWeight: 600 }}>
-              🔑 First time here? Set up password
-            </a>
-            <a className="text-link" href="/apply" style={{ color: '#0284c7' }}>
-              Apply for Accreditation ↗
-            </a>
-          </div>
+        <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0', fontSize: '0.875rem', textAlign: 'center' }}>
+          <a className="text-link" href="/apply" style={{ color: '#0284c7' }}>
+            Apply for Accreditation ↗
+          </a>
         </div>
       </form>
     </main>
