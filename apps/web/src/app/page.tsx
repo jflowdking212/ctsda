@@ -45,7 +45,7 @@ export default function Home() {
 
                 {/* Main Headline */}
                 <h1 style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.25rem)', fontWeight: 800, color: '#ffffff', lineHeight: 1.18, letterSpacing: '-0.02em', marginBottom: '1.25rem' }}>
-                  Council for Training, Skills &amp; Development America <span style={{ color: '#60a5fa' }}>(CTSDA)</span>
+                  Council For Training Skills &amp; Development America <span style={{ color: '#60a5fa' }}>(CTSDA)</span>
                 </h1>
 
                 {/* Subtitle / Value Statement */}

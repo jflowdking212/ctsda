@@ -9,7 +9,7 @@ export function PremiumHeader() {
           <img className="brand-logo" src="/images/logo-ctsda.png" alt="" />
           <span className="brand-text">
             <strong>CTSDA</strong>
-            <small>Council for Training, Skills & Development America</small>
+            <small>Council For Training Skills & Development America</small>
           </span>
         </Link>
         <nav className="site-nav" aria-label="Primary navigation">

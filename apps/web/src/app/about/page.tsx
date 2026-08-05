@@ -55,7 +55,7 @@ export default function AboutPage() {
                   Our Mission
                 </h2>
                 <p style={{ fontSize: '1.025rem', color: '#475569', lineHeight: 1.7, marginBottom: '1.75rem' }}>
-                  The Council For Training, Skills and Development, America (CTSDA) is dedicated to advancing excellence in education and training through comprehensive accreditation services. We strive to empower institutions, trainers and educational service providers to deliver high-quality programs that meet the evolving needs of learners and industries.
+                  The Council For Training Skills and Development America (CTSDA) is dedicated to advancing excellence in education and training through comprehensive accreditation services. We strive to empower institutions, trainers and educational service providers to deliver high-quality programs that meet the evolving needs of learners and industries.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

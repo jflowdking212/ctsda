@@ -269,7 +269,7 @@ export class ReviewsService {
                     </p>
                     <p style="font-size: 0.85rem; color: #64748b;">If paying via manual bank transfer, our finance team will verify your receipt and immediately activate your accreditation credentials.</p>
                     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 25px 0 15px 0;" />
-                    <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} CTSDA - Council for Training, Skills & Development America.</p>
+                    <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} CTSDA - Council For Training Skills & Development America.</p>
                   </div>
                 `,
                 userId: app.applicantId || 'system',
@@ -346,8 +346,8 @@ export class ReviewsService {
                   <p>Dear ${app.applicantFirstName || app.applicant?.firstName || 'Applicant'},</p>
                   <p>Your accreditation application for <strong>${app.institution?.name || 'your institution'}</strong> has been moved to <strong>Under Review</strong> by the CTSDA Accreditation Board.</p>
                   <p>Our review committee is actively evaluating your institution profile and compliance documentation. You will receive further updates as our review progresses.</p>
-                  <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 25px 0 15px 0;" />
-                  <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} CTSDA - Council for Training, Skills & Development America.</p>
+                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 25px 0 15px 0;" />
+                    <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} CTSDA - Council For Training Skills & Development America.</p>
                 </div>
               `,
               userId: app.applicantId || 'system',

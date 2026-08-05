@@ -33,7 +33,7 @@ export function PremiumHeader() {
           <img className="brand-logo" src="/images/logo-ctsda.png" alt="CTSDA Logo" loading="eager" style={{ width: '48px', height: '48px', objectFit: 'contain', flexShrink: 0 }} />
           <span className="brand-text">
             <strong>CTSDA</strong>
-            <small>Council for Training, Skills &amp; Development America</small>
+            <small>Council For Training Skills &amp; Development America</small>
           </span>
         </Link>
 

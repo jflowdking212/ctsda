@@ -3,7 +3,7 @@ import { PublicPage } from '../../components/public-shell';
 
 export const metadata = {
   title: 'Privacy Policy & Legal Framework | CTSDA',
-  description: 'Comprehensive Privacy Policy, Legal Framework, and Data Governance standards of the Council for Training, Skills & Development America (CTSDA).',
+  description: 'Comprehensive Privacy Policy, Legal Framework, and Data Governance standards of the Council For Training Skills & Development America (CTSDA).',
 };
 
 const sections = [
@@ -11,7 +11,7 @@ const sections = [
     id: 'overview',
     title: '1. Overview & Scope',
     icon: '📋',
-    content: `The Council for Training, Skills and Development America (CTSDA) is committed to protecting the privacy, confidentiality, and security of all personal and institutional data entrusted to us. This Privacy Policy & Legal Framework applies to all interactions with CTSDA, including our website (ctsdamerica.com / ctsda.acecoterieconsulting.com), applicant portal, public accreditation directory, certificate verification services, training programs, and communication channels.
+    content: `The Council For Training Skills and Development America (CTSDA) is committed to protecting the privacy, confidentiality, and security of all personal and institutional data entrusted to us. This Privacy Policy & Legal Framework applies to all interactions with CTSDA, including our website (ctsdamerica.com / ctsda.acecoterieconsulting.com), applicant portal, public accreditation directory, certificate verification services, training programs, and communication channels.
 
 By accessing our services, submitting accreditation applications, or utilizing our public verification system, you acknowledge and agree to the practices outlined in this policy.`
   },
@@ -99,7 +99,7 @@ To exercise any of these rights, contact us at management@ctsdamerica.com.`
     icon: '✉️',
     content: `If you have questions regarding this Privacy Policy & Legal Framework or wish to submit a privacy inquiry:
 
-Council for Training, Skills and Development America (CTSDA)
+Council For Training Skills and Development America (CTSDA)
 Address: The Green, STE A, Dover, Kent, Delaware, United States
 Email: management@ctsdamerica.com
 Official Verification Portal: https://ctsda.acecoterieconsulting.com/verify`

@@ -3,7 +3,7 @@ import { PublicPage } from '../../components/public-shell';
 
 export const metadata = {
   title: 'Contact Us | CTSDA',
-  description: 'Get in touch with the Council for Training, Skills & Development America for accreditation support, institutional inquiries, and verification assistance.',
+  description: 'Get in touch with the Council For Training Skills & Development America for accreditation support, institutional inquiries, and verification assistance.',
 };
 
 export default function ContactPage() {

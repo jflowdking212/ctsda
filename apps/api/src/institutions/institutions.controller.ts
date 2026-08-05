@@ -86,7 +86,7 @@ export class InstitutionsController {
           
           <p>Dear ${body.firstName} ${body.lastName},</p>
           
-          <p>Thank you for submitting your accreditation application for <strong>${body.institution.name}</strong> to the Council for Training, Skills & Development America (CTSDA).</p>
+          <p>Thank you for submitting your accreditation application for <strong>${body.institution.name}</strong> to the Council For Training Skills & Development America (CTSDA).</p>
           
           <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #2563eb; border-radius: 4px; margin: 20px 0;">
             <p style="margin: 0; font-weight: bold; color: #1e293b;">Next Steps in Review Process:</p>
@@ -103,7 +103,7 @@ export class InstitutionsController {
           </p>
           
           <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0 15px 0;" />
-          <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} CTSDA - Council for Training, Skills & Development America. All rights reserved.</p>
+          <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} CTSDA - Council For Training Skills & Development America. All rights reserved.</p>
         </div>
       `;
 

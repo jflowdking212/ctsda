@@ -410,7 +410,7 @@ export function IsolatedCertificateVerifier({
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
                            <img src="/images/logo-ctsda.png" alt="CTSDA Logo" style={{ height: '35px', objectFit: 'contain' }} />
                            <div style={{ fontSize: '0.55rem', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.02em', fontWeight: 800, textAlign: 'left', lineHeight: 1.2 }}>
-                             Council for Training, Skills &<br/>Development America
+                             Council For Training Skills &<br/>Development America
                            </div>
                         </div>
                         <div style={{ fontSize: '0.55rem', color: '#94a3b8', marginBottom: '0.5rem' }}>This is to certify that</div>

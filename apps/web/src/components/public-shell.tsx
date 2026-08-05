@@ -18,7 +18,7 @@ export function PublicHeader() {
           <img className="brand-logo" src="/images/logo-ctsda.png" alt="CTSDA Logo" style={{ width: '48px', height: '48px', objectFit: 'contain', flexShrink: 0 }} />
           <span className="brand-text">
             <strong>CTSDA</strong>
-            <small>Council for Training, Skills & Development America</small>
+            <small>Council For Training Skills & Development America</small>
           </span>
         </Link>
         <nav className="site-nav" aria-label="Primary navigation">

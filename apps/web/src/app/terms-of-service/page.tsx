@@ -3,7 +3,7 @@ import { PublicPage } from '../../components/public-shell';
 
 export const metadata = {
   title: 'Terms of Service | CTSDA - Global Standards in Education Excellence',
-  description: 'Official Terms of Service, institutional agreement, payment rules, and certificate verification terms for the Council for Training, Skills & Development America (CTSDA).',
+  description: 'Official Terms of Service, institutional agreement, payment rules, and certificate verification terms for the Council For Training Skills & Development America (CTSDA).',
 };
 
 const sections = [
@@ -11,7 +11,7 @@ const sections = [
     id: 'use-of-services',
     title: '1. Use of CTSDA Services',
     icon: '📋',
-    content: `The Council for Training, Skills and Development America (CTSDA) provides international accreditation, institutional evaluation, certificate verification, and educational governance services.
+    content: `The Council For Training Skills and Development America (CTSDA) provides international accreditation, institutional evaluation, certificate verification, and educational governance services.
 
 By accessing our website (ctsdamerica.com / ctsda.acecoterieconsulting.com), creating an account, submitting an accreditation application, making a fee payment, or using our public verification tools, you agree to comply with these Terms of Service.
 
@@ -101,7 +101,7 @@ You may use CTSDA services solely for lawful, authorized purposes. You represent
     icon: '✉️',
     content: `For legal inquiries, accreditation disputes, or questions regarding these Terms of Service, contact the CTSDA Legal Office:
 
-Council for Training, Skills and Development America (CTSDA)
+Council For Training Skills and Development America (CTSDA)
 Address: The Green, STE A, Dover, Kent, Delaware, United States
 Email: management@ctsdamerica.com
 Official Portal: https://ctsda.acecoterieconsulting.com`
