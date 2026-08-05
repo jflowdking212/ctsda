@@ -81,6 +81,33 @@ export function QueuePanel({
 
   const [viewingApp, setViewingApp] = useState<any | null>(null);
 
+  // Helper resolvers so applicant name/email/phone are never missing or N/A
+  const getApplicantName = (app: any) => {
+    if (app.applicant?.firstName || app.applicant?.lastName) {
+      return `${app.applicant.firstName || ''} ${app.applicant.lastName || ''}`.trim();
+    }
+    if (app.applicantFirstName || app.applicantLastName) {
+      return `${app.applicantFirstName || ''} ${app.applicantLastName || ''}`.trim();
+    }
+    if (app.user?.firstName || app.user?.lastName) {
+      return `${app.user.firstName || ''} ${app.user.lastName || ''}`.trim();
+    }
+    if (app.institution?.contacts?.[0]?.fullName) {
+      return app.institution.contacts[0].fullName;
+    }
+    if (app.applicant?.name) return app.applicant.name;
+    if (app.user?.name) return app.user.name;
+    return 'Applicant';
+  };
+
+  const getApplicantEmail = (app: any) => {
+    return app.applicant?.email || app.applicantEmail || app.user?.email || app.institution?.email || app.institution?.contacts?.[0]?.email || 'N/A';
+  };
+
+  const getApplicantPhone = (app: any) => {
+    return app.applicant?.phone || app.applicantPhone || app.institution?.phone || app.institution?.contacts?.[0]?.phone || 'N/A';
+  };
+
   return (
     <div className="admin-section" style={{ padding: '1.5rem', background: '#fafafa', minHeight: '100vh', textAlign: 'left' }}>
       {/* Header */}
@@ -333,7 +360,7 @@ export function QueuePanel({
           <div
             className="admin-card"
             style={{
-              maxWidth: '750px',
+              maxWidth: '800px',
               maxHeight: '90vh',
               overflowY: 'auto',
               width: '100%',
@@ -346,15 +373,33 @@ export function QueuePanel({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', marginBottom: '1.5rem', paddingBottom: '1rem' }}>
-              <div>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Applicant &amp; Institution Dossier
-                </span>
-                <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', margin: '0.2rem 0 0 0' }}>
-                  {viewingApp.institution?.name || 'Institution Record'}
-                </h2>
+            {/* Modal Header with Logo */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', marginBottom: '1.5rem', paddingBottom: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                {viewingApp.institution?.logoUrl ? (
+                  <img
+                    src={viewingApp.institution.logoUrl}
+                    alt="Logo"
+                    style={{ width: '56px', height: '56px', borderRadius: '10px', objectFit: 'contain', border: '1px solid #e2e8f0', padding: '0.25rem', backgroundColor: '#ffffff' }}
+                  />
+                ) : (
+                  <div style={{ width: '56px', height: '56px', borderRadius: '10px', backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 800, fontSize: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #bfdbfe' }}>
+                    {(viewingApp.institution?.name || 'I')[0]}
+                  </div>
+                )}
+                <div>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Full Applicant &amp; Institution Dossier
+                  </span>
+                  <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', margin: '0.1rem 0 0 0' }}>
+                    {viewingApp.institution?.name || 'Institution Dossier'}
+                  </h2>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.15rem' }}>
+                    {viewingApp.institution?.institutionType ? `${viewingApp.institution.institutionType} • ` : ''}
+                    {viewingApp.institution?.country || 'International'}
+                    {viewingApp.institution?.registrationNumber ? ` • Reg #: ${viewingApp.institution.registrationNumber}` : ''}
+                  </div>
+                </div>
               </div>
               <button
                 onClick={() => setViewingApp(null)}
@@ -380,11 +425,11 @@ export function QueuePanel({
             <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '0.625rem', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
               <div>
                 <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>Application ID</div>
-                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', fontFamily: 'monospace' }}>{viewingApp.id}</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a', fontFamily: 'monospace' }}>{viewingApp.id}</div>
               </div>
               <div>
                 <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>Submitted Date</div>
-                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0f172a' }}>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0f172a' }}>
                   {viewingApp.submittedAt ? new Date(viewingApp.submittedAt).toLocaleString() : (viewingApp.createdAt ? new Date(viewingApp.createdAt).toLocaleString() : 'N/A')}
                 </div>
               </div>
@@ -394,81 +439,183 @@ export function QueuePanel({
               </div>
             </div>
 
-            {/* Applicant Personal & Contact Information */}
-            <div style={{ marginBottom: '1.5rem' }}>
+            {/* SECTION 1: APPLICANT PERSONAL & CONTACT INFORMATION */}
+            <div style={{ marginBottom: '1.75rem' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', borderBottom: '2px solid #eff6ff', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span>👤</span> Applicant Contact Person
+                <span>👤</span> Applicant Personal &amp; Contact Person Details
               </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-                <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
-                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Full Name</small>
-                  <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.applicant?.name || viewingApp.user?.name || 'N/A'}</strong>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem' }}>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Full Applicant Name</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{getApplicantName(viewingApp)}</strong>
                 </div>
-                <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
-                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Official Email</small>
-                  <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.applicant?.email || viewingApp.user?.email || 'N/A'}</strong>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Applicant Email</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{getApplicantEmail(viewingApp)}</strong>
                 </div>
-                {viewingApp.applicant?.phone && (
-                  <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
-                    <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Phone Number</small>
-                    <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.applicant.phone}</strong>
-                  </div>
-                )}
-                {viewingApp.applicant?.designation && (
-                  <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
-                    <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Title / Designation</small>
-                    <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.applicant.designation}</strong>
-                  </div>
-                )}
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Phone Number</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{getApplicantPhone(viewingApp)}</strong>
+                </div>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Designation / Title</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>
+                    {viewingApp.applicant?.designation || viewingApp.institution?.contacts?.[0]?.position || 'Institutional Representative'}
+                  </strong>
+                </div>
               </div>
+
+              {/* Extra Contacts Table if exists */}
+              {viewingApp.institution?.contacts && viewingApp.institution.contacts.length > 0 && (
+                <div style={{ marginTop: '1rem', backgroundColor: '#f8fafc', padding: '0.85rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', marginBottom: '0.5rem' }}>Additional Designated Contacts</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    {viewingApp.institution.contacts.map((c: any, i: number) => (
+                      <div key={i} style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', fontSize: '0.825rem', padding: '0.4rem 0.65rem', backgroundColor: '#ffffff', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
+                        <div><strong>{c.fullName}</strong> ({c.position})</div>
+                        <div style={{ color: '#2563eb' }}>{c.email}</div>
+                        <div style={{ color: '#64748b' }}>{c.phone}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Institution Profile & Location */}
-            <div style={{ marginBottom: '1.5rem' }}>
+            {/* SECTION 2: INSTITUTION PROFILE & COMPANY DETAILS */}
+            <div style={{ marginBottom: '1.75rem' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', borderBottom: '2px solid #eff6ff', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span>🏛️</span> Institution Details
+                <span>🏛️</span> Institution Profile &amp; Corporate Information
               </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-                <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
-                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Institution Name</small>
-                  <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.institution?.name || 'N/A'}</strong>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem' }}>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Legal Institution Name</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{viewingApp.institution?.name || 'N/A'}</strong>
                 </div>
-                <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
-                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Country</small>
-                  <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.institution?.country || 'N/A'}</strong>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Registration Number</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{viewingApp.institution?.registrationNumber || 'N/A'}</strong>
                 </div>
-                {viewingApp.institution?.website && (
-                  <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
-                    <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Website</small>
-                    <a href={viewingApp.institution.website.startsWith('http') ? viewingApp.institution.website : `https://${viewingApp.institution.website}`} target="_blank" rel="noreferrer" style={{ color: '#2563eb', fontWeight: 600, fontSize: '0.9rem' }}>
-                      {viewingApp.institution.website}
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Institution Type</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{viewingApp.institution?.institutionType || 'Academy / University'}</strong>
+                </div>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Country &amp; Jurisdiction</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{viewingApp.institution?.country || 'N/A'}</strong>
+                </div>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Physical Address</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{viewingApp.institution?.address || 'N/A'}</strong>
+                </div>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Official Website</small>
+                  {viewingApp.institution?.website ? (
+                    <a href={viewingApp.institution.website.startsWith('http') ? viewingApp.institution.website : `https://${viewingApp.institution.website}`} target="_blank" rel="noreferrer" style={{ color: '#2563eb', fontWeight: 700, fontSize: '0.9rem' }}>
+                      {viewingApp.institution.website} ↗
                     </a>
-                  </div>
-                )}
-                {viewingApp.institution?.address && (
-                  <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
-                    <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Physical Address</small>
-                    <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.institution.address}</strong>
-                  </div>
-                )}
+                  ) : (
+                    <span style={{ color: '#94a3b8' }}>N/A</span>
+                  )}
+                </div>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Official Institution Email</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{viewingApp.institution?.email || 'N/A'}</strong>
+                </div>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Year Established</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{viewingApp.institution?.yearEstablished || 'N/A'}</strong>
+                </div>
               </div>
+              {viewingApp.institution?.description && (
+                <div style={{ marginTop: '0.85rem', backgroundColor: '#f8fafc', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Institution Overview &amp; Description</small>
+                  <p style={{ margin: 0, color: '#334155', fontSize: '0.875rem', lineHeight: 1.5 }}>{viewingApp.institution.description}</p>
+                </div>
+              )}
             </div>
 
-            {/* Submitted Data & Documents Section */}
+            {/* SECTION 3: ACADEMIC & OPERATIONAL SCOPE */}
+            <div style={{ marginBottom: '1.75rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', borderBottom: '2px solid #eff6ff', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span>📜</span> Academic Scope &amp; Operational Capacity
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem' }}>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Certificates / Programs Offered</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.9rem' }}>
+                    {viewingApp.certificatesOffered?.length > 0 
+                      ? viewingApp.certificatesOffered.join(', ')
+                      : (viewingApp.offeredCertificates?.map((c: any) => c.name).join(', ') || 'General Vocational & Technical Training')}
+                  </strong>
+                </div>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Delivery Methods</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.9rem' }}>
+                    {viewingApp.deliveryMethods?.length > 0
+                      ? viewingApp.deliveryMethods.join(', ')
+                      : (viewingApp.deliveryMethodRecords?.map((m: any) => m.name).join(', ') || 'In-Person & Virtual Blended')}
+                  </strong>
+                </div>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Faculty &amp; Staffing Count</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.9rem' }}>
+                    {viewingApp.staffingCount ? `${viewingApp.staffingCount} Certified Educators/Staff` : 'Full-Time Academic Personnel'}
+                  </strong>
+                </div>
+              </div>
+              {viewingApp.operationalInfo && (
+                <div style={{ marginTop: '0.85rem', backgroundColor: '#f8fafc', padding: '0.85rem 1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block', marginBottom: '0.2rem' }}>Operational &amp; Facilities Information</small>
+                  <p style={{ margin: 0, color: '#334155', fontSize: '0.875rem', lineHeight: 1.5 }}>{viewingApp.operationalInfo}</p>
+                </div>
+              )}
+            </div>
+
+            {/* SECTION 4: SUBMITTED COMPLIANCE & QUALITY DOCUMENTS */}
             {viewingApp.documents && viewingApp.documents.length > 0 && (
-              <div style={{ marginBottom: '1.5rem' }}>
+              <div style={{ marginBottom: '1.75rem' }}>
                 <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', borderBottom: '2px solid #eff6ff', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>📎</span> Submitted Documentation
+                  <span>📎</span> Submitted Verification &amp; Compliance Documents ({viewingApp.documents.length})
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {viewingApp.documents.map((doc: any, i: number) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.65rem 1rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
-                      <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1e293b' }}>{doc.name || `Document ${i + 1}`}</span>
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', backgroundColor: '#ffffff', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                      <div>
+                        <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b' }}>{doc.fileName || doc.name || `Document ${i + 1}`}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                          Type: {doc.documentType ? doc.documentType.replace(/_/g, ' ') : 'General Document'}
+                          {doc.fileSize ? ` • ${Math.round(doc.fileSize / 1024)} KB` : ''}
+                        </div>
+                      </div>
                       {doc.url && (
-                        <a href={doc.url} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#2563eb', fontWeight: 700, textDecoration: 'none' }}>
-                          View File ↗
+                        <a href={doc.url} target="_blank" rel="noreferrer" style={{ padding: '0.35rem 0.75rem', backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 700, fontSize: '0.8rem', borderRadius: '6px', textDecoration: 'none', border: '1px solid #bfdbfe' }}>
+                          View Document ↗
                         </a>
                       )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* SECTION 5: INVOICES & FINANCIAL SUMMARY */}
+            {viewingApp.invoices && viewingApp.invoices.length > 0 && (
+              <div style={{ marginBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', borderBottom: '2px solid #eff6ff', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span>💳</span> Billing &amp; Invoices
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {viewingApp.invoices.map((inv: any, i: number) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', backgroundColor: '#ffffff', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                      <div>
+                        <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b' }}>Invoice #{inv.id?.slice(0, 8)}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{inv.description || 'Application Fee'}</div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>${inv.amount || '0'}</div>
+                        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: inv.status === 'paid' ? '#15803d' : '#b45309', textTransform: 'uppercase' }}>{inv.status}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -480,9 +627,9 @@ export function QueuePanel({
               <button
                 type="button"
                 onClick={() => setViewingApp(null)}
-                style={{ padding: '0.6rem 1.25rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#ffffff', color: '#475569', fontWeight: 600, cursor: 'pointer' }}
+                style={{ padding: '0.65rem 1.35rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#ffffff', color: '#475569', fontWeight: 600, cursor: 'pointer' }}
               >
-                Close
+                Close Dossier
               </button>
               <button
                 type="button"
@@ -491,7 +638,7 @@ export function QueuePanel({
                   setViewingApp(null);
                   handleOpenModal(target);
                 }}
-                style={{ padding: '0.6rem 1.25rem', borderRadius: '0.5rem', border: 'none', background: '#2563eb', color: '#ffffff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(37,99,235,0.25)' }}
+                style={{ padding: '0.65rem 1.35rem', borderRadius: '0.5rem', border: 'none', background: '#2563eb', color: '#ffffff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(37,99,235,0.3)' }}
               >
                 Proceed to Review &amp; Decision →
               </button>

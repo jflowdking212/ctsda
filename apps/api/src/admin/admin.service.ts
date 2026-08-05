@@ -58,10 +58,16 @@ export class AdminService {
         }),
       },
       include: {
-        institution: { select: { id: true, name: true, country: true, logoUrl: true } },
-        applicant: { select: { id: true, email: true, firstName: true, lastName: true } },
+        institution: {
+          include: {
+            contacts: true,
+          },
+        },
+        applicant: { select: { id: true, email: true, firstName: true, lastName: true, phone: true } },
         reviewer: { select: { id: true, email: true, firstName: true, lastName: true } },
         checklistItems: true,
+        documents: true,
+        invoices: true,
         accreditations: { select: { id: true, expiresAt: true, status: true } },
         comments: { orderBy: { createdAt: 'desc' }, take: 3 },
       },
