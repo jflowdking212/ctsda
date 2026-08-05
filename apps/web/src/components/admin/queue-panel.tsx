@@ -79,6 +79,8 @@ export function QueuePanel({
     setSelectedApp(null);
   };
 
+  const [viewingApp, setViewingApp] = useState<any | null>(null);
+
   return (
     <div className="admin-section" style={{ padding: '1.5rem', background: '#fafafa', minHeight: '100vh', textAlign: 'left' }}>
       {/* Header */}
@@ -260,18 +262,41 @@ export function QueuePanel({
                     )}
                   </td>
                   <td style={{ padding: '0.75rem 1rem', textAlign: 'left' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                       <button
                         className="admin-button"
                         style={{
-                          padding: '0.3rem 0.7rem',
+                          padding: '0.3rem 0.65rem',
                           fontSize: '0.75rem',
                           borderRadius: '0.375rem',
-                          border: '1px solid #e2e8f0',
+                          border: '1px solid #cbd5e1',
                           background: '#ffffff',
-                          color: '#0f172a',
+                          color: '#1e293b',
                           cursor: 'pointer',
-                          fontWeight: 500,
+                          fontWeight: 600,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.25rem',
+                        }}
+                        onClick={() => setViewingApp(app)}
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        View
+                      </button>
+                      <button
+                        className="admin-button"
+                        style={{
+                          padding: '0.3rem 0.65rem',
+                          fontSize: '0.75rem',
+                          borderRadius: '0.375rem',
+                          border: '1px solid #2563eb',
+                          background: '#2563eb',
+                          color: '#ffffff',
+                          cursor: 'pointer',
+                          fontWeight: 600,
                         }}
                         onClick={() => handleOpenModal(app)}
                       >
@@ -285,6 +310,196 @@ export function QueuePanel({
           </tbody>
         </table>
       </div>
+
+      {/* Applicant Information View Modal */}
+      {viewingApp && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.6)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '1rem',
+          }}
+          onClick={() => setViewingApp(null)}
+        >
+          <div
+            className="admin-card"
+            style={{
+              maxWidth: '750px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              width: '100%',
+              borderRadius: '0.85rem',
+              padding: '2rem',
+              boxShadow: '0 25px 50px rgba(0,0,0,0.3)',
+              background: '#ffffff',
+              position: 'relative',
+              textAlign: 'left',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', marginBottom: '1.5rem', paddingBottom: '1rem' }}>
+              <div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Applicant &amp; Institution Dossier
+                </span>
+                <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', margin: '0.2rem 0 0 0' }}>
+                  {viewingApp.institution?.name || 'Institution Record'}
+                </h2>
+              </div>
+              <button
+                onClick={() => setViewingApp(null)}
+                style={{
+                  background: '#f1f5f9',
+                  border: 'none',
+                  fontSize: '1.25rem',
+                  cursor: 'pointer',
+                  color: '#64748b',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Application Overview Banner */}
+            <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '0.625rem', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>Application ID</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', fontFamily: 'monospace' }}>{viewingApp.id}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>Submitted Date</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0f172a' }}>
+                  {viewingApp.submittedAt ? new Date(viewingApp.submittedAt).toLocaleString() : (viewingApp.createdAt ? new Date(viewingApp.createdAt).toLocaleString() : 'N/A')}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, marginBottom: '0.2rem' }}>Current Status</div>
+                <div>{getStatusBadge(viewingApp.status)}</div>
+              </div>
+            </div>
+
+            {/* Applicant Personal & Contact Information */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', borderBottom: '2px solid #eff6ff', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span>👤</span> Applicant Contact Person
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Full Name</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.applicant?.name || viewingApp.user?.name || 'N/A'}</strong>
+                </div>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Official Email</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.applicant?.email || viewingApp.user?.email || 'N/A'}</strong>
+                </div>
+                {viewingApp.applicant?.phone && (
+                  <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
+                    <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Phone Number</small>
+                    <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.applicant.phone}</strong>
+                  </div>
+                )}
+                {viewingApp.applicant?.designation && (
+                  <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
+                    <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Title / Designation</small>
+                    <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.applicant.designation}</strong>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Institution Profile & Location */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', borderBottom: '2px solid #eff6ff', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span>🏛️</span> Institution Details
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Institution Name</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.institution?.name || 'N/A'}</strong>
+                </div>
+                <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
+                  <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Country</small>
+                  <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.institution?.country || 'N/A'}</strong>
+                </div>
+                {viewingApp.institution?.website && (
+                  <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
+                    <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Website</small>
+                    <a href={viewingApp.institution.website.startsWith('http') ? viewingApp.institution.website : `https://${viewingApp.institution.website}`} target="_blank" rel="noreferrer" style={{ color: '#2563eb', fontWeight: 600, fontSize: '0.9rem' }}>
+                      {viewingApp.institution.website}
+                    </a>
+                  </div>
+                )}
+                {viewingApp.institution?.address && (
+                  <div style={{ backgroundColor: '#ffffff', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #f1f5f9' }}>
+                    <small style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: 'block' }}>Physical Address</small>
+                    <strong style={{ color: '#0f172a', fontSize: '0.925rem' }}>{viewingApp.institution.address}</strong>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Submitted Data & Documents Section */}
+            {viewingApp.documents && viewingApp.documents.length > 0 && (
+              <div style={{ marginBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', borderBottom: '2px solid #eff6ff', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span>📎</span> Submitted Documentation
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {viewingApp.documents.map((doc: any, i: number) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.65rem 1rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1e293b' }}>{doc.name || `Document ${i + 1}`}</span>
+                      {doc.url && (
+                        <a href={doc.url} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#2563eb', fontWeight: 700, textDecoration: 'none' }}>
+                          View File ↗
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Modal Actions Footer */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', borderTop: '1px solid #e2e8f0', paddingTop: '1.25rem', marginTop: '1.5rem' }}>
+              <button
+                type="button"
+                onClick={() => setViewingApp(null)}
+                style={{ padding: '0.6rem 1.25rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: '#ffffff', color: '#475569', fontWeight: 600, cursor: 'pointer' }}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const target = viewingApp;
+                  setViewingApp(null);
+                  handleOpenModal(target);
+                }}
+                style={{ padding: '0.6rem 1.25rem', borderRadius: '0.5rem', border: 'none', background: '#2563eb', color: '#ffffff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(37,99,235,0.25)' }}
+              >
+                Proceed to Review &amp; Decision →
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* Review Detail Modal */}
       {selectedApp && (
