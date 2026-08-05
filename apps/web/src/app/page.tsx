@@ -20,7 +20,7 @@ export default async function Home() {
   // 1. Hero Section
   const heroBadge = settings.homeHeroBadge || 'Official International Accreditation Body';
   const heroTitle = settings.homeHeroTitle || 'Council For Training Skills & Development America (CTSDA)';
-  const heroSubtitle = settings.homeHeroSubtitle || 'Empowering global education and workforce training providers with rigorous quality standards, international recognition, and 100% verifiable digital credentials.';
+  const heroSubtitle = settings.homeHeroSubtitle || `The Council for Training Skills and Development, America (CTSDA) is an international accreditation and professional standards organization committed to advancing excellence in education, training, and workforce development. We accredit institutions, training providers, and professionals that demonstrate quality, credibility, and a commitment to internationally aligned standards.\n\nCTSDA accreditation enhances your credibility, strengthens your reputation, and demonstrates your commitment to delivering excellence.`;
   const frameworkTitle = settings.homeFrameworkTitle || 'Global Quality Benchmark';
   const frameworkSubtitle = settings.homeFrameworkSubtitle || 'CTSDA sets international standards for vocational, technical, and executive training providers worldwide.';
 
@@ -100,7 +100,7 @@ export default async function Home() {
                 </h1>
 
                 {/* Subtitle / Value Statement */}
-                <p style={{ fontSize: '1.125rem', color: '#cbd5e1', lineHeight: 1.65, maxWidth: '640px', marginBottom: '2rem', fontWeight: 400 }}>
+                <p style={{ fontSize: '1.05rem', color: '#cbd5e1', lineHeight: 1.65, maxWidth: '640px', marginBottom: '2rem', fontWeight: 400, whiteSpace: 'pre-line' }}>
                   {heroSubtitle}
                 </p>
 
@@ -228,7 +228,7 @@ export default async function Home() {
                       <span style={{ fontSize: '1.2rem', marginTop: '0.1rem' }}>📜</span>
                       <div>
                         <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#0f172a' }}>Verifiable Digital Credentials</div>
-                        <div style={{ fontSize: '0.775rem', color: '#64748b' }}>100% tamper-proof digital certificates &amp; QR validation</div>
+                        <div style={{ fontSize: '0.775rem', color: '#64748b' }}>100% tamper-proof digital certificates &amp; validation</div>
                       </div>
                     </div>
                   </div>
