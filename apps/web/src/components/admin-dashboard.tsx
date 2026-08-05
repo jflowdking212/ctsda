@@ -36,6 +36,10 @@ const adminNav: AdminNavItem[] = [
       { href: '/admin/queue', section: 'queue', label: 'Review Queue', roles: ['super_admin', 'support_officer'] },
     ]
   },
+  { href: '/admin/billing', section: 'billing', label: 'Billing & Orders', roles: ['super_admin', 'finance_officer'] },
+  { href: '/admin/users', section: 'users', label: 'Users', roles: ['super_admin'] },
+  { href: '/admin/blog', section: 'blog', label: 'CMS / Blog', roles: ['super_admin', 'content_manager'] },
+  { href: '/admin/training', section: 'training', label: 'Training', roles: ['super_admin', 'content_manager'] },
   { 
     href: '#', 
     section: 'pages', 
@@ -50,10 +54,6 @@ const adminNav: AdminNavItem[] = [
       { href: '/admin/pages?page=home', section: 'pages', label: 'Home Page', roles: ['super_admin', 'content_manager'] },
     ]
   },
-  { href: '/admin/billing', section: 'billing', label: 'Billing & Orders', roles: ['super_admin', 'finance_officer'] },
-  { href: '/admin/users', section: 'users', label: 'Users', roles: ['super_admin'] },
-  { href: '/admin/blog', section: 'blog', label: 'CMS / Blog', roles: ['super_admin', 'content_manager'] },
-  { href: '/admin/training', section: 'training', label: 'Training', roles: ['super_admin', 'content_manager'] },
   { href: '/admin/settings', section: 'settings', label: 'Settings', roles: ['super_admin'] },
   { href: '/admin/audit', section: 'audit', label: 'Audit Logs', roles: ['super_admin', 'auditor'] },
 ];
