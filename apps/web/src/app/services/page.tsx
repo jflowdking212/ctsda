@@ -87,9 +87,9 @@ export default async function ServicesPage() {
         </section>
 
         {/* 2. MAIN SERVICES GRID (2x2 Grid) */}
-        <section style={{ backgroundColor: '#ffffff', padding: '5rem 1.5rem' }}>
-          <div style={{ maxWidth: '1140px', margin: '0 auto' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '2rem' }}>
+        <section style={{ backgroundColor: '#ffffff', padding: 'clamp(2.5rem, 5vw, 5rem) 1rem' }}>
+          <div style={{ maxWidth: '1140px', margin: '0 auto', boxSizing: 'border-box' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '2rem' }}>
               
               {/* Institution Accreditation */}
               <div

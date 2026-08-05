@@ -123,9 +123,9 @@ export default async function TrainingPage({ searchParams }: { searchParams?: an
           </div>
         </div>
 
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '4rem 2rem' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: 'clamp(2rem, 5vw, 4rem) 1rem', boxSizing: 'border-box' }}>
           {items.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '5rem 2rem', color: '#94a3b8' }}>
+            <div style={{ textAlign: 'center', padding: '5rem 1rem', color: '#94a3b8' }}>
               <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎓</div>
               <h2 style={{ color: '#334155', marginBottom: '0.5rem' }}>Training modules coming soon</h2>
               <p>Check back shortly for our full library of training resources.</p>
@@ -149,7 +149,7 @@ export default async function TrainingPage({ searchParams }: { searchParams?: an
                 </div>
               )}
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '2rem' }}>
                 {items.map((item: any) => {
                   const catStyle = CATEGORY_COLORS[item.category] || DEFAULT_COLOR;
                   return (

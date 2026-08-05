@@ -64,11 +64,11 @@ export default async function AboutPage() {
         </section>
 
         {/* 2. OUR MISSION */}
-        <section style={{ backgroundColor: '#ffffff', padding: '4.5rem 1.5rem' }}>
-          <div style={{ maxWidth: '1140px', margin: '0 auto' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '3.5rem', alignItems: 'center' }}>
+        <section style={{ backgroundColor: '#ffffff', padding: 'clamp(2.5rem, 5vw, 4.5rem) 1rem' }}>
+          <div style={{ maxWidth: '1140px', margin: '0 auto', boxSizing: 'border-box' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '3rem', alignItems: 'center' }}>
               <div>
-                <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '1.25rem' }}>
+                <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 800, color: '#0f172a', marginBottom: '1.25rem' }}>
                   Our Mission
                 </h2>
                 <p style={{ fontSize: '1.025rem', color: '#475569', lineHeight: 1.7, marginBottom: '1.75rem' }}>
@@ -237,7 +237,7 @@ export default async function AboutPage() {
               </h2>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }}>
               {[
                 {
                   title: 'Integrity',
