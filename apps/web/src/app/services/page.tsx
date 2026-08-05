@@ -384,10 +384,10 @@ export default async function ServicesPage() {
                     </svg>
                   ),
                 },
-              ].map((item, idx) => (
+              ].map((item) => (
                 <div
                   key={item.step}
-                  className={idx === 4 ? 'col-span-2 sm:col-span-1 flex flex-col items-center' : 'flex flex-col items-center'}
+                  className="flex flex-col items-center"
                 >
                   <div
                     style={{
