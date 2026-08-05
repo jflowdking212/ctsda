@@ -11,6 +11,7 @@ import { BillingPanel } from './admin/billing-panel';
 import { UsersPanel } from './admin/users-panel';
 import { AccreditationsPanel } from './admin/accreditations-panel';
 import { SettingsPanel } from './admin/settings-panel';
+import { PagesPanel } from './admin/pages-panel';
 
 const ADMIN_SESSION_KEY = 'ctsda_admin_session';
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -33,6 +34,20 @@ const adminNav: AdminNavItem[] = [
     submenus: [
       { href: '/admin/accreditations', section: 'accreditations', label: 'All Accreditations', roles: ['super_admin', 'support_officer'] },
       { href: '/admin/queue', section: 'queue', label: 'Review Queue', roles: ['super_admin', 'support_officer'] },
+    ]
+  },
+  { 
+    href: '#', 
+    section: 'pages', 
+    label: 'Pages', 
+    roles: ['super_admin', 'content_manager'],
+    submenus: [
+      { href: '/admin/pages?page=about', section: 'pages', label: 'About Page', roles: ['super_admin', 'content_manager'] },
+      { href: '/admin/pages?page=services', section: 'pages', label: 'Services Page', roles: ['super_admin', 'content_manager'] },
+      { href: '/admin/pages?page=training', section: 'pages', label: 'Training Page', roles: ['super_admin', 'content_manager'] },
+      { href: '/admin/pages?page=blog', section: 'pages', label: 'Blog Page', roles: ['super_admin', 'content_manager'] },
+      { href: '/admin/pages?page=contact', section: 'pages', label: 'Contact Page', roles: ['super_admin', 'content_manager'] },
+      { href: '/admin/pages?page=home', section: 'pages', label: 'Home Page', roles: ['super_admin', 'content_manager'] },
     ]
   },
   { href: '/admin/billing', section: 'billing', label: 'Billing & Orders', roles: ['super_admin', 'finance_officer'] },
@@ -64,7 +79,7 @@ const getStatusStyle = (status: string) => {
   }
 };
 
-export type AdminSection = 'reports' | 'queue' | 'institutions' | 'billing' | 'users' | 'accreditations' | 'blog' | 'training' | 'settings' | 'audit';
+export type AdminSection = 'reports' | 'queue' | 'institutions' | 'billing' | 'users' | 'accreditations' | 'blog' | 'training' | 'settings' | 'audit' | 'pages';
 
 const statuses = [
   'draft',
@@ -127,6 +142,11 @@ const sectionMeta: Record<AdminSection, { title: string; eyebrow: string; descri
     title: 'Audit logs',
     eyebrow: 'Compliance trail',
     description: 'Inspect recorded administrative events and security-relevant activity.',
+  },
+  pages: {
+    title: 'Public Pages Management',
+    eyebrow: 'Content Management System',
+    description: 'Customize titles, headlines, value statements, and copy text across all public pages.',
   },
 };
 
@@ -689,7 +709,8 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
                 settings: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
                 users: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', 
                 audit: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
-                accreditations: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'
+                accreditations: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+                pages: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'
               };
 
               const hasSubmenus = item.submenus && item.submenus.length > 0;
@@ -842,6 +863,10 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
 
           {section === 'training' && (
             <TrainingPanel api={api} />
+          )}
+
+          {section === 'pages' && (
+            <PagesPanel api={api} />
           )}
 
           {section === 'settings' && (
