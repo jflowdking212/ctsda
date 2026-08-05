@@ -19,11 +19,26 @@ interface TrainingArea {
   description?: string;
 }
 
+const DEFAULT_CTSDA_TRAINING_AREAS = [
+  { id: 'cta-1', code: 'LEADERSHIP-MGMT', name: 'Leadership, Governance & Management', description: 'Executive leadership, governance frameworks, and strategic management' },
+  { id: 'cta-2', code: 'HR-MGMT', name: 'Human Resource Management', description: 'Talent management, HR operations, and organizational development' },
+  { id: 'cta-3', code: 'PROJECT-MGMT', name: 'Project Management', description: 'Project planning, agile methodologies, and program execution' },
+  { id: 'cta-4', code: 'FINANCE-PROCURE', name: 'Finance, Accounting & Procurement', description: 'Financial management, corporate accounting, auditing, and procurement' },
+  { id: 'cta-5', code: 'BUSINESS-ENTR', name: 'Business & Entrepreneurship', description: 'Business strategy, startup incubation, and commercial development' },
+  { id: 'cta-6', code: 'IT-DIGITAL', name: 'Information Technology & Digital Skills', description: 'Software development, cybersecurity, cloud computing, and digital literacy' },
+  { id: 'cta-7', code: 'HSE-HEALTH', name: 'Health, Safety & Environment (HSE)', description: 'Occupational health, workplace safety, hazard management, and environmental compliance' },
+  { id: 'cta-8', code: 'ENG-TECH', name: 'Engineering & Technical Training', description: 'Industrial engineering, technical trades, automotive, and mechanical operations' },
+  { id: 'cta-9', code: 'EDU-TRAIN', name: 'Education & Training', description: 'Pedagogy, instructional design, educator certification, and training methodology' },
+  { id: 'cta-10', code: 'RESEARCH-EVAL', name: 'Research, Monitoring & Evaluation', description: 'Data research methodologies, impact assessment, monitoring, and evaluation' },
+  { id: 'cta-11', code: 'COMM-SOFT', name: 'Communication & Soft Skills', description: 'Corporate communication, public speaking, negotiation, and interpersonal skills' },
+  { id: 'cta-12', code: 'LEGAL-RISK', name: 'Legal, Compliance & Risk Management', description: 'Regulatory compliance, legal frameworks, corporate governance, and risk mitigation' },
+];
+
 export default function NewApplicationPage() {
   const router = useRouter();
   const [institutions, setInstitutions] = useState<Institution[]>([]);
-  const [trainingAreas, setTrainingAreas] = useState<TrainingArea[]>([]);
-  const [selectedAreaIds, setSelectedAreaIds] = useState<string[]>([]);
+  const [trainingAreas, setTrainingAreas] = useState<TrainingArea[]>(DEFAULT_CTSDA_TRAINING_AREAS);
+  const [selectedAreaIds, setSelectedAreaIds] = useState<string[]>(['cta-1']);
   const [mode, setMode] = useState<'new' | 'existing'>('new');
   
   // Institution details form

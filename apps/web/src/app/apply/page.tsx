@@ -4,6 +4,21 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { CountrySelect } from '../../components/country-select';
 
+const DEFAULT_CTSDA_TRAINING_AREAS = [
+  { id: 'cta-1', code: 'LEADERSHIP-MGMT', name: 'Leadership, Governance & Management', description: 'Executive leadership, governance frameworks, and strategic management' },
+  { id: 'cta-2', code: 'HR-MGMT', name: 'Human Resource Management', description: 'Talent management, HR operations, and organizational development' },
+  { id: 'cta-3', code: 'PROJECT-MGMT', name: 'Project Management', description: 'Project planning, agile methodologies, and program execution' },
+  { id: 'cta-4', code: 'FINANCE-PROCURE', name: 'Finance, Accounting & Procurement', description: 'Financial management, corporate accounting, auditing, and procurement' },
+  { id: 'cta-5', code: 'BUSINESS-ENTR', name: 'Business & Entrepreneurship', description: 'Business strategy, startup incubation, and commercial development' },
+  { id: 'cta-6', code: 'IT-DIGITAL', name: 'Information Technology & Digital Skills', description: 'Software development, cybersecurity, cloud computing, and digital literacy' },
+  { id: 'cta-7', code: 'HSE-HEALTH', name: 'Health, Safety & Environment (HSE)', description: 'Occupational health, workplace safety, hazard management, and environmental compliance' },
+  { id: 'cta-8', code: 'ENG-TECH', name: 'Engineering & Technical Training', description: 'Industrial engineering, technical trades, automotive, and mechanical operations' },
+  { id: 'cta-9', code: 'EDU-TRAIN', name: 'Education & Training', description: 'Pedagogy, instructional design, educator certification, and training methodology' },
+  { id: 'cta-10', code: 'RESEARCH-EVAL', name: 'Research, Monitoring & Evaluation', description: 'Data research methodologies, impact assessment, monitoring, and evaluation' },
+  { id: 'cta-11', code: 'COMM-SOFT', name: 'Communication & Soft Skills', description: 'Corporate communication, public speaking, negotiation, and interpersonal skills' },
+  { id: 'cta-12', code: 'LEGAL-RISK', name: 'Legal, Compliance & Risk Management', description: 'Regulatory compliance, legal frameworks, corporate governance, and risk mitigation' },
+];
+
 export default function ApplyPage() {
   const [step, setStep] = useState(1);
   const router = useRouter();
@@ -31,14 +46,14 @@ export default function ApplyPage() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
   const [applicationForm, setApplicationForm] = useState({
-    trainingAreaIds: [] as string[],
+    trainingAreaIds: ['cta-1'] as string[],
     certificatesOffered: '',
     deliveryMethods: 'Online Live / Virtual',
     staffingCount: '',
     operationalInfo: '',
   });
 
-  const [trainingAreas, setTrainingAreas] = useState<any[]>([]);
+  const [trainingAreas, setTrainingAreas] = useState<any[]>(DEFAULT_CTSDA_TRAINING_AREAS);
   const [accreditationFee, setAccreditationFee] = useState<string>('500');
 
   // UI State
@@ -59,11 +74,12 @@ export default function ApplyPage() {
     fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/institutions/training-areas`)
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) && data.length > 0) {
           setTrainingAreas(data);
-          if (data.length > 0) {
-            setApplicationForm(prev => ({ ...prev, trainingAreaIds: [data[0].id] }));
-          }
+          setApplicationForm(prev => ({
+            ...prev,
+            trainingAreaIds: prev.trainingAreaIds.length > 0 ? prev.trainingAreaIds : [data[0].id]
+          }));
         }
       })
       .catch(() => {});

@@ -74,8 +74,41 @@ export class InstitutionsService {
   }
 
   async getTrainingAreas() {
+    const officialAreas = [
+      { code: 'LEADERSHIP-MGMT', name: 'Leadership, Governance & Management', description: 'Executive leadership, governance frameworks, and strategic management' },
+      { code: 'HR-MGMT', name: 'Human Resource Management', description: 'Talent management, HR operations, and organizational development' },
+      { code: 'PROJECT-MGMT', name: 'Project Management', description: 'Project planning, agile methodologies, and program execution' },
+      { code: 'FINANCE-PROCURE', name: 'Finance, Accounting & Procurement', description: 'Financial management, corporate accounting, auditing, and procurement' },
+      { code: 'BUSINESS-ENTR', name: 'Business & Entrepreneurship', description: 'Business strategy, startup incubation, and commercial development' },
+      { code: 'IT-DIGITAL', name: 'Information Technology & Digital Skills', description: 'Software development, cybersecurity, cloud computing, and digital literacy' },
+      { code: 'HSE-HEALTH', name: 'Health, Safety & Environment (HSE)', description: 'Occupational health, workplace safety, hazard management, and environmental compliance' },
+      { code: 'ENG-TECH', name: 'Engineering & Technical Training', description: 'Industrial engineering, technical trades, automotive, and mechanical operations' },
+      { code: 'EDU-TRAIN', name: 'Education & Training', description: 'Pedagogy, instructional design, educator certification, and training methodology' },
+      { code: 'RESEARCH-EVAL', name: 'Research, Monitoring & Evaluation', description: 'Data research methodologies, impact assessment, monitoring, and evaluation' },
+      { code: 'COMM-SOFT', name: 'Communication & Soft Skills', description: 'Corporate communication, public speaking, negotiation, and interpersonal skills' },
+      { code: 'LEGAL-RISK', name: 'Legal, Compliance & Risk Management', description: 'Regulatory compliance, legal frameworks, corporate governance, and risk mitigation' },
+    ];
+
+    try {
+      await Promise.all(
+        officialAreas.map((area) =>
+          this.prisma.trainingArea.upsert({
+            where: { code: area.code },
+            update: { name: area.name, description: area.description, isActive: true },
+            create: { name: area.name, code: area.code, description: area.description, isActive: true },
+          })
+        )
+      );
+    } catch (_err) {
+      // Ignore concurrency conflict if seeded in parallel
+    }
+
+    // Return active training areas (or official ones sorted)
     return this.prisma.trainingArea.findMany({
-      where: { isActive: true },
+      where: {
+        code: { in: officialAreas.map(a => a.code) },
+        isActive: true
+      },
       select: { id: true, name: true, code: true, description: true },
       orderBy: { name: 'asc' },
     });
