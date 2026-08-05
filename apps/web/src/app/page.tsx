@@ -3,7 +3,26 @@ import { PublicFooter } from '../components/public-shell';
 import { PremiumHeader } from '../components/premium-header';
 import { AccreditedLogosCarousel } from '../components/accredited-logos-carousel';
 
-export default function Home() {
+async function getSettings() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  try {
+    const res = await fetch(`${API_BASE}/settings/public`, { next: { revalidate: 30 } });
+    if (!res.ok) return {};
+    return res.json();
+  } catch {
+    return {};
+  }
+}
+
+export default async function Home() {
+  const settings = await getSettings();
+
+  const heroBadge = settings.homeHeroBadge || 'Official International Accreditation Body';
+  const heroTitle = settings.homeHeroTitle || 'Council For Training Skills & Development America (CTSDA)';
+  const heroSubtitle = settings.homeHeroSubtitle || 'Empowering global education and workforce training providers with rigorous quality standards, international recognition, and 100% verifiable digital credentials.';
+  const frameworkTitle = settings.homeFrameworkTitle || 'Global Quality Benchmark';
+  const frameworkSubtitle = settings.homeFrameworkSubtitle || 'CTSDA sets international standards for vocational, technical, and executive training providers worldwide.';
+
   return (
     <div className="public-page">
       {/* Premium Header */}
@@ -39,18 +58,18 @@ export default function Home() {
                     <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0110 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                   <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                    Official International Accreditation Body
+                    {heroBadge}
                   </span>
                 </div>
 
                 {/* Main Headline */}
                 <h1 style={{ fontSize: 'clamp(2.1rem, 4.2vw, 3.25rem)', fontWeight: 800, color: '#ffffff', lineHeight: 1.18, letterSpacing: '-0.02em', marginBottom: '1.25rem' }}>
-                  Council For Training Skills &amp; Development America <span style={{ color: '#60a5fa' }}>(CTSDA)</span>
+                  {heroTitle}
                 </h1>
 
                 {/* Subtitle / Value Statement */}
                 <p style={{ fontSize: '1.125rem', color: '#cbd5e1', lineHeight: 1.65, maxWidth: '640px', marginBottom: '2rem', fontWeight: 400 }}>
-                  Empowering global education and workforce training providers with rigorous quality standards, international recognition, and 100% verifiable digital credentials.
+                  {heroSubtitle}
                 </p>
 
                 {/* CTAs Row */}
@@ -149,10 +168,10 @@ export default function Home() {
                   </div>
 
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>
-                    Global Quality Benchmark
+                    {frameworkTitle}
                   </h3>
                   <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.25rem', lineHeight: 1.55 }}>
-                    CTSDA sets international standards for vocational, technical, and executive training providers worldwide.
+                    {frameworkSubtitle}
                   </p>
 
                   {/* 3 Core Pillar Item Cards */}

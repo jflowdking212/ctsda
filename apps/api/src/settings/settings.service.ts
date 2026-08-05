@@ -1,15 +1,39 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 
+const DEFAULT_PAGE_SETTINGS: Record<string, string> = {
+  homeHeroBadge: 'Official International Accreditation Body',
+  homeHeroTitle: 'Council For Training Skills & Development America (CTSDA)',
+  homeHeroSubtitle: 'Empowering global education and workforce training providers with rigorous quality standards, international recognition, and 100% verifiable digital credentials.',
+  homeFrameworkTitle: 'Global Quality Benchmark',
+  homeFrameworkSubtitle: 'CTSDA sets international standards for vocational, technical, and executive training providers worldwide.',
+  aboutHeroSubtitle: 'Empowering educational excellence through comprehensive accreditation services since 2010.',
+  aboutMissionText: 'The Council For Training Skills and Development America (CTSDA) is dedicated to advancing excellence in education and training through comprehensive accreditation services. We strive to empower institutions, trainers and educational service providers to deliver high-quality programs that meet the evolving needs of learners and industries.',
+  aboutVisionText: 'We envision a world where every learner has access to quality education and training, fostering personal growth, professional development, and societal progress. CTSDA aims to be the leading accreditation body, setting the gold standard for educational excellence and innovation.',
+  servicesHeroSubtitle: 'Comprehensive accreditation solutions designed to elevate educational standards and ensure excellence in learning.',
+  servicesOverviewText: 'At CTSDA, we offer specialized accreditation and evaluation services tailored to educational institutions, vocational training centers, and corporate learning providers.',
+  trainingHeroSubtitle: 'Browse free training modules, videos, and resources from the CTSDA to improve road safety and driver training standards.',
+  blogHeroSubtitle: 'Latest insights, accreditation standards, educational news, and industry updates from CTSDA.',
+  contactHeroSubtitle: 'We are here to assist institutions, educators, applicants, and the public with accreditation, verification, and partnership inquiries.',
+  contactIntroText: 'Reach out directly to our dedicated support team for assistance.',
+  contactEmail: 'support@ctsdamerica.com',
+  contactLegalEmail: 'management@ctsdamerica.com',
+  contactPhone: '+1 (302) 555-0199',
+  contactAddress: 'The Green, STE A, Dover, Kent, Delaware, United States',
+  contactHours: 'Monday - Friday: 9:00 AM - 5:00 PM EST',
+};
+
 @Injectable()
 export class SettingsService {
   constructor(private prisma: PrismaService) {}
 
   async getAll() {
     const settings = await this.prisma.siteSetting.findMany();
-    const result: Record<string, any> = {};
+    const result: Record<string, any> = { ...DEFAULT_PAGE_SETTINGS };
     for (const setting of settings) {
-      result[setting.key] = setting.value;
+      if (setting.value !== null && setting.value !== undefined && String(setting.value).trim() !== '') {
+        result[setting.key] = setting.value;
+      }
     }
     return result;
   }

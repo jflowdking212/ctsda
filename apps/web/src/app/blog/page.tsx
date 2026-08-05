@@ -17,8 +17,24 @@ async function getPosts() {
   }
 }
 
+async function getSettings() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  try {
+    const res = await fetch(`${API_BASE}/settings/public`, { next: { revalidate: 30 } });
+    if (!res.ok) return {};
+    return res.json();
+  } catch {
+    return {};
+  }
+}
+
 export default async function BlogPage() {
-  const posts = await getPosts();
+  const [posts, settings] = await Promise.all([
+    getPosts(),
+    getSettings(),
+  ]);
+
+  const heroSubtitle = settings.blogHeroSubtitle || 'Discover articles, research papers, and policy announcements from international accreditation leaders.';
 
   return (
     <PublicPage>
@@ -73,7 +89,7 @@ export default async function BlogPage() {
                 lineHeight: 1.6,
               }}
             >
-              Articles, announcements, and expert perspectives on accreditation standards and educational quality assurance.
+              {heroSubtitle}
             </p>
           </div>
         </section>

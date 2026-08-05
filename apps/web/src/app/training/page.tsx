@@ -30,11 +30,27 @@ const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
 
 const DEFAULT_COLOR = { bg: '#f1f5f9', text: '#475569' };
 
+async function getSettings() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  try {
+    const res = await fetch(`${API_BASE}/settings/public`, { next: { revalidate: 30 } });
+    if (!res.ok) return {};
+    return res.json();
+  } catch {
+    return {};
+  }
+}
+
 export default async function TrainingPage({ searchParams }: { searchParams?: any }) {
   const resolvedParams = searchParams ? await Promise.resolve(searchParams) : {};
   const selectedCategory = resolvedParams.category;
 
-  const allItems = await getTraining();
+  const [allItems, settings] = await Promise.all([
+    getTraining(),
+    getSettings(),
+  ]);
+
+  const heroSubtitle = settings.trainingHeroSubtitle || 'Elevate your skills with industry-leading modules designed for professional drivers and instructors.';
   const categories = [...new Set(allItems.map((i: any) => i.category).filter(Boolean))];
 
   const items = selectedCategory 
@@ -102,7 +118,7 @@ export default async function TrainingPage({ searchParams }: { searchParams?: an
                 textAlign: 'center',
               }}
             >
-              Elevate your skills with industry-leading modules designed for professional drivers and instructors.
+              {heroSubtitle}
             </p>
           </div>
         </div>

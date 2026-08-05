@@ -6,7 +6,24 @@ export const metadata = {
   description: 'Empowering educational excellence through comprehensive accreditation services since 2010.',
 };
 
-export default function AboutPage() {
+async function getSettings() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  try {
+    const res = await fetch(`${API_BASE}/settings/public`, { next: { revalidate: 30 } });
+    if (!res.ok) return {};
+    return res.json();
+  } catch {
+    return {};
+  }
+}
+
+export default async function AboutPage() {
+  const settings = await getSettings();
+
+  const heroSubtitle = settings.aboutHeroSubtitle || 'Empowering educational excellence through comprehensive accreditation services since 2010.';
+  const missionText = settings.aboutMissionText || 'The Council For Training Skills and Development America (CTSDA) is dedicated to advancing excellence in education and training through comprehensive accreditation services. We strive to empower institutions, trainers and educational service providers to deliver high-quality programs that meet the evolving needs of learners and industries.';
+  const visionText = settings.aboutVisionText || 'We envision a world where every learner has access to quality education and training, fostering personal growth, professional development, and societal progress. CTSDA aims to be the leading accreditation body, setting the gold standard for educational excellence and innovation.';
+
   return (
     <PublicPage>
       <main style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}>
@@ -41,7 +58,7 @@ export default function AboutPage() {
                 margin: 0,
               }}
             >
-              Empowering educational excellence through comprehensive accreditation services since 2010.
+              {heroSubtitle}
             </p>
           </div>
         </section>
@@ -55,7 +72,7 @@ export default function AboutPage() {
                   Our Mission
                 </h2>
                 <p style={{ fontSize: '1.025rem', color: '#475569', lineHeight: 1.7, marginBottom: '1.75rem' }}>
-                  The Council For Training Skills and Development America (CTSDA) is dedicated to advancing excellence in education and training through comprehensive accreditation services. We strive to empower institutions, trainers and educational service providers to deliver high-quality programs that meet the evolving needs of learners and industries.
+                  {missionText}
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -142,7 +159,7 @@ export default function AboutPage() {
                 Our Vision
               </h2>
               <p style={{ fontSize: '1.05rem', color: '#475569', lineHeight: 1.75, margin: 0 }}>
-                We envision a world where every learner has access to quality education and training, fostering personal growth, professional development, and societal progress. CTSDA aims to be the leading accreditation body, setting the gold standard for educational excellence and innovation.
+                {visionText}
               </p>
             </div>
 

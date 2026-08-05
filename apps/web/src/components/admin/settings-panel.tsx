@@ -316,6 +316,212 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
             </div>
           </fieldset>
 
+          {/* SECTION 2B: HOME PAGE CMS */}
+          <fieldset style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.5rem' }}>
+            <legend style={{ padding: '0 0.5rem', fontSize: '0.9rem', fontWeight: 600, color: '#2563eb' }}>🏠 Home / Landing Page Content</legend>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>Hero Ribbon Badge</label>
+                  <input 
+                    type="text" 
+                    value={settings.homeHeroBadge ?? 'Official International Accreditation Body'} 
+                    onChange={e => setSettings({...settings, homeHeroBadge: e.target.value})} 
+                    style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>Main Hero Title</label>
+                  <input 
+                    type="text" 
+                    value={settings.homeHeroTitle ?? 'Council For Training Skills & Development America (CTSDA)'} 
+                    onChange={e => setSettings({...settings, homeHeroTitle: e.target.value})} 
+                    style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                  />
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>Hero Subtitle / Value Statement</label>
+                <textarea 
+                  value={settings.homeHeroSubtitle ?? 'Empowering global education and workforce training providers with rigorous quality standards, international recognition, and 100% verifiable digital credentials.'} 
+                  onChange={e => setSettings({...settings, homeHeroSubtitle: e.target.value})} 
+                  rows={2}
+                  style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>Framework Card Title</label>
+                  <input 
+                    type="text" 
+                    value={settings.homeFrameworkTitle ?? 'Global Quality Benchmark'} 
+                    onChange={e => setSettings({...settings, homeFrameworkTitle: e.target.value})} 
+                    style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#334155' }}>Framework Subtitle</label>
+                  <input 
+                    type="text" 
+                    value={settings.homeFrameworkSubtitle ?? 'CTSDA sets international standards for vocational, technical, and executive training providers worldwide.'} 
+                    onChange={e => setSettings({...settings, homeFrameworkSubtitle: e.target.value})} 
+                    style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                  />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          {/* SECTION 2C: ABOUT, SERVICES, TRAINING, BLOG & CONTACT CMS */}
+          <fieldset style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.5rem' }}>
+            <legend style={{ padding: '0 0.5rem', fontSize: '0.9rem', fontWeight: 600, color: '#2563eb' }}>📄 Page Content CMS (About, Services, Training, Blog, Contact)</legend>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              
+              {/* ABOUT PAGE */}
+              <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontWeight: 700, fontSize: '0.95rem' }}>About Page (`/about`)</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.2rem' }}>About Hero Subtitle</label>
+                    <input 
+                      type="text" 
+                      value={settings.aboutHeroSubtitle ?? 'Empowering educational excellence through comprehensive accreditation services since 2010.'} 
+                      onChange={e => setSettings({...settings, aboutHeroSubtitle: e.target.value})} 
+                      style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', fontSize: '0.875rem' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Our Mission Statement</label>
+                    <textarea 
+                      value={settings.aboutMissionText ?? 'The Council For Training Skills and Development America (CTSDA) is dedicated to advancing excellence in education and training through comprehensive accreditation services.'} 
+                      onChange={e => setSettings({...settings, aboutMissionText: e.target.value})} 
+                      rows={2}
+                      style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', fontSize: '0.875rem' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Our Vision Statement</label>
+                    <textarea 
+                      value={settings.aboutVisionText ?? 'We envision a world where every learner has access to quality education and training, fostering personal growth, professional development, and societal progress.'} 
+                      onChange={e => setSettings({...settings, aboutVisionText: e.target.value})} 
+                      rows={2}
+                      style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', fontSize: '0.875rem' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SERVICES PAGE */}
+              <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontWeight: 700, fontSize: '0.95rem' }}>Services Page (`/services`)</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Services Hero Subtitle</label>
+                    <input 
+                      type="text" 
+                      value={settings.servicesHeroSubtitle ?? 'Comprehensive accreditation solutions designed to elevate educational standards and ensure excellence in learning.'} 
+                      onChange={e => setSettings({...settings, servicesHeroSubtitle: e.target.value})} 
+                      style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', fontSize: '0.875rem' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Services Overview Intro</label>
+                    <textarea 
+                      value={settings.servicesOverviewText ?? 'At CTSDA, we offer specialized accreditation and evaluation services tailored to educational institutions, vocational training centers, and corporate learning providers.'} 
+                      onChange={e => setSettings({...settings, servicesOverviewText: e.target.value})} 
+                      rows={2}
+                      style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', fontSize: '0.875rem' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* TRAINING & BLOG PAGES */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0' }}>
+                  <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontWeight: 700, fontSize: '0.95rem' }}>Training Page (`/training`)</h4>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Training Hero Subtitle</label>
+                    <textarea 
+                      value={settings.trainingHeroSubtitle ?? 'Browse free training modules, videos, and resources from the CTSDA to improve road safety and driver training standards.'} 
+                      onChange={e => setSettings({...settings, trainingHeroSubtitle: e.target.value})} 
+                      rows={2}
+                      style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', fontSize: '0.875rem' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0' }}>
+                  <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontWeight: 700, fontSize: '0.95rem' }}>Blog Page (`/blog`)</h4>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Blog Hero Subtitle</label>
+                    <textarea 
+                      value={settings.blogHeroSubtitle ?? 'Latest insights, accreditation standards, educational news, and industry updates from CTSDA.'} 
+                      onChange={e => setSettings({...settings, blogHeroSubtitle: e.target.value})} 
+                      rows={2}
+                      style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', fontSize: '0.875rem' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* CONTACT PAGE */}
+              <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontWeight: 700, fontSize: '0.95rem' }}>Contact Page (`/contact`)</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Contact Hero Subtitle</label>
+                    <input 
+                      type="text" 
+                      value={settings.contactHeroSubtitle ?? 'We are here to assist institutions, educators, applicants, and the public with accreditation, verification, and partnership inquiries.'} 
+                      onChange={e => setSettings({...settings, contactHeroSubtitle: e.target.value})} 
+                      style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', fontSize: '0.875rem' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Contact Form Intro Text</label>
+                    <input 
+                      type="text" 
+                      value={settings.contactIntroText ?? 'Reach out directly to our dedicated support team for assistance.'} 
+                      onChange={e => setSettings({...settings, contactIntroText: e.target.value})} 
+                      style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', fontSize: '0.875rem' }}
+                    />
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+                    <div>
+                      <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Legal Inquiry Email</label>
+                      <input 
+                        type="email" 
+                        value={settings.contactLegalEmail ?? 'management@ctsdamerica.com'} 
+                        onChange={e => setSettings({...settings, contactLegalEmail: e.target.value})} 
+                        style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Operating Hours</label>
+                      <input 
+                        type="text" 
+                        value={settings.contactHours ?? 'Monday - Friday: 9:00 AM - 5:00 PM EST'} 
+                        onChange={e => setSettings({...settings, contactHours: e.target.value})} 
+                        style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Office Address</label>
+                      <input 
+                        type="text" 
+                        value={settings.contactAddress ?? 'The Green, STE A, Dover, Kent, Delaware, United States'} 
+                        onChange={e => setSettings({...settings, contactAddress: e.target.value})} 
+                        style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </fieldset>
+
           {/* SECTION 3: CONTACT & PLATFORM OPTIONS */}
           <fieldset style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.5rem' }}>
             <legend style={{ padding: '0 0.5rem', fontSize: '0.9rem', fontWeight: 600, color: '#2563eb' }}>Platform Contact Details</legend>

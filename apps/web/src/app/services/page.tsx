@@ -6,7 +6,21 @@ export const metadata = {
   description: 'Comprehensive accreditation solutions designed to elevate educational standards and ensure excellence in learning.',
 };
 
-export default function ServicesPage() {
+async function getSettings() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  try {
+    const res = await fetch(`${API_BASE}/settings/public`, { next: { revalidate: 30 } });
+    if (!res.ok) return {};
+    return res.json();
+  } catch {
+    return {};
+  }
+}
+
+export default async function ServicesPage() {
+  const settings = await getSettings();
+  const heroSubtitle = settings.servicesHeroSubtitle || 'Comprehensive accreditation solutions designed to elevate educational standards and ensure excellence in learning.';
+
   return (
     <PublicPage>
       <main style={{ backgroundColor: '#ffffff', minHeight: '100vh' }}>
@@ -67,7 +81,7 @@ export default function ServicesPage() {
                 textAlign: 'center',
               }}
             >
-              Comprehensive accreditation solutions designed to elevate educational standards and ensure excellence in learning.
+              {heroSubtitle}
             </p>
           </div>
         </section>

@@ -6,7 +6,28 @@ export const metadata = {
   description: 'Get in touch with the Council For Training Skills & Development America for accreditation support, institutional inquiries, and verification assistance.',
 };
 
-export default function ContactPage() {
+async function getSettings() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  try {
+    const res = await fetch(`${API_BASE}/settings/public`, { next: { revalidate: 30 } });
+    if (!res.ok) return {};
+    return res.json();
+  } catch {
+    return {};
+  }
+}
+
+export default async function ContactPage() {
+  const settings = await getSettings();
+
+  const heroSubtitle = settings.contactHeroSubtitle || 'We are here to assist institutions, educators, applicants, and the public with accreditation, verification, and partnership inquiries.';
+  const introText = settings.contactIntroText || 'Reach out directly to our dedicated support team for assistance.';
+  const email = settings.supportEmail || settings.contactEmail || 'support@ctsdamerica.com';
+  const legalEmail = settings.contactLegalEmail || 'management@ctsdamerica.com';
+  const phone = settings.contactPhone || '+1 (302) 555-0199';
+  const address = settings.contactAddress || 'The Green, STE A, Dover, Kent, Delaware, United States';
+  const hours = settings.contactHours || 'Monday - Friday: 9:00 AM - 5:00 PM EST';
+
   return (
     <PublicPage>
       <main style={{ backgroundColor: '#f8fafc', minHeight: '100vh', paddingBottom: '6rem' }}>
@@ -50,7 +71,7 @@ export default function ContactPage() {
               Speak with the CTSDA Team
             </h1>
             <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '640px', margin: '0 auto', lineHeight: 1.6 }}>
-              We are here to assist institutions, educators, applicants, and the public with accreditation, verification, and partnership inquiries.
+              {heroSubtitle}
             </p>
           </div>
         </section>
@@ -244,10 +265,10 @@ export default function ContactPage() {
                         Email Inquiries
                       </div>
                       <a
-                        href="mailto:management@ctsdamerica.com"
+                        href={`mailto:${email}`}
                         style={{ fontSize: '1rem', fontWeight: 700, color: '#2563eb', textDecoration: 'none' }}
                       >
-                        management@ctsdamerica.com
+                        {email}
                       </a>
                       <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0.25rem 0 0' }}>
                         For general support, application guidance, and institutional inquiries.
@@ -278,7 +299,7 @@ export default function ContactPage() {
                         United States Headquarters
                       </div>
                       <div style={{ fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>
-                        The Green, STE A, Dover, Kent, Delaware, United States
+                        {address}
                       </div>
                     </div>
                   </div>
@@ -306,7 +327,7 @@ export default function ContactPage() {
                         Business Hours
                       </div>
                       <div style={{ fontSize: '0.975rem', fontWeight: 600, color: '#334155' }}>
-                        Monday to Friday: 9:00 AM – 5:00 PM (EST)
+                        {hours}
                       </div>
                     </div>
                   </div>
