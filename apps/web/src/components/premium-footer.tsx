@@ -52,6 +52,7 @@ export function PremiumFooter() {
             <Link href="/services">Services</Link>
             <Link href="/directory">Accredited directory</Link>
             <Link href="/verify">Certificate verification</Link>
+            <Link href="/portal/login" style={{ color: '#2563eb', fontWeight: 600 }}>Accredited Institution Portal ↗</Link>
             <Link href="/privacy-policy">Privacy Policy</Link>
             <Link href="/terms-of-service">Terms of Service</Link>
           </div>
@@ -86,9 +87,15 @@ export function PremiumFooter() {
           </div>
         </div>
         
-        <div className="footer-bottom">
+        <div className="footer-bottom" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
           <span>&copy; {new Date().getFullYear()} CTSDA. All rights reserved.</span>
-          <span>Private, independent international accreditation body.</span>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <Link href="/portal/login" style={{ color: '#2563eb', fontWeight: 600, fontSize: '0.85rem' }}>
+              Institution Portal Login ↗
+            </Link>
+            <span style={{ color: '#94a3b8' }}>•</span>
+            <span>Private, independent international accreditation body.</span>
+          </div>
         </div>
       </div>
     </footer>

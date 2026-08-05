@@ -48,7 +48,11 @@ export function PremiumHeader() {
         </nav>
 
         {/* Action Button & Mobile Toggle */}
-        <div className="header-actions">
+        <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <Link href="/portal/login" style={{ fontSize: '0.875rem', fontWeight: 600, color: '#2563eb', padding: '0.5rem 0.85rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', backgroundColor: '#eff6ff', textDecoration: 'none' }}>
+            Portal Login
+          </Link>
+
           <Link className="header-action" href="/apply" style={{ backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 700 }}>
             Apply Now
           </Link>
@@ -100,15 +104,23 @@ export function PremiumHeader() {
                 {item.label}
               </Link>
             ))}
+            <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '0.5rem 0' }} />
+            <Link
+              href="/portal/login"
+              onClick={() => setIsMobileMenuOpen(false)}
+              style={{ fontSize: '1.15rem', fontWeight: 700, color: '#2563eb', textDecoration: 'none' }}
+            >
+              Member Portal Login ↗
+            </Link>
             <Link
               href="/apply"
               onClick={() => setIsMobileMenuOpen(false)}
               style={{
-                marginTop: '1.5rem',
-                backgroundColor: '#2563eb',
-                color: '#ffffff',
-                textAlign: 'center',
+                fontSize: '1.15rem',
                 fontWeight: 700,
+                color: '#ffffff',
+                backgroundColor: '#2563eb',
+                textAlign: 'center',
                 padding: '0.85rem',
                 borderRadius: '0.5rem',
                 textDecoration: 'none',

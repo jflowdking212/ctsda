@@ -29,9 +29,14 @@ export function PublicHeader() {
             </Link>
           ))}
         </nav>
-        <Link className="header-action" href="/apply">
-          Apply Now
-        </Link>
+        <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <Link href="/portal/login" style={{ fontSize: '0.875rem', fontWeight: 600, color: '#2563eb', padding: '0.5rem 0.85rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', backgroundColor: '#eff6ff', textDecoration: 'none' }}>
+            Portal Login
+          </Link>
+          <Link className="header-action" href="/apply">
+            Apply Now
+          </Link>
+        </div>
       </div>
     </header>
   );
@@ -60,6 +65,7 @@ export function PublicFooter() {
             <h2>Explore</h2>
             <Link href="/services">Services</Link>
             <Link href="/verify">Certificate verification</Link>
+            <Link href="/portal/login" style={{ color: '#2563eb', fontWeight: 600 }}>Accredited Institution Portal ↗</Link>
             <Link href="/privacy-policy">Privacy Policy</Link>
             <Link href="/terms-of-service">Terms of Service</Link>
           </div>
