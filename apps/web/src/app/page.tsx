@@ -125,7 +125,7 @@ export default function Home() {
 
               </div>
 
-              {/* Right Column (5 cols on desktop): Premium Glass Verification Card */}
+              {/* Right Column: Accreditation Framework Showcase Card */}
               <div className="col-span-1 lg:col-span-5 w-full">
                 <div style={{
                   backgroundColor: '#ffffff',
@@ -135,75 +135,62 @@ export default function Home() {
                   border: '1px solid #e2e8f0',
                   color: '#0f172a'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}>
+                  {/* Card Header Badge */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.85rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#22c55e', boxShadow: '0 0 8px #22c55e' }}></span>
-                      <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Live Verification Portal
+                      <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#2563eb', boxShadow: '0 0 8px #2563eb' }}></span>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                        Accreditation Framework
                       </span>
                     </div>
-                    <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>CTSDA-V2</span>
+                    <span style={{ fontSize: '0.75rem', backgroundColor: '#dbeafe', color: '#1e40af', fontWeight: 700, padding: '0.2rem 0.65rem', borderRadius: '1rem' }}>
+                      ISO Aligned
+                    </span>
                   </div>
 
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>
-                    Verify Any Certificate
+                    Global Quality Benchmark
                   </h3>
-                  <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.25rem', lineHeight: 1.5 }}>
-                    Enter a certificate or accreditation code to instantly confirm validity and institutional credentials.
+                  <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.25rem', lineHeight: 1.55 }}>
+                    CTSDA sets international standards for vocational, technical, and executive training providers worldwide.
                   </p>
 
-                  {/* Embedded Compact Search Widget */}
-                  <form action="/verify" method="GET" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                    <input
-                      name="q"
-                      placeholder="E.G. CTSDA-125346-AB"
-                      style={{
-                        width: '100%',
-                        padding: '0.85rem 1rem',
-                        borderRadius: '0.5rem',
-                        border: '2px solid #cbd5e1',
-                        fontSize: '0.95rem',
-                        fontWeight: 600,
-                        letterSpacing: '0.05em',
-                        textTransform: 'uppercase',
-                        outline: 'none',
-                        color: '#0f172a',
-                        backgroundColor: '#f8fafc',
-                      }}
-                    />
-                    <button
-                      type="submit"
-                      style={{
-                        width: '100%',
-                        padding: '0.85rem',
-                        backgroundColor: '#2563eb',
-                        color: '#ffffff',
-                        fontWeight: 700,
-                        fontSize: '0.95rem',
-                        borderRadius: '0.5rem',
-                        border: 'none',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.5rem',
-                        boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
-                      }}
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                      Verify Certificate Now
-                    </button>
-                  </form>
-
-                  {/* Floating Stat Mini Cards */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                    <div style={{ backgroundColor: '#f8fafc', padding: '0.85rem', borderRadius: '0.625rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#2563eb' }}>2,500+</div>
-                      <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>Accredited Providers</div>
+                  {/* 3 Core Pillar Item Cards */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', backgroundColor: '#f8fafc', padding: '0.75rem 1rem', borderRadius: '0.625rem', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '1.2rem', marginTop: '0.1rem' }}>🛡️</span>
+                      <div>
+                        <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#0f172a' }}>Institutional Quality Audit</div>
+                        <div style={{ fontSize: '0.775rem', color: '#64748b' }}>Rigorously evaluated curriculum &amp; faculty standards</div>
+                      </div>
                     </div>
-                    <div style={{ backgroundColor: '#f8fafc', padding: '0.85rem', borderRadius: '0.625rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', backgroundColor: '#f8fafc', padding: '0.75rem 1rem', borderRadius: '0.625rem', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '1.2rem', marginTop: '0.1rem' }}>🌐</span>
+                      <div>
+                        <div style={{ fontSize: '0.875rem', fontWeight 700, color: '#0f172a' }}>Cross-Border Recognition</div>
+                        <div style={{ fontSize: '0.775rem', color: '#64748b' }}>Accepted across 150+ countries worldwide</div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', backgroundColor: '#f8fafc', padding: '0.75rem 1rem', borderRadius: '0.625rem', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '1.2rem', marginTop: '0.1rem' }}>📜</span>
+                      <div>
+                        <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#0f172a' }}>Verifiable Digital Credentials</div>
+                        <div style={{ fontSize: '0.775rem', color: '#64748b' }}>100% tamper-proof digital certificates &amp; QR validation</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Impact Stats */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                    <div style={{ backgroundColor: '#eff6ff', padding: '0.85rem', borderRadius: '0.625rem', border: '1px solid #bfdbfe', textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#2563eb' }}>2,500+</div>
+                      <div style={{ fontSize: '0.725rem', color: '#1e40af', fontWeight: 700 }}>Accredited Institutions</div>
+                    </div>
+                    <div style={{ backgroundColor: '#ecfdf5', padding: '0.85rem', borderRadius: '0.625rem', border: '1px solid #a7f3d0', textAlign: 'center' }}>
                       <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#059669' }}>95%</div>
-                      <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>Retention Rate</div>
+                      <div style={{ fontSize: '0.725rem', color: '#065f46', fontWeight: 700 }}>Satisfaction Rate</div>
                     </div>
                   </div>
 
