@@ -83,7 +83,7 @@ export function PagesPanel({
   ];
 
   return (
-    <div className="admin-panel" style={{ padding: '2rem', maxWidth: '1000px', backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', position: 'relative' }}>
+    <div className="admin-panel" style={{ padding: '2rem', maxWidth: '1050px', backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', position: 'relative' }}>
       {toast && (
         <div style={{
           position: 'fixed',
@@ -108,7 +108,7 @@ export function PagesPanel({
 
       <header style={{ marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #e2e8f0' }}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.35rem' }}>Public Pages Management</h2>
-        <p style={{ color: '#64748b', fontSize: '0.925rem' }}>Customize titles, headlines, value statements, and copy text across all public pages.</p>
+        <p style={{ color: '#64748b', fontSize: '0.925rem' }}>Edit and manage all copy, section titles, subtitles, bullets, and CTAs across the entire website.</p>
       </header>
 
       {/* SUBMENU TABS */}
@@ -151,60 +151,240 @@ export function PagesPanel({
           
           {/* TAB 1: HOME PAGE */}
           {activeTab === 'home' && (
-            <fieldset style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.5rem' }}>
-              <legend style={{ padding: '0 0.5rem', fontSize: '0.95rem', fontWeight: 700, color: '#2563eb' }}>🏠 Home / Landing Page Content (`/`)</legend>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              
+              {/* SECTION 1: HERO BANNER */}
+              <fieldset style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.5rem' }}>
+                <legend style={{ padding: '0 0.5rem', fontSize: '0.95rem', fontWeight: 700, color: '#2563eb' }}>1. Hero Banner & Showcase Card (`/`)</legend>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Hero Ribbon Badge</label>
+                      <input 
+                        type="text" 
+                        value={settings.homeHeroBadge ?? 'Official International Accreditation Body'} 
+                        onChange={e => setSettings({...settings, homeHeroBadge: e.target.value})} 
+                        style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Main Hero Headline</label>
+                      <input 
+                        type="text" 
+                        value={settings.homeHeroTitle ?? 'Council For Training Skills & Development America (CTSDA)'} 
+                        onChange={e => setSettings({...settings, homeHeroTitle: e.target.value})} 
+                        style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                      />
+                    </div>
+                  </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Hero Ribbon Badge</label>
-                    <input 
-                      type="text" 
-                      value={settings.homeHeroBadge ?? 'Official International Accreditation Body'} 
-                      onChange={e => setSettings({...settings, homeHeroBadge: e.target.value})} 
+                    <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Hero Subtitle / Value Statement</label>
+                    <textarea 
+                      value={settings.homeHeroSubtitle ?? 'Empowering global education and workforce training providers with rigorous quality standards, international recognition, and 100% verifiable digital credentials.'} 
+                      onChange={e => setSettings({...settings, homeHeroSubtitle: e.target.value})} 
+                      rows={3}
                       style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
                     />
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Main Hero Headline</label>
-                    <input 
-                      type="text" 
-                      value={settings.homeHeroTitle ?? 'Council For Training Skills & Development America (CTSDA)'} 
-                      onChange={e => setSettings({...settings, homeHeroTitle: e.target.value})} 
-                      style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
-                    />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Framework Card Title</label>
+                      <input 
+                        type="text" 
+                        value={settings.homeFrameworkTitle ?? 'Global Quality Benchmark'} 
+                        onChange={e => setSettings({...settings, homeFrameworkTitle: e.target.value})} 
+                        style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Framework Subtitle</label>
+                      <input 
+                        type="text" 
+                        value={settings.homeFrameworkSubtitle ?? 'CTSDA sets international standards for vocational, technical, and executive training providers worldwide.'} 
+                        onChange={e => setSettings({...settings, homeFrameworkSubtitle: e.target.value})} 
+                        style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                      />
+                    </div>
                   </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Hero Subtitle / Value Statement</label>
-                  <textarea 
-                    value={settings.homeHeroSubtitle ?? 'Empowering global education and workforce training providers with rigorous quality standards, international recognition, and 100% verifiable digital credentials.'} 
-                    onChange={e => setSettings({...settings, homeHeroSubtitle: e.target.value})} 
-                    rows={3}
-                    style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
-                  />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
+              </fieldset>
+
+              {/* SECTION 2: WHY CHOOSE CTSDA */}
+              <fieldset style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.5rem' }}>
+                <legend style={{ padding: '0 0.5rem', fontSize: '0.95rem', fontWeight: 700, color: '#2563eb' }}>2. Why Choose CTSDA Section</legend>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Eyebrow Badge Text</label>
+                      <input 
+                        type="text" 
+                        value={settings.homeWhyChooseEyebrow ?? 'Why Institutions Choose CTSDA'} 
+                        onChange={e => setSettings({...settings, homeWhyChooseEyebrow: e.target.value})} 
+                        style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Section Heading</label>
+                      <input 
+                        type="text" 
+                        value={settings.homeWhyChooseTitle ?? 'Accreditation that reads as rigorous, transparent, and globally useful.'} 
+                        onChange={e => setSettings({...settings, homeWhyChooseTitle: e.target.value})} 
+                        style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                      />
+                    </div>
+                  </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Framework Card Title</label>
-                    <input 
-                      type="text" 
-                      value={settings.homeFrameworkTitle ?? 'Global Quality Benchmark'} 
-                      onChange={e => setSettings({...settings, homeFrameworkTitle: e.target.value})} 
+                    <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Section Subtitle Paragraph</label>
+                    <textarea 
+                      value={settings.homeWhyChooseSubtitle ?? 'Our international quality framework empowers educational academies, universities, and specialized training providers with instant global credibility and tamper-proof verification.'} 
+                      onChange={e => setSettings({...settings, homeWhyChooseSubtitle: e.target.value})} 
+                      rows={2}
                       style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
                     />
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Framework Subtitle</label>
-                    <input 
-                      type="text" 
-                      value={settings.homeFrameworkSubtitle ?? 'CTSDA sets international standards for vocational, technical, and executive training providers worldwide.'} 
-                      onChange={e => setSettings({...settings, homeFrameworkSubtitle: e.target.value})} 
-                      style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
-                    />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>Bullet Highlight 1</label>
+                      <input 
+                        type="text" 
+                        value={settings.homeWhyChooseBullet1 ?? '100% Verifiable Digital Credentials & QR Codes'} 
+                        onChange={e => setSettings({...settings, homeWhyChooseBullet1: e.target.value})} 
+                        style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>Bullet Highlight 2</label>
+                      <input 
+                        type="text" 
+                        value={settings.homeWhyChooseBullet2 ?? 'Comprehensive Governance & Quality Audits'} 
+                        onChange={e => setSettings({...settings, homeWhyChooseBullet2: e.target.value})} 
+                        style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>Bullet Highlight 3</label>
+                      <input 
+                        type="text" 
+                        value={settings.homeWhyChooseBullet3 ?? 'Recognized Across International Jurisdictions'} 
+                        onChange={e => setSettings({...settings, homeWhyChooseBullet3: e.target.value})} 
+                        style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </fieldset>
+              </fieldset>
+
+              {/* SECTION 3: ACCREDITATION PATHWAY / PROCESS */}
+              <fieldset style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.5rem' }}>
+                <legend style={{ padding: '0 0.5rem', fontSize: '0.95rem', fontWeight: 700, color: '#2563eb' }}>3. Accreditation Pathway / Process Section</legend>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Pathway Eyebrow Text</label>
+                      <input 
+                        type="text" 
+                        value={settings.homePathwayEyebrow ?? 'Accreditation pathway'} 
+                        onChange={e => setSettings({...settings, homePathwayEyebrow: e.target.value})} 
+                        style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Pathway Section Title</label>
+                      <input 
+                        type="text" 
+                        value={settings.homePathwayTitle ?? 'A clear route from application to recognized status.'} 
+                        onChange={e => setSettings({...settings, homePathwayTitle: e.target.value})} 
+                        style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Step 1 & Step 2 */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <strong>Step 01</strong>
+                      <input type="text" value={settings.homePathwayStep1Title ?? 'Application'} onChange={e => setSettings({...settings, homePathwayStep1Title: e.target.value})} placeholder="Step 1 Title" style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.25rem' }} />
+                      <input type="text" value={settings.homePathwayStep1Text ?? 'Submit institutional profile and initial documentation.'} onChange={e => setSettings({...settings, homePathwayStep1Text: e.target.value})} placeholder="Step 1 Description" style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.25rem' }} />
+                    </div>
+                    <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <strong>Step 02</strong>
+                      <input type="text" value={settings.homePathwayStep2Title ?? 'Self-Assessment'} onChange={e => setSettings({...settings, homePathwayStep2Title: e.target.value})} placeholder="Step 2 Title" style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.25rem' }} />
+                      <input type="text" value={settings.homePathwayStep2Text ?? 'Complete a structured quality and readiness review.'} onChange={e => setSettings({...settings, homePathwayStep2Text: e.target.value})} placeholder="Step 2 Description" style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.25rem' }} />
+                    </div>
+                  </div>
+
+                  {/* Step 3 & Step 4 */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <strong>Step 03</strong>
+                      <input type="text" value={settings.homePathwayStep3Title ?? 'Evaluation'} onChange={e => setSettings({...settings, homePathwayStep3Title: e.target.value})} placeholder="Step 3 Title" style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.25rem' }} />
+                      <input type="text" value={settings.homePathwayStep3Text ?? 'Proceed through expert assessment and site review where required.'} onChange={e => setSettings({...settings, homePathwayStep3Text: e.target.value})} placeholder="Step 3 Description" style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.25rem' }} />
+                    </div>
+                    <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '0.375rem', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <strong>Step 04</strong>
+                      <input type="text" value={settings.homePathwayStep4Title ?? 'Decision'} onChange={e => setSettings({...settings, homePathwayStep4Title: e.target.value})} placeholder="Step 4 Title" style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.25rem' }} />
+                      <input type="text" value={settings.homePathwayStep4Text ?? 'Receive accreditation outcome, guidance, and public listing.'} onChange={e => setSettings({...settings, homePathwayStep4Text: e.target.value})} placeholder="Step 4 Description" style={{ padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.25rem' }} />
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+
+              {/* SECTION 4: SERVICES PREVIEW & CTA BANNER */}
+              <fieldset style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.5rem' }}>
+                <legend style={{ padding: '0 0.5rem', fontSize: '0.95rem', fontWeight: 700, color: '#2563eb' }}>4. Services Preview & CTA Banner (Before Footer)</legend>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Services Eyebrow Text</label>
+                      <input 
+                        type="text" 
+                        value={settings.homeServicesEyebrow ?? 'Services'} 
+                        onChange={e => setSettings({...settings, homeServicesEyebrow: e.target.value})} 
+                        style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Services Section Title</label>
+                      <input 
+                        type="text" 
+                        value={settings.homeServicesTitle ?? 'Built for institutions, programs, trainers, and continuing education providers.'} 
+                        onChange={e => setSettings({...settings, homeServicesTitle: e.target.value})} 
+                        style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <h4 style={{ margin: 0, fontSize: '0.9rem', color: '#1e40af', fontWeight: 700 }}>CTA Banner Before Footer</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>CTA Eyebrow</label>
+                        <input type="text" value={settings.homeCtaEyebrow ?? 'Start with confidence'} onChange={e => setSettings({...settings, homeCtaEyebrow: e.target.value})} style={{ padding: '0.55rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>CTA Title</label>
+                        <input type="text" value={settings.homeCtaTitle ?? 'Join institutions worldwide using CTSDA to demonstrate quality.'} onChange={e => setSettings({...settings, homeCtaTitle: e.target.value})} style={{ padding: '0.55rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} />
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>CTA Subtitle Paragraph</label>
+                      <input type="text" value={settings.homeCtaSubtitle ?? 'Start your accreditation journey with CTSDA today and join our network of excellence in education.'} onChange={e => setSettings({...settings, homeCtaSubtitle: e.target.value})} style={{ padding: '0.55rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>Primary Button Label</label>
+                        <input type="text" value={settings.homeCtaBtnPrimary ?? 'Apply Now'} onChange={e => setSettings({...settings, homeCtaBtnPrimary: e.target.value})} style={{ padding: '0.55rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>Outline Button Label</label>
+                        <input type="text" value={settings.homeCtaBtnOutline ?? 'Contact Us'} onChange={e => setSettings({...settings, homeCtaBtnOutline: e.target.value})} style={{ padding: '0.55rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+
+            </div>
           )}
 
           {/* TAB 2: ABOUT PAGE */}

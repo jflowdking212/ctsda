@@ -17,11 +17,43 @@ async function getSettings() {
 export default async function Home() {
   const settings = await getSettings();
 
+  // 1. Hero Section
   const heroBadge = settings.homeHeroBadge || 'Official International Accreditation Body';
   const heroTitle = settings.homeHeroTitle || 'Council For Training Skills & Development America (CTSDA)';
   const heroSubtitle = settings.homeHeroSubtitle || 'Empowering global education and workforce training providers with rigorous quality standards, international recognition, and 100% verifiable digital credentials.';
   const frameworkTitle = settings.homeFrameworkTitle || 'Global Quality Benchmark';
   const frameworkSubtitle = settings.homeFrameworkSubtitle || 'CTSDA sets international standards for vocational, technical, and executive training providers worldwide.';
+
+  // 2. Why Choose Section
+  const whyChooseEyebrow = settings.homeWhyChooseEyebrow || 'Why Institutions Choose CTSDA';
+  const whyChooseTitle = settings.homeWhyChooseTitle || 'Accreditation that reads as rigorous, transparent, and globally useful.';
+  const whyChooseSubtitle = settings.homeWhyChooseSubtitle || 'Our international quality framework empowers educational academies, universities, and specialized training providers with instant global credibility and tamper-proof verification.';
+  const whyChooseBullet1 = settings.homeWhyChooseBullet1 || '100% Verifiable Digital Credentials & QR Codes';
+  const whyChooseBullet2 = settings.homeWhyChooseBullet2 || 'Comprehensive Governance & Quality Audits';
+  const whyChooseBullet3 = settings.homeWhyChooseBullet3 || 'Recognized Across International Jurisdictions';
+
+  // 3. Accreditation Pathway / Process Section
+  const pathwayEyebrow = settings.homePathwayEyebrow || 'Accreditation pathway';
+  const pathwayTitle = settings.homePathwayTitle || 'A clear route from application to recognized status.';
+  const pathwayStep1Title = settings.homePathwayStep1Title || 'Application';
+  const pathwayStep1Text = settings.homePathwayStep1Text || 'Submit institutional profile and initial documentation.';
+  const pathwayStep2Title = settings.homePathwayStep2Title || 'Self-Assessment';
+  const pathwayStep2Text = settings.homePathwayStep2Text || 'Complete a structured quality and readiness review.';
+  const pathwayStep3Title = settings.homePathwayStep3Title || 'Evaluation';
+  const pathwayStep3Text = settings.homePathwayStep3Text || 'Proceed through expert assessment and site review where required.';
+  const pathwayStep4Title = settings.homePathwayStep4Title || 'Decision';
+  const pathwayStep4Text = settings.homePathwayStep4Text || 'Receive accreditation outcome, guidance, and public listing.';
+
+  // 4. Services Preview Section
+  const servicesEyebrow = settings.homeServicesEyebrow || 'Services';
+  const servicesTitle = settings.homeServicesTitle || 'Built for institutions, programs, trainers, and continuing education providers.';
+
+  // 5. CTA Band Section
+  const ctaEyebrow = settings.homeCtaEyebrow || 'Start with confidence';
+  const ctaTitle = settings.homeCtaTitle || 'Join institutions worldwide using CTSDA to demonstrate quality.';
+  const ctaSubtitle = settings.homeCtaSubtitle || 'Start your accreditation journey with CTSDA today and join our network of excellence in education.';
+  const ctaBtnPrimary = settings.homeCtaBtnPrimary || 'Apply Now';
+  const ctaBtnOutline = settings.homeCtaBtnOutline || 'Contact Us';
 
   return (
     <div className="public-page">
@@ -258,24 +290,24 @@ export default async function Home() {
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', padding: '0.35rem 0.85rem', borderRadius: '50px', marginBottom: '1.25rem' }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#2563eb' }}></span>
                   <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                    Why Institutions Choose CTSDA
+                    {whyChooseEyebrow}
                   </span>
                 </div>
                 
                 <h2 style={{ fontSize: 'clamp(1.85rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#0f172a', lineHeight: 1.2, letterSpacing: '-0.02em', marginBottom: '1.25rem' }}>
-                  Accreditation that reads as <span style={{ background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>rigorous</span>, transparent, and globally useful.
+                  {whyChooseTitle}
                 </h2>
                 
                 <p style={{ color: '#475569', fontSize: '1.05rem', lineHeight: 1.65, marginBottom: '2rem' }}>
-                  Our international quality framework empowers educational academies, universities, and specialized training providers with instant global credibility and tamper-proof verification.
+                  {whyChooseSubtitle}
                 </p>
 
                 {/* Quick Trust Highlights */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '2.25rem' }}>
                   {[
-                    '100% Verifiable Digital Credentials & QR Codes',
-                    'Comprehensive Governance & Quality Audits',
-                    'Recognized Across International Jurisdictions'
+                    whyChooseBullet1,
+                    whyChooseBullet2,
+                    whyChooseBullet3,
                   ].map((point, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#dcfce7', color: '#15803d', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -439,15 +471,15 @@ export default async function Home() {
         <section className="process-section">
           <div className="container">
             <div className="text-center mb-16">
-              <p className="text-blue-600 font-semibold uppercase tracking-wider text-sm mb-4">Accreditation pathway</p>
-              <h2 className="section-title">A clear route from application to recognized status.</h2>
+              <p className="text-blue-600 font-semibold uppercase tracking-wider text-sm mb-4">{pathwayEyebrow}</p>
+              <h2 className="section-title">{pathwayTitle}</h2>
             </div>
             <div className="process-grid">
               {[
-                { step: '01', title: 'Application', text: 'Submit institutional profile and initial documentation.' },
-                { step: '02', title: 'Self-Assessment', text: 'Complete a structured quality and readiness review.' },
-                { step: '03', title: 'Evaluation', text: 'Proceed through expert assessment and site review where required.' },
-                { step: '04', title: 'Decision', text: 'Receive accreditation outcome, guidance, and public listing.' },
+                { step: '01', title: pathwayStep1Title, text: pathwayStep1Text },
+                { step: '02', title: pathwayStep2Title, text: pathwayStep2Text },
+                { step: '03', title: pathwayStep3Title, text: pathwayStep3Text },
+                { step: '04', title: pathwayStep4Title, text: pathwayStep4Text },
               ].map((item) => (
                 <article className="process-card" key={item.title}>
                   <span className="process-number" style={{ backgroundColor: "#2563eb", color: "#ffffff", fontWeight: 800 }}>{item.step}</span>
@@ -464,8 +496,8 @@ export default async function Home() {
           <div className="container">
             <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-start">
               <div>
-                <p className="text-blue-600 font-semibold uppercase tracking-wider text-sm mb-4">Services</p>
-                <h2 className="section-title">Built for institutions, programs, trainers, and continuing education providers.</h2>
+                <p className="text-blue-600 font-semibold uppercase tracking-wider text-sm mb-4">{servicesEyebrow}</p>
+                <h2 className="section-title">{servicesTitle}</h2>
                 <Link className="text-link inline-flex items-center gap-2 mt-6" href="/services">
                   View all services
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -492,24 +524,24 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* CTA Band Before Footer - Enhanced with Old Services Picture (girl_eng.jpeg) */}
+        {/* CTA Band Before Footer */}
         <section className="cta-band" style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', color: '#ffffff', padding: '4.5rem 1.5rem' }}>
           <div className="container" style={{ maxWidth: '1140px', margin: '0 auto' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'center' }}>
               <div>
-                <p className="font-semibold uppercase tracking-wider text-sm mb-3" style={{ color: '#fbbf24' }}>Start with confidence</p>
+                <p className="font-semibold uppercase tracking-wider text-sm mb-3" style={{ color: '#fbbf24' }}>{ctaEyebrow}</p>
                 <h2 className="cta-title" style={{ color: '#ffffff', fontWeight: 800, fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)', lineHeight: 1.2, marginBottom: '1rem' }}>
-                  Join institutions worldwide using CTSDA to demonstrate quality.
+                  {ctaTitle}
                 </h2>
                 <p style={{ color: '#e2e8f0', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '2rem' }}>
-                  Start your accreditation journey with CTSDA today and join our network of excellence in education.
+                  {ctaSubtitle}
                 </p>
                 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                   <Link className="cta-button primary" href="/apply" style={{ backgroundColor: '#ffffff', color: '#0f172a', fontWeight: 700, padding: '0.875rem 1.75rem', borderRadius: '0.625rem', textDecoration: 'none', boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)' }}>
-                    Apply Now
+                    {ctaBtnPrimary}
                   </Link>
                   <Link className="cta-button outline" href="/contact" style={{ backgroundColor: 'rgba(255, 255, 255, 0.15)', border: '1.5px solid rgba(255, 255, 255, 0.7)', color: '#ffffff', fontWeight: 700, padding: '0.875rem 1.75rem', borderRadius: '0.625rem', textDecoration: 'none' }}>
-                    Contact Us
+                    {ctaBtnOutline}
                   </Link>
                 </div>
               </div>
