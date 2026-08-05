@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { PremiumHeader } from './premium-header';
 
 const navItems = [
+  { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
   { href: '/services', label: 'Services' },
   { href: '/training', label: 'Training' },
