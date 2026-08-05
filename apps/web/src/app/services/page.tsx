@@ -337,7 +337,7 @@ export default async function ServicesPage() {
               </h2>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.5rem', textAlign: 'center' }}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 text-center">
               {[
                 {
                   step: 'Application',
@@ -384,8 +384,11 @@ export default async function ServicesPage() {
                     </svg>
                   ),
                 },
-              ].map((item) => (
-                <div key={item.step} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              ].map((item, idx) => (
+                <div
+                  key={item.step}
+                  className={idx === 4 ? 'col-span-2 sm:col-span-1 flex flex-col items-center' : 'flex flex-col items-center'}
+                >
                   <div
                     style={{
                       width: '3.5rem',
