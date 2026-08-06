@@ -193,9 +193,10 @@ interface CountrySelectProps {
   onChange: (country: string) => void;
   disabled?: boolean;
   required?: boolean;
+  placeholder?: string;
 }
 
-export function CountrySelect({ value, onChange, disabled, required }: CountrySelectProps) {
+export function CountrySelect({ value, onChange, disabled, required, placeholder }: CountrySelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
