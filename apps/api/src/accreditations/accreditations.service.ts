@@ -5,6 +5,7 @@ import { StorageService } from '../storage/storage.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import * as crypto from 'crypto';
 import * as QRCode from 'qrcode';
+import argon2 from 'argon2';
 
 @Injectable()
 export class AccreditationsService {
@@ -230,8 +231,7 @@ export class AccreditationsService {
 
     if (!user) {
       isNewUser = true;
-      const bcrypt = require('bcryptjs');
-      const tempPasswordHash = await bcrypt.hash(crypto.randomBytes(16).toString('hex'), 10);
+      const tempPasswordHash = await argon2.hash(crypto.randomBytes(16).toString('hex'));
       accountSetupToken = crypto.randomBytes(32).toString('base64url');
 
       user = await this.prisma.user.create({
