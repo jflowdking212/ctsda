@@ -67,7 +67,8 @@ export class PaymentsService {
     );
 
     const stripe = this.getStripe();
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const envUrl = process.env.FRONTEND_URL || '';
+    const frontendUrl = (!envUrl || envUrl.includes('localhost')) ? 'https://ctsda.acecoterieconsulting.com' : envUrl;
     const session = await stripe.checkout.sessions.create(
       {
         mode: 'payment',
@@ -288,7 +289,8 @@ export class PaymentsService {
         });
 
         const verificationToken = crypto.randomBytes(32).toString('base64url');
-        const frontendUrl = process.env.FRONTEND_URL || 'https://ctsda.acecoterieconsulting.com';
+        const envUrl2 = process.env.FRONTEND_URL || '';
+        const frontendUrl = (!envUrl2 || envUrl2.includes('localhost')) ? 'https://ctsda.acecoterieconsulting.com' : envUrl2;
         const qrCodeUrl = `${frontendUrl}/verify?token=${verificationToken}`;
         
         const certificate = await this.prisma.certificate.create({

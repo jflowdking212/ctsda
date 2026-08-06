@@ -47,6 +47,18 @@ export class StorageService {
     return getSignedUrl(this.s3 as any, command, { expiresIn });
   }
 
+  async getObjectStream(key: string): Promise<{ stream: any; contentType: string }> {
+    const command = new GetObjectCommand({
+      Bucket: process.env.MINIO_BUCKET || 'ctsda-documents',
+      Key: key,
+    });
+    const response = await this.s3.send(command);
+    return {
+      stream: response.Body,
+      contentType: response.ContentType || 'image/png',
+    };
+  }
+
   async delete(key: string) {
     await this.s3.send(
       new DeleteObjectCommand({

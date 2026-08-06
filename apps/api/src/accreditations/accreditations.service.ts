@@ -343,7 +343,8 @@ export class AccreditationsService {
       });
 
       const verificationToken = crypto.randomBytes(32).toString('base64url');
-      const frontendUrl = process.env.FRONTEND_URL || 'https://ctsda.acecoterieconsulting.com';
+      const envUrl = process.env.FRONTEND_URL || '';
+      const frontendUrl = (!envUrl || envUrl.includes('localhost')) ? 'https://ctsda.acecoterieconsulting.com' : envUrl;
       const qrCodeUrl = `${frontendUrl}/verify?token=${verificationToken}`;
 
       const certificate = await tx.certificate.create({

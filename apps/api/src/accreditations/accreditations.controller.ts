@@ -1,11 +1,16 @@
-import { Body, Controller, Get, Param, Post, UseGuards, Request, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Res, UseGuards, Request, BadRequestException, NotFoundException } from '@nestjs/common';
+import { FastifyReply } from 'fastify';
 import { AccreditationsService } from './accreditations.service';
+import { StorageService } from '../storage/storage.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { AuthGuard } from '../common/guards/auth.guard';
 
 @Controller('accreditations')
 export class AccreditationsController {
-  constructor(private accreditationsService: AccreditationsService) {}
+  constructor(
+    private accreditationsService: AccreditationsService,
+    private storageService: StorageService,
+  ) {}
 
   @Post(':id/upload-certificate')
   @UseGuards(AuthGuard)
@@ -65,6 +70,18 @@ export class AccreditationsController {
     };
 
     return this.accreditationsService.uploadLogoFile(file, multipart.mimetype);
+  }
+
+  @Get('logo-file')
+  async getLogoFile(@Query('key') key: string, @Res() res: FastifyReply) {
+    if (!key) throw new BadRequestException('Missing image file key');
+    try {
+      const { stream, contentType } = await this.storageService.getObjectStream(key);
+      res.type(contentType);
+      return res.send(stream);
+    } catch {
+      throw new NotFoundException('Logo image not found');
+    }
   }
 
   @Get('verify/:certificateNumber')

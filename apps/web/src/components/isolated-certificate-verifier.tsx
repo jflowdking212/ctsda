@@ -61,12 +61,12 @@ export function IsolatedCertificateVerifier({
       setResult({
         valid: Boolean(data.valid),
         message: data.message || (data.valid ? 'This certificate is authentic and was issued by the Council for Training Skills and Development America.' : INVALID_CERTIFICATE_RESULT.message),
-        institution: data.institution,
+        institution: data.institution || 'Accredited Institution Partner',
         certificateNumber: data.certificateNumber || cleanToken,
-        recipientName: data.recipientName || 'John Doe',
-        courseProgram: data.courseProgram || 'Certified Project Management Professional',
-        dateIssued: data.dateIssued || 'May 15, 2024',
-        expirationDate: data.expirationDate || 'May 14, 2027',
+        recipientName: data.recipientName || data.institution || 'Accredited Institution / Recipient',
+        courseProgram: data.courseProgram || 'Institutional Accreditation & Quality Standards',
+        dateIssued: data.issueDate || data.dateIssued ? new Date(data.issueDate || data.dateIssued).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Official Issue Date',
+        expirationDate: data.expiryDate || data.expirationDate ? new Date(data.expiryDate || data.expirationDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Active Expiry Date',
         status: data.status || 'Active',
       });
     } catch {

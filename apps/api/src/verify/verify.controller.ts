@@ -39,6 +39,19 @@ export class VerifyController {
       };
     }
 
+    const applicant = cert.accreditation?.application?.applicant;
+    const recipientName = applicant && (applicant.firstName || applicant.lastName)
+      ? `${applicant.firstName || ''} ${applicant.lastName || ''}`.trim()
+      : cert.accreditation?.institution?.name || 'Accredited Institution';
+
+    const certsOffered = cert.accreditation?.application?.certificatesOffered;
+    const trainingAreas = cert.accreditation?.application?.trainingAreas;
+    const courseProgram = (Array.isArray(certsOffered) && certsOffered.length > 0)
+      ? certsOffered.join(', ')
+      : (trainingAreas && trainingAreas.length > 0)
+      ? trainingAreas.map((t: any) => t.trainingArea?.name || t.trainingAreaId).join(', ')
+      : 'Institutional Accreditation & Quality Standards';
+
     return {
       valid: true,
       message: 'Certificate is valid',
@@ -46,6 +59,8 @@ export class VerifyController {
       registrationNumber: cert.accreditation.institution.registrationNumber,
       country: cert.accreditation.institution.country,
       certificateNumber: cert.certificateNumber,
+      recipientName,
+      courseProgram,
       issueDate: cert.issueDate,
       expiryDate: cert.expiryDate,
     };

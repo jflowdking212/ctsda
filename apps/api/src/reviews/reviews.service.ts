@@ -249,7 +249,9 @@ export class ReviewsService {
               });
             }
 
-            const paymentLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/payment/${invoice.id}`;
+            const envUrl = process.env.FRONTEND_URL || '';
+            const baseUrl = (!envUrl || envUrl.includes('localhost')) ? 'https://ctsda.acecoterieconsulting.com' : envUrl;
+            const paymentLink = `${baseUrl}/payment/${invoice.id}`;
             const targetEmail = app.applicantEmail || app.applicant?.email || app.institution?.email || app.institution?.contacts?.find((c: any) => c.isPrimary)?.email || app.institution?.contacts?.[0]?.email;
             if (targetEmail) {
               await this.notificationsService.enqueueEmail({
@@ -439,6 +441,22 @@ export class ReviewsService {
                 name: true,
                 registrationNumber: true,
                 country: true,
+              },
+            },
+            application: {
+              include: {
+                applicant: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                  },
+                },
+                trainingAreas: {
+                  include: {
+                    trainingArea: true,
+                  },
+                },
               },
             },
           },

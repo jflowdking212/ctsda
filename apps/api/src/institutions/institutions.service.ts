@@ -39,25 +39,36 @@ export class InstitutionsService {
   async findPublicAccredited() {
     const institutions = await this.prisma.institution.findMany({
       where: {
-        applications: {
-          some: {
-            status: 'approved'
-          }
-        },
-        logoUrl: { not: null }
+        logoUrl: { not: null },
+        OR: [
+          { applications: { some: { status: 'approved' } } },
+          { accreditations: { some: { status: 'active' } } },
+        ],
       },
       select: {
         id: true,
         name: true,
         logoUrl: true,
+        country: true,
       },
-      take: 10,
+      take: 20,
     });
 
-    return Promise.all(institutions.map(async (inst) => ({
-      ...inst,
-      logoUrl: inst.logoUrl ? await this.storageService.getSignedUrl(inst.logoUrl) : null,
-    })));
+    const rawUrl = process.env.FRONTEND_URL || 'https://ctsda.acecoterieconsulting.com';
+    const baseUrl = (rawUrl.includes('localhost') && process.env.NODE_ENV === 'production')
+      ? 'https://ctsda.acecoterieconsulting.com'
+      : rawUrl;
+
+    return institutions.map((inst) => {
+      let logo = inst.logoUrl;
+      if (logo && !logo.startsWith('http') && !logo.startsWith('data:')) {
+        logo = `${baseUrl}/accreditations/logo-file?key=${encodeURIComponent(logo)}`;
+      }
+      return {
+        ...inst,
+        logoUrl: logo,
+      };
+    });
   }
 
   async findAll() {
