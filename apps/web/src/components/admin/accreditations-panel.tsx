@@ -1126,13 +1126,13 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
-                      Registration / RC Number
+                      Company Registration No/LLC/LTD/CIN etc
                     </label>
                     <input
                       type="text"
                       value={manualForm.registrationNumber}
                       onChange={(e) => setManualForm({ ...manualForm, registrationNumber: e.target.value })}
-                      placeholder="e.g. RC-849201"
+                      placeholder="e.g. RC-849201 / LLC-94812"
                       style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
                     />
                   </div>

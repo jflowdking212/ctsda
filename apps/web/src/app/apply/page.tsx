@@ -370,13 +370,33 @@ export default function ApplyPage() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Company Registration No/LLC/LTD/CIN etc <span style={{ color: '#ef4444' }}>*</span></label>
+                <input required value={institutionForm.registrationNumber} onChange={e => setInstitutionForm({...institutionForm, registrationNumber: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%' }} placeholder="e.g. RC-104958 / LLC-94812" />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Institution Type <span style={{ color: '#ef4444' }}>*</span></label>
+                <select value={institutionForm.institutionType} onChange={e => setInstitutionForm({...institutionForm, institutionType: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%', backgroundColor: '#ffffff' }}>
+                  <option value="corporate">Corporate Training Provider</option>
+                  <option value="higher_education">Higher Education / University</option>
+                  <option value="vocational">Vocational / Technical Institute</option>
+                  <option value="non_profit">Non-Profit / NGO</option>
+                  <option value="government">Government / Public Sector</option>
+                  <option value="individual">Individual Educator / Consultant</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Country <span style={{ color: '#ef4444' }}>*</span></label>
+                <CountrySelect value={institutionForm.country} onChange={val => setInstitutionForm({...institutionForm, country: val})} disabled={loading} placeholder="Select country..." />
+              </div>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Physical Headquarters Address <span style={{ color: '#ef4444' }}>*</span></label>
                 <input required value={institutionForm.address} onChange={e => setInstitutionForm({...institutionForm, address: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%' }} placeholder="Street address, City, State/Province" />
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', gridColumn: 'span 2' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Company Logo (Appears on accredited partner gallery upon approval)</label>
                 <input type="file" accept="image/*" onChange={e => setLogoFile(e.target.files?.[0] || null)} disabled={loading} style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.85rem', backgroundColor: '#f8fafc', width: '100%' }} />
               </div>
