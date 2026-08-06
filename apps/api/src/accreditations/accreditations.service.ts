@@ -5,7 +5,6 @@ import { StorageService } from '../storage/storage.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import * as crypto from 'crypto';
 import * as QRCode from 'qrcode';
-import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AccreditationsService {
@@ -231,6 +230,7 @@ export class AccreditationsService {
 
     if (!user) {
       isNewUser = true;
+      const bcrypt = require('bcryptjs');
       const tempPasswordHash = await bcrypt.hash(crypto.randomBytes(16).toString('hex'), 10);
       accountSetupToken = crypto.randomBytes(32).toString('base64url');
 
@@ -280,8 +280,8 @@ export class AccreditationsService {
           registrationNumber: data.registrationNumber || `RC-${Math.floor(100000 + Math.random() * 900000)}`,
           institutionType: data.institutionType || 'corporate',
           country: data.country || 'United States',
-          address: data.address || undefined,
-          phone: data.institutionPhone || data.phone || undefined,
+          address: data.address || 'N/A',
+          phone: data.institutionPhone || data.phone || 'N/A',
           email: data.institutionEmail || targetEmail,
           website: data.website || undefined,
           yearEstablished: data.yearEstablished ? Number(data.yearEstablished) : undefined,
