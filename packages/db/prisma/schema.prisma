@@ -491,7 +491,7 @@ model Certificate {
   expiryDate        DateTime
   status            AccreditationStatus @default(active)
   pdfUrl            String?             @db.VarChar(500)
-  qrCodeUrl         String?             @db.VarChar(500)
+  qrCodeUrl         String?             @db.Text
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
 

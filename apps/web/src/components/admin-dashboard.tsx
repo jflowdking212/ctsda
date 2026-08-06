@@ -285,7 +285,7 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
     };
 
     if (hasBody) {
-      if (!headers['Content-Type']) {
+      if (!headers['Content-Type'] && !(init?.body instanceof FormData)) {
         headers['Content-Type'] = 'application/json';
       }
     }

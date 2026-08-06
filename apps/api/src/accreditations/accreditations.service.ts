@@ -344,7 +344,7 @@ export class AccreditationsService {
 
       const verificationToken = crypto.randomBytes(32).toString('base64url');
       const frontendUrl = process.env.FRONTEND_URL || 'https://ctsda.acecoterieconsulting.com';
-      const qrCodeUrl = await QRCode.toDataURL(`${frontendUrl}/verify?token=${verificationToken}`);
+      const qrCodeUrl = `${frontendUrl}/verify?token=${verificationToken}`;
 
       const certificate = await tx.certificate.create({
         data: {

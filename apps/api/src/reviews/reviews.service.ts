@@ -290,8 +290,8 @@ export class ReviewsService {
             });
 
             const verificationToken = this.generateVerificationToken();
-            const verificationBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-            const qrCodeUrl = await QRCode.toDataURL(verificationBaseUrl + '/verify?token=' + verificationToken);
+            const verificationBaseUrl = process.env.FRONTEND_URL || 'https://ctsda.acecoterieconsulting.com';
+            const qrCodeUrl = verificationBaseUrl + '/verify?token=' + verificationToken;
             const certificate = await tx.certificate.create({
               data: {
                 accreditationId: acc.id,
