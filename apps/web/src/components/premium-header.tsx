@@ -28,7 +28,7 @@ export function PremiumHeader() {
   }, [isMobileMenuOpen]);
 
   return (
-    <header className="premium-site-header" style={{ position: 'relative', backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
+    <header className="premium-site-header" style={{ position: 'relative', backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0', margin: 0, padding: 0 }}>
       <div className="container premium-header-shell">
         <Link className="brand-mark" href="/" aria-label="CTSDA home">
           <img className="brand-logo" src="/images/logo-ctsda.png" alt="CTSDA Logo" loading="eager" style={{ width: '48px', height: '48px', objectFit: 'contain', flexShrink: 0 }} />

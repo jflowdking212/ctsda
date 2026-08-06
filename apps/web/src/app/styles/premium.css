@@ -2405,11 +2405,18 @@ button.button.secondary:hover * {
    ENFORCE PURELY STATIC HEADER LIKE OLD CTSDA SITE
    ========================================================= */
 
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 .premium-site-header,
 .site-header,
 header {
   position: relative !important;
-  top: auto !important;
+  top: 0 !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
   z-index: 50 !important;
   background: #ffffff !important;
   backdrop-filter: none !important;
