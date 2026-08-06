@@ -5,6 +5,7 @@ import { PrismaService } from '../common/prisma.service';
 import { BullModule } from '@nestjs/bullmq';
 import { CertificateProcessor } from './processors/certificate.processor';
 import { StorageModule } from '../storage/storage.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { StorageModule } from '../storage/storage.module';
       name: 'certificates',
     }),
     StorageModule,
+    NotificationsModule,
   ],
   controllers: [AccreditationsController],
   providers: [AccreditationsService, PrismaService, CertificateProcessor],

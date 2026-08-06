@@ -28,6 +28,21 @@ const MOCK_ACCREDITATIONS: Accreditation[] = [
   { id:'5', accreditationCode:'CTSDA-2024-0073', status:'expired', issuedAt:'2023-09-15', expiresAt:'2024-09-15', institution:{ name:'EduCorp Canada', email:'hello@educorp.ca', country:'Canada' }, certificates:[{ certificateNumber:'CERT-0073', verificationToken:'ghi789rst', status:'issued' }] },
 ];
 
+const DEFAULT_MANUAL_TRAINING_AREAS = [
+  { code: 'LEADERSHIP-MGMT', name: 'Leadership, Governance & Management' },
+  { code: 'HR-MGMT', name: 'Human Resource Management' },
+  { code: 'PROJECT-MGMT', name: 'Project Management' },
+  { code: 'FINANCE-PROCURE', name: 'Finance, Accounting & Procurement' },
+  { code: 'BUSINESS-ENTR', name: 'Business & Entrepreneurship' },
+  { code: 'IT-DIGITAL', name: 'Information Technology & Digital Skills' },
+  { code: 'HSE-HEALTH', name: 'Health, Safety & Environment (HSE)' },
+  { code: 'ENG-TECH', name: 'Engineering & Technical Training' },
+  { code: 'EDU-TRAIN', name: 'Education & Training' },
+  { code: 'RESEARCH-EVAL', name: 'Research, Monitoring & Evaluation' },
+  { code: 'COMM-SOFT', name: 'Communication & Soft Skills' },
+  { code: 'LEGAL-RISK', name: 'Legal, Compliance & Risk Management' },
+];
+
 export function AccreditationsPanel({ api }: { api: (path: string, init?: RequestInit) => Promise<Response> }) {
   const [accreditations, setAccreditations] = useState<Accreditation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,15 +52,45 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'suspended' | 'expired'>('all');
   const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
 
+  const initialManualForm = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    institutionName: '',
+    registrationNumber: '',
+    institutionType: 'corporate',
+    country: 'United States',
+    address: '',
+    institutionPhone: '',
+    institutionEmail: '',
+    website: '',
+    yearEstablished: '',
+    description: '',
+    logoUrl: '',
+    trainingAreaIds: ['LEADERSHIP-MGMT'] as string[],
+    certificatesOffered: '',
+    deliveryMethods: 'Online Live / Virtual, Physical / In-Person',
+    staffingCount: '',
+    operationalInfo: '',
+    accreditationCode: '',
+    certificateNumber: '',
+    issuedAt: new Date().toISOString().split('T')[0],
+    expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+  };
+
   // Modal States
   const [showManualModal, setShowManualModal] = useState(false);
-  const [manualForm, setManualForm] = useState({
-    institutionName: '',
-    email: '',
-    country: 'United States',
-    certificateNumber: '',
-    expiresAt: '',
-  });
+  const [manualForm, setManualForm] = useState(initialManualForm);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [submittingManual, setSubmittingManual] = useState(false);
+
+  function resetManualForm() {
+    setManualForm(initialManualForm);
+    setLogoPreview(null);
+    setUploadingLogo(false);
+  }
 
   const [editingAccreditation, setEditingAccreditation] = useState<Accreditation | null>(null);
   const [newExpiryDate, setNewExpiryDate] = useState('');
@@ -80,28 +125,39 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
     }
   }
 
+  async function handleLogoSelect(file: File) {
+    if (!file || !file.type.startsWith('image/')) {
+      setError('Please select a valid image file (PNG, JPG, WEBP)');
+      return;
+    }
+    setLogoPreview(URL.createObjectURL(file));
+    setUploadingLogo(true);
+    setError('');
+    try {
+      const formData = new FormData();
+      formData.append('logo', file);
+      const res = await api('/accreditations/upload-logo', {
+        method: 'POST',
+        body: formData,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setManualForm(prev => ({ ...prev, logoUrl: data.key }));
+      } else {
+        setError('Failed to upload logo image.');
+      }
+    } catch {
+      setError('Error uploading logo file.');
+    } finally {
+      setUploadingLogo(false);
+    }
+  }
+
   async function handleManualSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     setMessage('');
-
-    const newAcc: Accreditation = {
-      id: String(Date.now()),
-      accreditationCode: manualForm.certificateNumber || `CTSDA-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-      status: 'active',
-      issuedAt: new Date().toISOString().split('T')[0],
-      expiresAt: manualForm.expiresAt || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      institution: {
-        name: manualForm.institutionName,
-        email: manualForm.email,
-        country: manualForm.country,
-      },
-      certificates: manualForm.certificateNumber ? [{
-        certificateNumber: manualForm.certificateNumber,
-        verificationToken: Math.random().toString(36).substring(2, 11),
-        status: 'issued',
-      }] : [],
-    };
+    setSubmittingManual(true);
 
     try {
       const res = await api('/accreditations/manual', {
@@ -110,28 +166,23 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
         body: JSON.stringify(manualForm),
       });
 
+      const resData = await res.json().catch(() => ({}));
+
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        if (errData.message) {
-          setError(errData.message);
-          return;
-        }
-        setAccreditations(prev => [newAcc, ...prev]);
-        setMessage(`Manual Accreditation issued successfully for ${manualForm.institutionName}!`);
-        setShowManualModal(false);
-        setManualForm({ institutionName: '', email: '', country: 'United States', certificateNumber: '', expiresAt: '' });
+        setError(resData.message || resData.error?.message || 'Failed to issue manual accreditation.');
         return;
       }
 
-      setMessage(`Manual Accreditation issued successfully for ${manualForm.institutionName}!`);
+      const instName = manualForm.institutionName || 'Institution';
+      const emailNote = manualForm.email ? ` Account setup link sent to ${manualForm.email}.` : '';
+      setMessage(`Manual Accreditation issued successfully for "${instName}"!${emailNote}`);
       setShowManualModal(false);
-      setManualForm({ institutionName: '', email: '', country: 'United States', certificateNumber: '', expiresAt: '' });
+      resetManualForm();
       await loadAccreditations();
-    } catch {
-      setAccreditations(prev => [newAcc, ...prev]);
-      setMessage(`Manual Accreditation issued successfully for ${manualForm.institutionName}!`);
-      setShowManualModal(false);
-      setManualForm({ institutionName: '', email: '', country: 'United States', certificateNumber: '', expiresAt: '' });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error issuing manual accreditation.');
+    } finally {
+      setSubmittingManual(false);
     }
   }
 
@@ -921,8 +972,8 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(15, 23, 42, 0.55)',
-          backdropFilter: 'blur(3px)',
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -931,179 +982,495 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
         }}>
           <div style={{
             backgroundColor: '#ffffff',
-            borderRadius: '12px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            borderRadius: '16px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
             width: '100%',
-            maxWidth: '520px',
+            maxWidth: '840px',
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
             overflow: 'hidden',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #cbd5e1',
           }}>
             {/* Modal Header */}
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              padding: '1.25rem 1.5rem',
+              padding: '1.25rem 1.75rem',
               borderBottom: '1px solid #e2e8f0',
-              backgroundColor: '#f8fafc',
+              backgroundColor: '#0f172a',
+              color: '#ffffff',
             }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 700, color: '#0f172a' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.1em', color: '#60a5fa', textTransform: 'uppercase', display: 'block' }}>
+                  ADMINISTRATION TOOL
+                </span>
+                <h3 style={{ margin: '0.2rem 0 0', fontSize: '1.25rem', fontWeight: 800, color: '#ffffff' }}>
                   Issue Manual Accreditation
                 </h3>
-                <p style={{ margin: '0.2rem 0 0', fontSize: '0.8125rem', color: '#64748b' }}>
-                  Register an institution and generate accreditation records manually.
+                <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: '#94a3b8' }}>
+                  Register an institution profile, assign accreditation scope, and generate student/portal account access.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowManualModal(false)}
                 style={{
-                  background: 'none',
+                  background: 'rgba(255,255,255,0.1)',
                   border: 'none',
-                  color: '#64748b',
+                  color: '#ffffff',
                   cursor: 'pointer',
-                  padding: '0.375rem',
-                  borderRadius: '6px',
+                  padding: '0.5rem',
+                  borderRadius: '8px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  transition: 'background 0.15s',
                 }}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
               </button>
             </div>
 
-            {/* Modal Form */}
-            <form onSubmit={handleManualSubmit} style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.125rem' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#334155', marginBottom: '0.375rem' }}>
-                  Institution / Company Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={manualForm.institutionName}
-                  onChange={(e) => setManualForm({ ...manualForm, institutionName: e.target.value })}
-                  placeholder="e.g. Apex Skills Academy"
-                  style={{
-                    width: '100%',
-                    padding: '0.625rem 0.875rem',
-                    fontSize: '0.875rem',
-                    borderRadius: '6px',
-                    border: '1px solid #cbd5e1',
-                    boxSizing: 'border-box',
-                  }}
-                />
+            {/* Scrollable Form Body */}
+            <form onSubmit={handleManualSubmit} style={{ flex: 1, overflowY: 'auto', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+              
+              {/* SECTION 1: APPLICANT ACCOUNT DETAILS */}
+              <div style={{ backgroundColor: '#f8fafc', padding: '1.25rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <span style={{ backgroundColor: '#eff6ff', color: '#2563eb', padding: '0.35rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 700 }}>1</span>
+                  <h4 style={{ margin: 0, fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>Applicant &amp; Account Activation Details</h4>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      First Name
+                    </label>
+                    <input
+                      type="text"
+                      value={manualForm.firstName}
+                      onChange={(e) => setManualForm({ ...manualForm, firstName: e.target.value })}
+                      placeholder="e.g. Dr. Sarah"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      value={manualForm.lastName}
+                      onChange={(e) => setManualForm({ ...manualForm, lastName: e.target.value })}
+                      placeholder="e.g. Johnson"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '0.85rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Official Email Address <span style={{ color: '#ef4444' }}>*</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={manualForm.email}
+                      onChange={(e) => setManualForm({ ...manualForm, email: e.target.value })}
+                      placeholder="name@institution.org"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                    <span style={{ fontSize: '0.75rem', color: '#2563eb', marginTop: '0.2rem', display: 'block', fontWeight: 500 }}>
+                      An account setup &amp; password activation email will be automatically sent here.
+                    </span>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Applicant Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={manualForm.phone}
+                      onChange={(e) => setManualForm({ ...manualForm, phone: e.target.value })}
+                      placeholder="+1 (555) 234-5678"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#334155', marginBottom: '0.375rem' }}>
-                    Official Email *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={manualForm.email}
-                    onChange={(e) => setManualForm({ ...manualForm, email: e.target.value })}
-                    placeholder="info@apexskills.com"
-                    style={{
-                      width: '100%',
-                      padding: '0.625rem 0.875rem',
-                      fontSize: '0.875rem',
-                      borderRadius: '6px',
-                      border: '1px solid #cbd5e1',
-                      boxSizing: 'border-box',
-                    }}
-                  />
+              {/* SECTION 2: INSTITUTION PROFILE & BRANDING */}
+              <div style={{ backgroundColor: '#ffffff', padding: '1.25rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <span style={{ backgroundColor: '#eff6ff', color: '#2563eb', padding: '0.35rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 700 }}>2</span>
+                  <h4 style={{ margin: 0, fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>Institution Profile &amp; Branding</h4>
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#334155', marginBottom: '0.375rem' }}>
-                    Country
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Institution / Company Name <span style={{ color: '#ef4444' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={manualForm.institutionName}
+                      onChange={(e) => setManualForm({ ...manualForm, institutionName: e.target.value })}
+                      placeholder="e.g. Apex Skills Academy"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Registration / RC Number
+                    </label>
+                    <input
+                      type="text"
+                      value={manualForm.registrationNumber}
+                      onChange={(e) => setManualForm({ ...manualForm, registrationNumber: e.target.value })}
+                      placeholder="e.g. RC-849201"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '0.85rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Institution Type
+                    </label>
+                    <select
+                      value={manualForm.institutionType}
+                      onChange={(e) => setManualForm({ ...manualForm, institutionType: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: '#ffffff', boxSizing: 'border-box' }}
+                    >
+                      <option value="corporate">Corporate Training Provider</option>
+                      <option value="higher_education">Higher Education / University</option>
+                      <option value="vocational">Vocational / Technical Institute</option>
+                      <option value="non_profit">Non-Profit / NGO</option>
+                      <option value="government">Government / Public Sector</option>
+                      <option value="individual">Individual Educator / Consultant</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Country
+                    </label>
+                    <input
+                      type="text"
+                      value={manualForm.country}
+                      onChange={(e) => setManualForm({ ...manualForm, country: e.target.value })}
+                      placeholder="United States"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '0.85rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                    Full Physical Address
                   </label>
                   <input
                     type="text"
-                    value={manualForm.country}
-                    onChange={(e) => setManualForm({ ...manualForm, country: e.target.value })}
-                    placeholder="e.g. United States"
-                    style={{
-                      width: '100%',
-                      padding: '0.625rem 0.875rem',
-                      fontSize: '0.875rem',
-                      borderRadius: '6px',
-                      border: '1px solid #cbd5e1',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#334155', marginBottom: '0.375rem' }}>
-                    Certificate Number (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={manualForm.certificateNumber}
-                    onChange={(e) => setManualForm({ ...manualForm, certificateNumber: e.target.value })}
-                    placeholder="Auto-generated if left blank"
-                    style={{
-                      width: '100%',
-                      padding: '0.625rem 0.875rem',
-                      fontSize: '0.875rem',
-                      borderRadius: '6px',
-                      border: '1px solid #cbd5e1',
-                      boxSizing: 'border-box',
-                    }}
+                    value={manualForm.address}
+                    onChange={(e) => setManualForm({ ...manualForm, address: e.target.value })}
+                    placeholder="100 Innovation Way, Suite 400, City, State/Province"
+                    style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
                   />
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#334155', marginBottom: '0.375rem' }}>
-                    Expiry Date
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginTop: '0.85rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Website URL
+                    </label>
+                    <input
+                      type="url"
+                      value={manualForm.website}
+                      onChange={(e) => setManualForm({ ...manualForm, website: e.target.value })}
+                      placeholder="https://apexskills.com"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Year Established
+                    </label>
+                    <input
+                      type="number"
+                      value={manualForm.yearEstablished}
+                      onChange={(e) => setManualForm({ ...manualForm, yearEstablished: e.target.value })}
+                      placeholder="e.g. 2012"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Institution Phone
+                    </label>
+                    <input
+                      type="tel"
+                      value={manualForm.institutionPhone}
+                      onChange={(e) => setManualForm({ ...manualForm, institutionPhone: e.target.value })}
+                      placeholder="+1 (555) 987-6543"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+
+                {/* LOGO UPLOADER BOX */}
+                <div style={{ marginTop: '1rem', paddingTop: '0.85rem', borderTop: '1px dashed #cbd5e1' }}>
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.4rem' }}>
+                    Institution Logo Branding (Optional)
                   </label>
-                  <input
-                    type="date"
-                    value={manualForm.expiresAt}
-                    onChange={(e) => setManualForm({ ...manualForm, expiresAt: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '0.625rem 0.875rem',
-                      fontSize: '0.875rem',
-                      borderRadius: '6px',
-                      border: '1px solid #cbd5e1',
-                      boxSizing: 'border-box',
-                    }}
-                  />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    {logoPreview ? (
+                      <div style={{ width: '64px', height: '64px', borderRadius: '8px', border: '1px solid #cbd5e1', overflow: 'hidden', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <img src={logoPreview} alt="Logo Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      </div>
+                    ) : (
+                      <div style={{ width: '64px', height: '64px', borderRadius: '8px', border: '2px dashed #cbd5e1', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                          <circle cx="8.5" cy="8.5" r="1.5" />
+                          <polyline points="21 15 16 10 5 21" />
+                        </svg>
+                      </div>
+                    )}
+                    <div>
+                      <input
+                        type="file"
+                        id="manual-logo-input"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleLogoSelect(file);
+                        }}
+                        style={{ display: 'none' }}
+                      />
+                      <label
+                        htmlFor="manual-logo-input"
+                        style={{
+                          display: 'inline-block',
+                          padding: '0.5rem 0.875rem',
+                          backgroundColor: '#f1f5f9',
+                          border: '1px solid #cbd5e1',
+                          borderRadius: '6px',
+                          fontSize: '0.8125rem',
+                          fontWeight: 600,
+                          color: '#334155',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {uploadingLogo ? 'Uploading logo...' : (logoPreview ? 'Change Logo Image' : 'Upload Logo Image')}
+                      </label>
+                      <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginTop: '0.25rem' }}>
+                        Supported formats: PNG, JPG, SVG, WEBP (Max 5MB)
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              {/* SECTION 3: SCOPE & OPERATIONS */}
+              <div style={{ backgroundColor: '#f8fafc', padding: '1.25rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <span style={{ backgroundColor: '#eff6ff', color: '#2563eb', padding: '0.35rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 700 }}>3</span>
+                  <h4 style={{ margin: 0, fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>Scope of Accreditation &amp; Operations</h4>
+                </div>
+
+                {/* Training Areas Checkboxes */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.5rem' }}>
+                    Approved Training Areas
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '0.5rem' }}>
+                    {DEFAULT_MANUAL_TRAINING_AREAS.map((area) => {
+                      const selected = manualForm.trainingAreaIds.includes(area.code);
+                      return (
+                        <label
+                          key={area.code}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.45rem 0.65rem',
+                            borderRadius: '6px',
+                            border: `1px solid ${selected ? '#2563eb' : '#e2e8f0'}`,
+                            backgroundColor: selected ? '#eff6ff' : '#ffffff',
+                            fontSize: '0.78rem',
+                            fontWeight: selected ? 700 : 500,
+                            color: selected ? '#1e40af' : '#475569',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s',
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setManualForm({ ...manualForm, trainingAreaIds: [...manualForm.trainingAreaIds, area.code] });
+                              } else {
+                                setManualForm({ ...manualForm, trainingAreaIds: manualForm.trainingAreaIds.filter(c => c !== area.code) });
+                              }
+                            }}
+                          />
+                          {area.name}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Certificates / Programs Offered
+                    </label>
+                    <input
+                      type="text"
+                      value={manualForm.certificatesOffered}
+                      onChange={(e) => setManualForm({ ...manualForm, certificatesOffered: e.target.value })}
+                      placeholder="e.g. Executive Management Diploma, IT Certificate"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Delivery Methods
+                    </label>
+                    <input
+                      type="text"
+                      value={manualForm.deliveryMethods}
+                      onChange={(e) => setManualForm({ ...manualForm, deliveryMethods: e.target.value })}
+                      placeholder="Online Live / Virtual, Physical / In-Person"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem', marginTop: '0.85rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Trainer / Staff Count
+                    </label>
+                    <input
+                      type="number"
+                      value={manualForm.staffingCount}
+                      onChange={(e) => setManualForm({ ...manualForm, staffingCount: e.target.value })}
+                      placeholder="e.g. 15"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Operational Notes / Summary
+                    </label>
+                    <input
+                      type="text"
+                      value={manualForm.operationalInfo}
+                      onChange={(e) => setManualForm({ ...manualForm, operationalInfo: e.target.value })}
+                      placeholder="Key facilities, accreditation audit notes, or legacy credentials"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 4: ACCREDITATION CODE & VALIDITY */}
+              <div style={{ backgroundColor: '#ffffff', padding: '1.25rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <span style={{ backgroundColor: '#eff6ff', color: '#2563eb', padding: '0.35rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 700 }}>4</span>
+                  <h4 style={{ margin: 0, fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>Accreditation Code &amp; Validity</h4>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Accreditation Code (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={manualForm.accreditationCode}
+                      onChange={(e) => setManualForm({ ...manualForm, accreditationCode: e.target.value })}
+                      placeholder="e.g. CTSDA-2026-9842 (Auto-generated if blank)"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Certificate Number (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={manualForm.certificateNumber}
+                      onChange={(e) => setManualForm({ ...manualForm, certificateNumber: e.target.value })}
+                      placeholder="e.g. CERT-984201 (Auto-generated if blank)"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '0.85rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Issue Date
+                    </label>
+                    <input
+                      type="date"
+                      value={manualForm.issuedAt}
+                      onChange={(e) => setManualForm({ ...manualForm, issuedAt: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Expiry Date
+                    </label>
+                    <input
+                      type="date"
+                      value={manualForm.expiresAt}
+                      onChange={(e) => setManualForm({ ...manualForm, expiresAt: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {error && (
+                <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '0.75rem 1rem', borderRadius: '8px', fontSize: '0.85rem' }}>
+                  {error}
+                </div>
+              )}
 
               {/* Modal Footer */}
               <div style={{
                 display: 'flex',
                 gap: '0.75rem',
                 justifyContent: 'flex-end',
-                marginTop: '0.5rem',
+                alignItems: 'center',
                 paddingTop: '1rem',
                 borderTop: '1px solid #f1f5f9',
+                backgroundColor: '#ffffff',
+                position: 'sticky',
+                bottom: 0,
               }}>
                 <button
                   type="button"
                   onClick={() => setShowManualModal(false)}
                   style={{
-                    padding: '0.58rem 1.125rem',
+                    padding: '0.65rem 1.25rem',
                     fontSize: '0.875rem',
-                    fontWeight: 500,
-                    borderRadius: '6px',
+                    fontWeight: 600,
+                    borderRadius: '8px',
                     border: '1px solid #cbd5e1',
                     backgroundColor: '#ffffff',
-                    color: '#334155',
+                    color: '#475569',
                     cursor: 'pointer',
                   }}
                 >
@@ -1111,18 +1478,20 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
                 </button>
                 <button
                   type="submit"
+                  disabled={submittingManual}
                   style={{
-                    padding: '0.58rem 1.25rem',
+                    padding: '0.65rem 1.5rem',
                     fontSize: '0.875rem',
-                    fontWeight: 600,
-                    borderRadius: '6px',
+                    fontWeight: 700,
+                    borderRadius: '8px',
                     border: 'none',
-                    backgroundColor: '#2563eb',
+                    backgroundColor: submittingManual ? '#94a3b8' : '#2563eb',
                     color: '#ffffff',
-                    cursor: 'pointer',
+                    cursor: submittingManual ? 'not-allowed' : 'pointer',
+                    boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
                   }}
                 >
-                  Issue Accreditation
+                  {submittingManual ? 'Issuing Accreditation...' : 'Issue Manual Accreditation'}
                 </button>
               </div>
             </form>

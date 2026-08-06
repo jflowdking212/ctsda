@@ -33,6 +33,40 @@ export class AccreditationsController {
     return this.accreditationsService.listActive();
   }
 
+  @Get('all')
+  @UseGuards(AuthGuard)
+  async listAll() {
+    return this.accreditationsService.listAll();
+  }
+
+  @Post('manual')
+  @UseGuards(AuthGuard)
+  async issueManual(
+    @CurrentUser() user: any,
+    @Body() body: any,
+  ) {
+    return this.accreditationsService.issueManualAccreditation(user.userId, body);
+  }
+
+  @Post('upload-logo')
+  @UseGuards(AuthGuard)
+  async uploadLogo(
+    @CurrentUser() user: any,
+    @Request() req: any,
+  ) {
+    const multipart = await req.file();
+    if (!multipart) throw new BadRequestException('No image file provided');
+
+    const buffer = await multipart.toBuffer();
+    const file = {
+      buffer,
+      originalname: multipart.filename,
+      size: buffer.length,
+    };
+
+    return this.accreditationsService.uploadLogoFile(file, multipart.mimetype);
+  }
+
   @Get('verify/:certificateNumber')
   async verifyCertificate(@Param('certificateNumber') certificateNumber: string) {
     return this.accreditationsService.verifyCertificate(certificateNumber);
