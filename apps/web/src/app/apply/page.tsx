@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { CountrySelect } from '../../components/country-select';
+import { PremiumHeader } from '../../components/premium-header';
+import { PremiumFooter } from '../../components/premium-footer';
 
 const DEFAULT_CTSDA_TRAINING_AREAS = [
   { id: 'cta-1', code: 'LEADERSHIP-MGMT', name: 'Leadership, Governance & Management', description: 'Executive leadership, governance frameworks, and strategic management' },
@@ -190,230 +192,185 @@ export default function ApplyPage() {
   };
 
   return (
-    <main className="section-inner narrow" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
-      {/* HEADER CARD */}
-      <div style={{
-        backgroundColor: '#ffffff',
-        borderRadius: '1rem',
-        border: '1px solid #e2e8f0',
-        boxShadow: '0 4px 20px rgba(15, 23, 42, 0.06)',
-        marginBottom: '2rem',
-        overflow: 'hidden',
-        position: 'relative',
-        padding: '1.75rem 1.5rem',
-      }} className="sm:p-8">
-        {/* Left accent bar */}
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f8fafc' }}>
+      <PremiumHeader />
+
+      <main className="section-inner narrow" style={{ flex: 1, paddingTop: '2.5rem', paddingBottom: '5rem' }}>
+        {/* HEADER CARD */}
         <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          bottom: 0,
-          width: '6px',
-          backgroundColor: '#2563eb',
-        }} />
-
-        <div style={{ paddingLeft: '0.5rem' }}>
-          <p style={{
-            color: '#d97706',
-            fontWeight: 800,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            fontSize: '0.75rem',
-            margin: '0 0 0.5rem 0',
-          }}>
-            Accreditation
-          </p>
-          <h1 style={{
-            color: '#0f172a',
-            fontSize: 'clamp(1.5rem, 4vw, 2.15rem)',
-            fontWeight: 800,
-            margin: '0 0 0.5rem 0',
-            lineHeight: 1.25,
-          }}>
-            Apply for CTSDA Accreditation
-          </h1>
-          <p style={{
-            color: '#64748b',
-            fontSize: '0.975rem',
-            margin: '0 0 1.25rem 0',
-            lineHeight: 1.5,
-          }}>
-            Complete the form below to submit your institutional profile for evaluation.
-          </p>
-
-          {/* ACCREDITATION FEE NOTICE */}
+          backgroundColor: '#ffffff',
+          borderRadius: '1rem',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 4px 20px rgba(15, 23, 42, 0.06)',
+          marginBottom: '2rem',
+          overflow: 'hidden',
+          position: 'relative',
+          padding: '1.75rem 1.5rem',
+        }} className="sm:p-8">
+          {/* Left accent bar */}
           <div style={{
-            backgroundColor: '#eff6ff',
-            border: '1px solid #bfdbfe',
-            borderRadius: '0.625rem',
-            padding: '1rem 1.25rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.85rem',
-          }}>
-            <span style={{ fontSize: '1.35rem', flexShrink: 0 }}>💳</span>
-            <p style={{ margin: 0, fontSize: '0.875rem', color: '#1e40af', lineHeight: 1.5 }}>
-              <strong>Accreditation Fee: ${accreditationFee} USD</strong> — Initial application submission is <strong>FREE ($0)</strong>. The accreditation fee is payable only after your institution profile is reviewed and approved by the CTSDA board.
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            bottom: 0,
+            width: '6px',
+            backgroundColor: '#2563eb',
+          }} />
+
+          <div style={{ paddingLeft: '0.5rem' }}>
+            <p style={{
+              color: '#d97706',
+              fontWeight: 800,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              fontSize: '0.75rem',
+              margin: '0 0 0.5rem 0',
+            }}>
+              Accreditation
             </p>
-          </div>
-        </div>
-      </div>
+            <h1 style={{
+              color: '#0f172a',
+              fontSize: 'clamp(1.5rem, 4vw, 2.15rem)',
+              fontWeight: 800,
+              margin: '0 0 0.5rem 0',
+              lineHeight: 1.25,
+            }}>
+              Apply for CTSDA Accreditation
+            </h1>
+            <p style={{
+              color: '#64748b',
+              fontSize: '0.975rem',
+              margin: '0 0 1.25rem 0',
+              lineHeight: 1.5,
+            }}>
+              Complete the form below to submit your institutional profile for evaluation.
+            </p>
 
-      {/* STEP WIZARD BAR */}
-      <div style={{
-        backgroundColor: '#ffffff',
-        borderRadius: '0.875rem',
-        border: '1px solid #e2e8f0',
-        boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
-        marginBottom: '2rem',
-        padding: '0.875rem 1.25rem',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        overflow: 'hidden',
-      }} className="sm:p-5">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 1 ? '#2563eb' : '#e2e8f0', color: step >= 1 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>1</div>
-          <span style={{ fontSize: '0.85rem', fontWeight: step === 1 ? 700 : 500, color: step === 1 ? '#0f172a' : '#64748b' }}>Profile</span>
-        </div>
-        <div style={{ flex: 1, height: '2px', backgroundColor: step >= 2 ? '#2563eb' : '#e2e8f0', margin: '0 0.5rem', minWidth: '12px' }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 2 ? '#2563eb' : '#e2e8f0', color: step >= 2 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>2</div>
-          <span style={{ fontSize: '0.85rem', fontWeight: step === 2 ? 700 : 500, color: step === 2 ? '#0f172a' : '#64748b' }}>Verify</span>
-        </div>
-        <div style={{ flex: 1, height: '2px', backgroundColor: step >= 3 ? '#2563eb' : '#e2e8f0', margin: '0 0.5rem', minWidth: '12px' }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 3 ? '#2563eb' : '#e2e8f0', color: step >= 3 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>3</div>
-          <span style={{ fontSize: '0.85rem', fontWeight: step === 3 ? 700 : 500, color: step === 3 ? '#0f172a' : '#64748b' }}>Institution</span>
-        </div>
-      </div>
-
-      {step === 1 && (
-        <form className="content-panel p-5 sm:p-10" onSubmit={handleRequestOtp} style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.05)' }}>
-          <div style={{ marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #f1f5f9' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>Step 1: Applicant Representative Profile</h3>
-            <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>Please enter your personal contact details as the primary applicant representative.</p>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>First Name <span style={{ color: '#ef4444' }}>*</span></label>
-              <input required value={applicantForm.firstName} onChange={e => setApplicantForm({...applicantForm, firstName: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.925rem', outline: 'none', width: '100%' }} placeholder="e.g. John" />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Last Name <span style={{ color: '#ef4444' }}>*</span></label>
-              <input required value={applicantForm.lastName} onChange={e => setApplicantForm({...applicantForm, lastName: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.925rem', outline: 'none', width: '100%' }} placeholder="e.g. Doe" />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Email Address <span style={{ color: '#ef4444' }}>*</span></label>
-              <input required type="email" value={applicantForm.email} onChange={e => setApplicantForm({...applicantForm, email: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.925rem', outline: 'none', width: '100%' }} placeholder="john.doe@example.com" />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Phone Number <span style={{ color: '#ef4444' }}>*</span></label>
-              <input required value={applicantForm.phone} onChange={e => setApplicantForm({...applicantForm, phone: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.925rem', outline: 'none', width: '100%' }} placeholder="+1 (555) 019-2831" />
+            {/* ACCREDITATION FEE NOTICE */}
+            <div style={{
+              backgroundColor: '#eff6ff',
+              border: '1px solid #bfdbfe',
+              borderRadius: '0.625rem',
+              padding: '1rem 1.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.85rem',
+            }}>
+              <span style={{ fontSize: '1.35rem', flexShrink: 0 }}>💳</span>
+              <p style={{ margin: 0, fontSize: '0.875rem', color: '#1e40af', lineHeight: 1.5 }}>
+                <strong>Accreditation Fee: ${accreditationFee} USD</strong> — Initial application submission is <strong>FREE ($0)</strong>. The accreditation fee is payable only after your institution profile is reviewed and approved by the CTSDA board.
+              </p>
             </div>
           </div>
-          
-          {error && <p className="status-message error" style={{ marginTop: '1.25rem', backgroundColor: '#fef2f2', color: '#b91c1c', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #fecaca', fontSize: '0.875rem' }}>{error}</p>}
-          
-          <button className={loading ? 'button primary is-loading' : 'button primary'} type="submit" disabled={loading} style={{ width: '100%', marginTop: '1.75rem', padding: '0.875rem 1.5rem', backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 700, borderRadius: '0.5rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '0.95rem' }}>
-            {loading ? 'Sending Verification Code...' : 'Continue & Verify Email →'}
-          </button>
-        </form>
-      )}
+        </div>
 
-      {step === 2 && (
-        <form className="content-panel p-5 sm:p-10" onSubmit={handleVerifyOtp} style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.05)' }}>
-          <div style={{ marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #f1f5f9' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>Step 2: Email Verification</h3>
-            <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>Verify your identity to unlock institution registration.</p>
+        {/* STEP WIZARD BAR */}
+        <div style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '0.875rem',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
+          marginBottom: '2rem',
+          padding: '0.875rem 1.25rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          overflow: 'hidden',
+        }} className="sm:p-5">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 1 ? '#2563eb' : '#e2e8f0', color: step >= 1 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>1</div>
+            <span style={{ fontSize: '0.85rem', fontWeight: step === 1 ? 700 : 500, color: step === 1 ? '#0f172a' : '#64748b' }}>Profile</span>
           </div>
-
-          {success && <p className="status-message success" style={{ backgroundColor: '#ecfdf5', color: '#047857', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #a7f3d0', fontSize: '0.875rem', marginBottom: '1.25rem' }}>{success}</p>}
-          
-          <p style={{ margin: '0.5rem 0 1.25rem 0', color: '#475569', fontSize: '0.95rem', lineHeight: 1.6 }}>
-            Please enter the 6-digit verification code sent to <strong>{applicantForm.email}</strong>. 
-            <br />
-            <span style={{ color: '#d97706', fontSize: '0.85rem', fontWeight: 500, display: 'inline-block', marginTop: '0.35rem' }}>
-              💡 If you don't see the email in your inbox, please check your <strong>Spam / Junk</strong> folder.
-            </span>
-          </p>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '1.5rem' }}>
-            <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>6-Digit Verification Code <span style={{ color: '#ef4444' }}>*</span></label>
-            <input required value={otp} onChange={e => setOtp(e.target.value)} disabled={loading} placeholder="123456" maxLength={6} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '1.25rem', letterSpacing: '0.25em', fontFamily: 'monospace', fontWeight: 700, outline: 'none' }} className="w-full max-w-[220px]" />
+          <div style={{ flex: 1, height: '2px', backgroundColor: step >= 2 ? '#2563eb' : '#e2e8f0', margin: '0 0.5rem', minWidth: '12px' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 2 ? '#2563eb' : '#e2e8f0', color: step >= 2 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>2</div>
+            <span style={{ fontSize: '0.85rem', fontWeight: step === 2 ? 700 : 500, color: step === 2 ? '#0f172a' : '#64748b' }}>Verify</span>
           </div>
-
-          {error && <p className="status-message error" style={{ backgroundColor: '#fef2f2', color: '#b91c1c', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #fecaca', fontSize: '0.875rem', marginBottom: '1.25rem' }}>{error}</p>}
-          
-          <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
-            <button type="button" onClick={() => setStep(1)} disabled={loading} style={{ padding: '0.875rem 1.5rem', backgroundColor: '#f1f5f9', color: '#334155', fontWeight: 600, borderRadius: '0.5rem', border: '1px solid #cbd5e1', cursor: loading ? 'not-allowed' : 'pointer' }}>
-              ← Back
-            </button>
-            <button className={loading ? 'button primary is-loading' : 'button primary'} style={{ flex: 1, padding: '0.875rem 1.5rem', backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 700, borderRadius: '0.5rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '0.95rem' }} type="submit" disabled={loading}>
-              {loading ? 'Verifying Code...' : 'Verify Code & Proceed →'}
-            </button>
+          <div style={{ flex: 1, height: '2px', backgroundColor: step >= 3 ? '#2563eb' : '#e2e8f0', margin: '0 0.5rem', minWidth: '12px' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: step >= 3 ? '#2563eb' : '#e2e8f0', color: step >= 3 ? '#ffffff' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>3</div>
+            <span style={{ fontSize: '0.85rem', fontWeight: step === 3 ? 700 : 500, color: step === 3 ? '#0f172a' : '#64748b' }}>Institution</span>
           </div>
-        </form>
-      )}
+        </div>
 
-      {step === 3 && (
-        <form className="content-panel p-5 sm:p-10" onSubmit={handleFinalSubmit} style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.05)', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          
-          {/* SECTION 1: INSTITUTION DETAILS */}
-          <div>
-            <div style={{ marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid #f1f5f9' }}>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>1. Institution Information</h3>
-              <p style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '0.2rem' }}>Official details of the organization seeking CTSDA accreditation.</p>
+        {step === 1 && (
+          <form className="content-panel p-5 sm:p-10" onSubmit={handleRequestOtp} style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.05)' }}>
+            <div style={{ marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #f1f5f9' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>Step 1: Applicant Representative Profile</h3>
+              <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>Please enter your personal contact details as the primary applicant representative.</p>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Institution Name <span style={{ color: '#ef4444' }}>*</span></label>
-                <input required value={institutionForm.name} onChange={e => setInstitutionForm({...institutionForm, name: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%' }} placeholder="e.g. Apex Safety Institute" />
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>First Name <span style={{ color: '#ef4444' }}>*</span></label>
+                <input required value={applicantForm.firstName} onChange={e => setApplicantForm({...applicantForm, firstName: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.925rem', outline: 'none', width: '100%' }} placeholder="e.g. John" />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Company Registration No/LLC/LTD/CIN etc <span style={{ color: '#ef4444' }}>*</span></label>
-                <input required value={institutionForm.registrationNumber} onChange={e => setInstitutionForm({...institutionForm, registrationNumber: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%' }} placeholder="e.g. RC-982341, LLC-1029, CIN-4091" />
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Last Name <span style={{ color: '#ef4444' }}>*</span></label>
+                <input required value={applicantForm.lastName} onChange={e => setApplicantForm({...applicantForm, lastName: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.925rem', outline: 'none', width: '100%' }} placeholder="e.g. Doe" />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Email Address <span style={{ color: '#ef4444' }}>*</span></label>
+                <input required type="email" value={applicantForm.email} onChange={e => setApplicantForm({...applicantForm, email: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.925rem', outline: 'none', width: '100%' }} placeholder="john.doe@example.com" />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Phone Number <span style={{ color: '#ef4444' }}>*</span></label>
+                <input required value={applicantForm.phone} onChange={e => setApplicantForm({...applicantForm, phone: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.925rem', outline: 'none', width: '100%' }} placeholder="+1 (555) 019-2831" />
+              </div>
+            </div>
+            
+            {error && <p className="status-message error" style={{ marginTop: '1.25rem', backgroundColor: '#fef2f2', color: '#b91c1c', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #fecaca', fontSize: '0.875rem' }}>{error}</p>}
+            
+            <button className={loading ? 'button primary is-loading' : 'button primary'} type="submit" disabled={loading} style={{ width: '100%', padding: '0.875rem 1.5rem', backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 700, borderRadius: '0.5rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '1rem', marginTop: '1.5rem' }}>
+              {loading ? 'Sending Verification Code...' : 'Continue to Email Verification →'}
+            </button>
+          </form>
+        )}
+
+        {step === 2 && (
+          <form className="content-panel p-5 sm:p-10" onSubmit={handleVerifyOtp} style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.05)' }}>
+            <div style={{ marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #f1f5f9' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>Step 2: Email Verification Code</h3>
+              <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>We sent a 6-digit verification code to <strong>{applicantForm.email}</strong>.</p>
+            </div>
+            
+            {success && <p className="status-message success" style={{ marginBottom: '1.25rem', backgroundColor: '#ecfdf5', color: '#047857', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #a7f3d0', fontSize: '0.875rem' }}>{success}</p>}
+            {error && <p className="status-message error" style={{ marginBottom: '1.25rem', backgroundColor: '#fef2f2', color: '#b91c1c', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #fecaca', fontSize: '0.875rem' }}>{error}</p>}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', maxWidth: '320px', margin: '0 auto 1.5rem auto' }}>
+              <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155', textAlign: 'center' }}>Enter 6-Digit OTP Code</label>
+              <input required maxLength={6} value={otp} onChange={e => setOtp(e.target.value)} disabled={loading} style={{ padding: '0.875rem 1rem', border: '2px solid #2563eb', borderRadius: '0.5rem', fontSize: '1.5rem', fontWeight: 800, textAlign: 'center', letterSpacing: '0.3em', outline: 'none', width: '100%', backgroundColor: '#eff6ff' }} placeholder="123456" />
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button type="button" onClick={() => setStep(1)} disabled={loading} style={{ padding: '0.875rem 1.5rem', backgroundColor: '#ffffff', color: '#475569', fontWeight: 600, borderRadius: '0.5rem', border: '1px solid #cbd5e1', cursor: 'pointer', fontSize: '0.95rem' }}>
+                ← Back
+              </button>
+              <button className={loading ? 'button primary is-loading' : 'button primary'} type="submit" disabled={loading} style={{ flex: 1, padding: '0.875rem 1.5rem', backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 700, borderRadius: '0.5rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '1rem' }}>
+                {loading ? 'Verifying Code...' : 'Verify Code & Proceed →'}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {step === 3 && (
+          <form className="content-panel p-5 sm:p-10" onSubmit={handleFinalSubmit} style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.05)' }}>
+            <div style={{ marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #f1f5f9' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>Step 3: Institution Profile &amp; Accreditation Scope</h3>
+              <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>Provide your legal entity details, registration numbers, address, and accreditation training scope.</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5" style={{ marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', gridColumn: 'span 2' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Official Institution / Company Name <span style={{ color: '#ef4444' }}>*</span></label>
+                <input required value={institutionForm.name} onChange={e => setInstitutionForm({...institutionForm, name: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.925rem', outline: 'none', width: '100%' }} placeholder="e.g. Apex Global Training Institute LLC" />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Institution Type <span style={{ color: '#ef4444' }}>*</span></label>
-                <select required value={institutionForm.institutionType} onChange={e => setInstitutionForm({...institutionForm, institutionType: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', backgroundColor: '#ffffff', outline: 'none', width: '100%' }}>
-                  <option value="tech_software">Tech, Software & Digital Skills Academy</option>
-                  <option value="ecommerce_digital">E-Commerce, Digital Business & Marketing Institute</option>
-                  <option value="corporate">Corporate Training & Professional Development</option>
-                  <option value="vocational">Vocational & Technical Training Institute</option>
-                  <option value="safety_compliance">Safety, Health & Compliance Institute</option>
-                  <option value="finance_fintech">Finance, Accounting & FinTech Academy</option>
-                  <option value="healthcare_medical">Healthcare & Medical Training Center</option>
-                  <option value="higher_education">Higher Education / University / College</option>
-                  <option value="driving_transport">Transport, Logistics & Automotive Institute</option>
-                  <option value="other">Other Training Provider</option>
-                </select>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Country <span style={{ color: '#ef4444' }}>*</span></label>
-                <CountrySelect value={institutionForm.country} onChange={(val) => setInstitutionForm({ ...institutionForm, country: val })} disabled={loading} required />
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Official Email <span style={{ color: '#ef4444' }}>*</span></label>
-                <input required type="email" value={institutionForm.email} onChange={e => setInstitutionForm({...institutionForm, email: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%' }} placeholder="info@institution.com" />
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Official Phone <span style={{ color: '#ef4444' }}>*</span></label>
-                <input required value={institutionForm.phone} onChange={e => setInstitutionForm({...institutionForm, phone: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%' }} placeholder="+1 (555) 019-2831" />
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.25rem', marginTop: '1.25rem' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Physical Headquarters Address <span style={{ color: '#ef4444' }}>*</span></label>
                 <input required value={institutionForm.address} onChange={e => setInstitutionForm({...institutionForm, address: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%' }} placeholder="Street address, City, State/Province" />
@@ -561,6 +518,9 @@ export default function ApplyPage() {
           </button>
         </div>
       )}
-    </main>
+      </main>
+
+      <PremiumFooter />
+    </div>
   );
 }
