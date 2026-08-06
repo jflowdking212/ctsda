@@ -1097,45 +1097,55 @@ export function ApplicationDetail({
           <p>{new Date(application.createdAt).toLocaleDateString()}</p>
         </div>
       </div>
-      <div className="admin-actions" style={{ marginTop: '1rem' }}>
-        {['submitted', 'initial_screening'].includes(application.status) && (
+      <div className="admin-actions" style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.65rem', alignItems: 'center' }}>
+        {['submitted', 'initial_screening', 'changes_requested', 'resubmitted'].includes(application.status) && (
           <button
             className={workingAction.endsWith('/start-review') ? 'admin-button primary is-loading' : 'admin-button primary'}
             type="button"
             onClick={() => onAction(`/admin/applications/${application.id}/start-review`, { reason: 'Started review' })}
             disabled={actionBusy}
           >
-            Start Review
+            Mark Under Review
           </button>
         )}
-        {['under_review', 'final_review'].includes(application.status) && (
+        {['submitted', 'initial_screening', 'under_review', 'changes_requested', 'resubmitted', 'final_review'].includes(application.status) && (
           <button
             className={`admin-button ${workingAction.endsWith('/approve') ? 'is-loading' : ''}`}
-            style={{ backgroundColor: '#10b981', color: 'white', borderColor: '#10b981' }}
+            style={{ backgroundColor: '#10b981', color: 'white', borderColor: '#10b981', fontWeight: 700, padding: '0.5rem 1rem', borderRadius: '0.375rem' }}
             type="button"
             onClick={() => onAction(`/admin/applications/${application.id}/approve`, { reason: 'Approved in dashboard' })}
             disabled={actionBusy}
           >
-            {workingAction.endsWith('/approve') ? 'Approving...' : 'Approve Application'}
+            {workingAction.endsWith('/approve') ? 'Approving...' : '✓ Approve Application'}
           </button>
         )}
-        {['submitted', 'under_review', 'initial_screening'].includes(application.status) && (
+        {['submitted', 'under_review', 'initial_screening', 'changes_requested', 'resubmitted'].includes(application.status) && (
           <button
             className={`admin-button ${workingAction.endsWith('/request-changes') ? 'is-loading' : ''}`}
-            style={{ backgroundColor: '#f59e0b', color: 'white', borderColor: '#f59e0b' }}
+            style={{ backgroundColor: '#f59e0b', color: 'white', borderColor: '#f59e0b', fontWeight: 600, padding: '0.5rem 1rem', borderRadius: '0.375rem' }}
             type="button"
-            onClick={() => onAction(`/admin/applications/${application.id}/request-changes`, { reason: 'Changes requested' })}
+            onClick={() => {
+              const note = window.prompt('Enter requested changes / comments for applicant (sent via email):', 'Please provide updated documents');
+              if (note !== null) {
+                onAction(`/admin/applications/${application.id}/request-changes`, { reason: note || 'Changes requested', comments: note });
+              }
+            }}
             disabled={actionBusy}
           >
-            {workingAction.endsWith('/request-changes') ? 'Sending...' : 'Request changes'}
+            {workingAction.endsWith('/request-changes') ? 'Sending...' : 'Request Changes'}
           </button>
         )}
-        {['submitted', 'initial_screening', 'under_review', 'final_review'].includes(application.status) && (
+        {['submitted', 'initial_screening', 'under_review', 'changes_requested', 'resubmitted', 'final_review'].includes(application.status) && (
           <button
             className={`admin-button ${workingAction.endsWith('/reject') && !workingAction.endsWith('/undo-reject') ? 'is-loading' : ''}`}
-            style={{ backgroundColor: '#ef4444', color: 'white', borderColor: '#ef4444' }}
+            style={{ backgroundColor: '#ef4444', color: 'white', borderColor: '#ef4444', fontWeight: 600, padding: '0.5rem 1rem', borderRadius: '0.375rem' }}
             type="button"
-            onClick={() => onAction(`/admin/applications/${application.id}/reject`, { reason: 'Rejected in dashboard' })}
+            onClick={() => {
+              const reason = window.prompt('Enter reason for rejection (sent via email):', 'Does not meet accreditation standards');
+              if (reason !== null) {
+                onAction(`/admin/applications/${application.id}/reject`, { reason: reason || 'Rejected in dashboard', comments: reason });
+              }
+            }}
             disabled={actionBusy}
           >
             {workingAction.endsWith('/reject') && !workingAction.endsWith('/undo-reject') ? 'Rejecting...' : 'Reject'}
