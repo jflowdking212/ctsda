@@ -401,7 +401,6 @@ export default function ApplyPage() {
                 <input type="file" accept="image/*" onChange={e => setLogoFile(e.target.files?.[0] || null)} disabled={loading} style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.85rem', backgroundColor: '#f8fafc', width: '100%' }} />
               </div>
             </div>
-          </div>
 
           {/* SECTION 2: ACCREDITATION SCOPE & TRAINING AREAS */}
           <div>
