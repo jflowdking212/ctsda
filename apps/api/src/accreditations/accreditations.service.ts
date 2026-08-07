@@ -359,6 +359,24 @@ export class AccreditationsService {
         },
       });
 
+      const inputData = data as any;
+      const invoiceAmount = inputData.amount && !isNaN(Number(inputData.amount)) ? Number(inputData.amount) : 1500;
+      const invoiceCurrency = (inputData.currency || 'USD').toUpperCase();
+
+      await tx.invoice.create({
+        data: {
+          invoiceNumber: `INV-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+          applicationId: application.id,
+          amount: invoiceAmount,
+          currency: invoiceCurrency,
+          status: 'paid',
+          description: `CTSDA Institutional Accreditation Fee (${invoiceAmount} ${invoiceCurrency}/year)`,
+          dueDate: issuedAt,
+          paidAt: issuedAt,
+          createdBy: actorId,
+        },
+      });
+
       await tx.auditLog.create({
         data: {
           userId: actorId,
@@ -371,6 +389,8 @@ export class AccreditationsService {
             institutionId: institution.id,
             targetEmail,
             isNewUser,
+            amount: invoiceAmount,
+            currency: invoiceCurrency,
           },
         },
       });

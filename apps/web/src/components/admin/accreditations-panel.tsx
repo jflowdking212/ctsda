@@ -77,6 +77,8 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
     certificateNumber: '',
     issuedAt: new Date().toISOString().split('T')[0],
     expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    amount: '1500',
+    currency: 'USD',
   };
 
   // Modal States
@@ -1438,6 +1440,43 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
                       onChange={(e) => setManualForm({ ...manualForm, expiresAt: e.target.value })}
                       style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
                     />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem', marginTop: '0.85rem', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.35rem' }}>
+                      Accreditation Fee Amount (Annual Billing Rate)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={manualForm.amount}
+                      onChange={(e) => setManualForm({ ...manualForm, amount: e.target.value })}
+                      placeholder="e.g. 1500"
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box', fontWeight: 700 }}
+                    />
+                    <small style={{ color: '#64748b', fontSize: '0.75rem', display: 'block', marginTop: '0.25rem' }}>
+                      Recorded on initial invoice receipt &amp; used for automated annual renewal billing at expiration.
+                    </small>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.35rem' }}>
+                      Currency
+                    </label>
+                    <select
+                      value={manualForm.currency}
+                      onChange={(e) => setManualForm({ ...manualForm, currency: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box', backgroundColor: '#ffffff', fontWeight: 700 }}
+                    >
+                      <option value="USD">USD ($)</option>
+                      <option value="EUR">EUR (€)</option>
+                      <option value="GBP">GBP (£)</option>
+                      <option value="NGN">NGN (₦)</option>
+                      <option value="CAD">CAD ($)</option>
+                      <option value="AUD">AUD ($)</option>
+                    </select>
                   </div>
                 </div>
               </div>
