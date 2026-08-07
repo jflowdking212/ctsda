@@ -809,92 +809,93 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
             )}
           </header>
 
-          {message && <p className="admin-message success">{message}</p>}
+          <div className="admin-main-inner">
+            {message && <p className="admin-message success">{message}</p>}
 
-          {section === 'reports' && (
-          <section className="admin-section">
-            <div className="admin-section-header">
-              <div>
-                <p className="admin-kicker">Reporting</p>
-                <h2>Pipeline analytics & Actions</h2>
+            {section === 'reports' && (
+            <section className="admin-section">
+              <div className="admin-section-header">
+                <div>
+                  <p className="admin-kicker">Reporting</p>
+                  <h2>Pipeline analytics & Actions</h2>
+                </div>
+                <div className="admin-actions">
+                  <button
+                    className={exporting === 'board-csv' ? 'admin-button is-loading' : 'admin-button'}
+                    type="button"
+                    onClick={() => exportBoardReport('csv')}
+                    disabled={Boolean(exporting)}
+                  >
+                    {exporting === 'board-csv' ? 'Exporting...' : 'Export CSV'}
+                  </button>
+                  <button
+                    className={exporting === 'board-pdf' ? 'admin-button primary is-loading' : 'admin-button primary'}
+                    type="button"
+                    onClick={() => exportBoardReport('pdf')}
+                    disabled={Boolean(exporting)}
+                  >
+                    {exporting === 'board-pdf' ? 'Exporting...' : 'Export PDF'}
+                  </button>
+                </div>
               </div>
-              <div className="admin-actions">
-                <button
-                  className={exporting === 'board-csv' ? 'admin-button is-loading' : 'admin-button'}
-                  type="button"
-                  onClick={() => exportBoardReport('csv')}
-                  disabled={Boolean(exporting)}
-                >
-                  {exporting === 'board-csv' ? 'Exporting...' : 'Export CSV'}
-                </button>
-                <button
-                  className={exporting === 'board-pdf' ? 'admin-button primary is-loading' : 'admin-button primary'}
-                  type="button"
-                  onClick={() => exportBoardReport('pdf')}
-                  disabled={Boolean(exporting)}
-                >
-                  {exporting === 'board-pdf' ? 'Exporting...' : 'Export PDF'}
-                </button>
-              </div>
-            </div>
-            <ReportPanel summary={reportSummary} />
-          </section>
-          )}
+              <ReportPanel summary={reportSummary} />
+            </section>
+            )}
 
-          
-          {section === 'queue' && (
-            <QueuePanel 
-              api={api} 
-              applications={applications}
-              onAction={action}
-              workingAction={workingAction}
-              selectedApp={selectedApplication}
-              setSelectedApp={setSelectedApplication}
-            />
-          )}
+            {section === 'queue' && (
+              <QueuePanel 
+                api={api} 
+                applications={applications}
+                onAction={action}
+                workingAction={workingAction}
+                selectedApp={selectedApplication}
+                setSelectedApp={setSelectedApplication}
+              />
+            )}
 
-          {section === 'institutions' && (
-            <DirectoryPanel 
-              api={api}
-              institutions={institutions}
-            />
-          )}
+            {section === 'institutions' && (
+              <DirectoryPanel 
+                api={api}
+                institutions={institutions}
+              />
+            )}
 
-          {section === 'billing' && (
-            <BillingPanel api={api} />
-          )}
+            {section === 'billing' && (
+              <BillingPanel api={api} />
+            )}
 
-          {section === 'users' && (
-            <UsersPanel api={api} />
-          )}
+            {section === 'users' && (
+              <UsersPanel api={api} />
+            )}
 
-          {section === 'accreditations' && (
-            <AccreditationsPanel api={api} />
-          )}
+            {section === 'accreditations' && (
+              <AccreditationsPanel api={api} />
+            )}
 
-          {section === 'student_verification' && (
-            <StudentVerificationPanel />
-          )}
+            {section === 'student_verification' && (
+              <StudentVerificationPanel api={api} />
+            )}
 
-          {section === 'blog' && (
-            <BlogPanel api={api} />
-          )}
+            {section === 'blog' && (
+              <BlogPanel api={api} />
+            )}
 
-          {section === 'training' && (
-            <TrainingPanel api={api} />
-          )}
+            {section === 'training' && (
+              <TrainingPanel api={api} />
+            )}
 
-          {section === 'pages' && (
-            <PagesPanel api={api} />
-          )}
+            {section === 'pages' && (
+              <PagesPanel api={api} />
+            )}
 
-          {section === 'settings' && (
-             <SettingsPanel api={api} />
-          )}
+            {section === 'settings' && (
+               <SettingsPanel api={api} />
+            )}
 
-          {section === 'audit' && (
-             <div className="admin-section"><p>Audit logs panel integration pending...</p></div>
-          )}
+            {section === 'audit' && (
+               <div className="admin-section"><p>Audit logs panel integration pending...</p></div>
+            )}
+          </div>
         </section>
       </main>
 

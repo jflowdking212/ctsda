@@ -179,26 +179,53 @@ export default function StudentVerificationPanel({ api }: PanelProps) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Header Banner */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '1rem',
-        backgroundColor: '#ffffff',
-        padding: '1.5rem',
-        borderRadius: '12px',
-        border: '1px solid #e2e8f0',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-      }}>
-        <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-            Student Verification Certificates
-          </h1>
-          <p style={{ color: '#64748b', fontSize: '0.875rem', margin: '0.25rem 0 0 0' }}>
-            Manually issue and manage verified student certificates for partner institutions and course graduates.
-          </p>
+      {message && (
+        <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '0.875rem 1.25rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 500 }}>
+          {message}
+        </div>
+      )}
+
+      {error && (
+        <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '0.875rem 1.25rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 500 }}>
+          {error}
+        </div>
+      )}
+
+      {/* Metric Cards Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+        <div style={{ backgroundColor: '#ffffff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Student Certificates</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginTop: '0.25rem' }}>{totalCerts}</div>
+        </div>
+        <div style={{ backgroundColor: '#ffffff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active Certificates</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#16a34a', marginTop: '0.25rem' }}>{activeCerts}</div>
+        </div>
+        <div style={{ backgroundColor: '#ffffff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Suspended Certificates</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#d97706', marginTop: '0.25rem' }}>{suspendedCerts}</div>
+        </div>
+      </div>
+
+      {/* Search & Filter Controls with Issue Certificate Action */}
+      <div style={{ display: 'flex', gap: '1rem', backgroundColor: '#ffffff', padding: '1rem 1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', flex: 1, minWidth: '280px', flexWrap: 'wrap' }}>
+          <input
+            type="text"
+            placeholder="Search by student name, certificate number, course, or institution..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ flex: 1, minWidth: '240px', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+          />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as any)}
+            style={{ padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '8px', border: '1px solid #cbd5e1', backgroundColor: '#ffffff', cursor: 'pointer' }}
+          >
+            <option value="all">All Statuses</option>
+            <option value="active">Active Only</option>
+            <option value="suspended">Suspended Only</option>
+          </select>
         </div>
 
         <button
@@ -217,59 +244,12 @@ export default function StudentVerificationPanel({ api }: PanelProps) {
             alignItems: 'center',
             gap: '0.5rem',
             boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
+            whiteSpace: 'nowrap',
           }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Issue Student Certificate
         </button>
-      </div>
-
-      {message && (
-        <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '0.875rem 1.25rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 500 }}>
-          {message}
-        </div>
-      )}
-
-      {error && (
-        <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '0.875rem 1.25rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 500 }}>
-          {error}
-        </div>
-      )}
-
-      {/* Metric Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-        <div style={{ backgroundColor: '#ffffff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Total Student Certificates</span>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginTop: '0.25rem' }}>{totalCerts}</div>
-        </div>
-        <div style={{ backgroundColor: '#ffffff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase' }}>Active Certificates</span>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#16a34a', marginTop: '0.25rem' }}>{activeCerts}</div>
-        </div>
-        <div style={{ backgroundColor: '#ffffff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#d97706', textTransform: 'uppercase' }}>Suspended Certificates</span>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#d97706', marginTop: '0.25rem' }}>{suspendedCerts}</div>
-        </div>
-      </div>
-
-      {/* Search & Filter Controls */}
-      <div style={{ display: 'flex', gap: '1rem', backgroundColor: '#ffffff', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0', flexWrap: 'wrap' }}>
-        <input
-          type="text"
-          placeholder="Search by student name, certificate number, course, or institution..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ flex: 1, minWidth: '240px', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-        />
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as any)}
-          style={{ padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '8px', border: '1px solid #cbd5e1', backgroundColor: '#ffffff' }}
-        >
-          <option value="all">All Statuses</option>
-          <option value="active">Active Only</option>
-          <option value="suspended">Suspended Only</option>
-        </select>
       </div>
 
       {/* Data Table */}
