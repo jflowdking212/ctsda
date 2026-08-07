@@ -17,13 +17,48 @@ export class ApplicationsService {
     return this.prisma.application.findMany({
       where: { applicantId },
       include: { 
-        institution: { select: { name: true, country: true } },
+        institution: {
+          select: {
+            id: true,
+            name: true,
+            registrationNumber: true,
+            country: true,
+            address: true,
+            phone: true,
+            email: true,
+            website: true,
+            logoUrl: true,
+          }
+        },
         invoices: {
-          where: { status: 'sent' },
-          select: { id: true, amount: true, description: true }
+          select: {
+            id: true,
+            amount: true,
+            currency: true,
+            status: true,
+            description: true,
+            createdAt: true,
+            paidAt: true,
+          },
+          orderBy: { createdAt: 'desc' },
         },
         accreditations: {
-          select: { id: true, status: true }
+          include: {
+            certificates: {
+              select: {
+                id: true,
+                certificateNumber: true,
+                verificationToken: true,
+                issueDate: true,
+                expiryDate: true,
+                status: true,
+                qrCodeUrl: true,
+                pdfUrl: true,
+              },
+              orderBy: { createdAt: 'desc' },
+            }
+          },
+          orderBy: { createdAt: 'desc' },
         }
       },
       orderBy: { createdAt: 'desc' },
