@@ -173,7 +173,12 @@ async function readErrorMessage(response: Response) {
     // Some API errors are plain text.
   }
 
-  return text;
+  // If the response is an HTML page (e.g. a server-level 404), don't show raw HTML.
+  if (text.trimStart().startsWith('<')) {
+    return fallback;
+  }
+
+  return text.length > 300 ? fallback : text;
 }
 
 function readStoredSession() {

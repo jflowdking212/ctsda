@@ -18,7 +18,7 @@ import { AccreditationsModule } from './accreditations/accreditations.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AdminModule } from './admin/admin.module';
-import { VerifyController } from './verify/verify.controller';
+import { VerifyModule } from './verify/verify.module';
 import { HealthController } from './health.controller';
 import { SettingsModule } from './settings/settings.module';
 import { BlogModule } from './blog/blog.module';
@@ -91,8 +91,9 @@ import { createPinoRedactOptions } from './common/logging/redaction';
     SubscriptionsModule,
     TrainingModule,
     StudentsModule,
+    VerifyModule,
   ],
-  controllers: [HealthController, VerifyController],
+  controllers: [HealthController],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
