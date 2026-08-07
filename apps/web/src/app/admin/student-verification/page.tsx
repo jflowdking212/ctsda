@@ -1,7 +1,5 @@
-'use client';
-
-import StudentVerificationPanel from '../../../components/admin/student-verification-panel';
+import { AdminDashboard } from '../../../components/admin-dashboard';
 
 export default function StudentVerificationPage() {
-  return <StudentVerificationPanel />;
+  return <AdminDashboard section="student_verification" />;
 }

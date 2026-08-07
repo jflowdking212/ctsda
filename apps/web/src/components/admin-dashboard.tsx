@@ -34,10 +34,10 @@ const adminNav: AdminNavItem[] = [
     roles: ['super_admin', 'support_officer'],
     submenus: [
       { href: '/admin/accreditations', section: 'accreditations', label: 'All Accreditations', roles: ['super_admin', 'support_officer'] },
-      { href: '/admin/student-verification', section: 'student_verification', label: 'Student Verification', roles: ['super_admin', 'support_officer'] },
       { href: '/admin/queue', section: 'queue', label: 'Review Queue', roles: ['super_admin', 'support_officer'] },
     ]
   },
+  { href: '/admin/student-verification', section: 'student_verification', label: 'Student Verification', roles: ['super_admin', 'support_officer'] },
   { href: '/admin/billing', section: 'billing', label: 'Billing & Orders', roles: ['super_admin', 'finance_officer'] },
   { href: '/admin/users', section: 'users', label: 'Users', roles: ['super_admin'] },
   { href: '/admin/blog', section: 'blog', label: 'CMS / Blog', roles: ['super_admin', 'content_manager'] },
