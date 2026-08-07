@@ -800,11 +800,13 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
               <h1 style={{ textAlign: 'left', margin: '0 0 0.25rem 0', alignSelf: 'flex-start' }}>{currentSection.title}</h1>
               <p style={{ textAlign: 'left', margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.95rem', lineHeight: 1.5, alignSelf: 'flex-start' }}>{currentSection.description}</p>
             </div>
-            <div className="admin-actions">
-              <Link className="admin-button" href="/portal">
-                Applicant Portal
-              </Link>
-            </div>
+            {section !== 'student_verification' && (
+              <div className="admin-actions">
+                <Link className="admin-button" href="/portal">
+                  Applicant Portal
+                </Link>
+              </div>
+            )}
           </header>
 
           {message && <p className="admin-message success">{message}</p>}
