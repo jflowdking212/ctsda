@@ -10,6 +10,7 @@ import { DirectoryPanel } from './admin/directory-panel';
 import { BillingPanel } from './admin/billing-panel';
 import { UsersPanel } from './admin/users-panel';
 import { AccreditationsPanel } from './admin/accreditations-panel';
+import StudentVerificationPanel from './admin/student-verification-panel';
 import { SettingsPanel } from './admin/settings-panel';
 import { PagesPanel } from './admin/pages-panel';
 
@@ -33,6 +34,7 @@ const adminNav: AdminNavItem[] = [
     roles: ['super_admin', 'support_officer'],
     submenus: [
       { href: '/admin/accreditations', section: 'accreditations', label: 'All Accreditations', roles: ['super_admin', 'support_officer'] },
+      { href: '/admin/student-verification', section: 'student_verification', label: 'Student Verification', roles: ['super_admin', 'support_officer'] },
       { href: '/admin/queue', section: 'queue', label: 'Review Queue', roles: ['super_admin', 'support_officer'] },
     ]
   },
@@ -79,7 +81,7 @@ const getStatusStyle = (status: string) => {
   }
 };
 
-export type AdminSection = 'reports' | 'queue' | 'institutions' | 'billing' | 'users' | 'accreditations' | 'blog' | 'training' | 'settings' | 'audit' | 'pages';
+export type AdminSection = 'reports' | 'queue' | 'institutions' | 'billing' | 'users' | 'accreditations' | 'student_verification' | 'blog' | 'training' | 'settings' | 'audit' | 'pages';
 
 const statuses = [
   'draft',
@@ -137,6 +139,11 @@ const sectionMeta: Record<AdminSection, { title: string; eyebrow: string; descri
     title: 'Accreditations',
     description: 'Monitor, issue, and manage institutional accreditations and verifiable digital certificates.',
     eyebrow: 'Certifications',
+  },
+  student_verification: {
+    title: 'Student Verification Certificates',
+    eyebrow: 'Graduates & Student Verification',
+    description: 'Manually issue and manage verified student certificates for partner institutions and course graduates.',
   }, 
   audit: {
     title: 'Audit logs',
@@ -710,6 +717,7 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
                 users: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', 
                 audit: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
                 accreditations: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+                student_verification: 'M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z',
                 pages: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'
               };
 
@@ -855,6 +863,10 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
 
           {section === 'accreditations' && (
             <AccreditationsPanel api={api} />
+          )}
+
+          {section === 'student_verification' && (
+            <StudentVerificationPanel />
           )}
 
           {section === 'blog' && (

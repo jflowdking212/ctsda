@@ -809,3 +809,28 @@ model EmailVerificationOTP {
   @@index([email])
   @@map("email_verification_otps")
 }
+
+// =============== STUDENT CERTIFICATES ===============
+
+model StudentCertificate {
+  id                String              @id @default(uuid()) @db.Uuid
+  studentName       String              @db.VarChar(255)
+  studentEmail      String?             @db.VarChar(255)
+  institutionName   String              @db.VarChar(255)
+  courseProgram     String              @db.VarChar(255)
+  certificateNumber String              @unique @db.VarChar(100)
+  verificationToken String              @unique @db.VarChar(255)
+  issueDate         DateTime            @default(now())
+  expiryDate        DateTime?
+  status            AccreditationStatus @default(active)
+  grade             String?             @db.VarChar(100)
+  qrCodeUrl         String?             @db.Text
+  pdfUrl            String?             @db.VarChar(500)
+  createdBy         String?             @db.Uuid
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@index([certificateNumber])
+  @@index([verificationToken])
+  @@map("student_certificates")
+}

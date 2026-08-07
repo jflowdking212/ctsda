@@ -24,6 +24,7 @@ import { SettingsModule } from './settings/settings.module';
 import { BlogModule } from './blog/blog.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { TrainingModule } from './training/training.module';
+import { StudentsModule } from './students/students.module';
 import { createPinoRedactOptions } from './common/logging/redaction';
 
 @Module({
@@ -89,6 +90,7 @@ import { createPinoRedactOptions } from './common/logging/redaction';
     BlogModule,
     SubscriptionsModule,
     TrainingModule,
+    StudentsModule,
   ],
   controllers: [HealthController, VerifyController],
   providers: [

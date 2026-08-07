@@ -1,15 +1,38 @@
 import { Controller, Get, Param, Request } from '@nestjs/common';
 import { ReviewsService } from '../reviews/reviews.service';
+import { StudentsService } from '../students/students.service';
 
 @Controller('verify')
 export class VerifyController {
-  constructor(private reviewsService: ReviewsService) {}
+  constructor(
+    private reviewsService: ReviewsService,
+    private studentsService: StudentsService,
+  ) {}
 
   @Get(':token')
   async verify(@Param('token') token: string, @Request() req: any) {
-    const cert = await this.reviewsService.findCertificateByToken(token);
+    let cert = await this.reviewsService.findCertificateByToken(token);
 
     if (!cert) {
+      const studentCert = await this.studentsService.findByCertificateNumberOrToken(token);
+      if (studentCert) {
+        const isExpired = studentCert.expiryDate && new Date(studentCert.expiryDate) < new Date();
+        const isValid = studentCert.status === 'active' && !isExpired;
+
+        return {
+          valid: isValid,
+          message: isValid ? 'Student Certificate is authentic and valid' : `Student Certificate status: ${studentCert.status}`,
+          recipientName: studentCert.studentName,
+          courseProgram: studentCert.courseProgram,
+          institution: studentCert.institutionName,
+          certificateNumber: studentCert.certificateNumber,
+          grade: studentCert.grade,
+          issueDate: studentCert.issueDate,
+          expiryDate: studentCert.expiryDate,
+          status: studentCert.status,
+          qrCodeUrl: studentCert.qrCodeUrl,
+        };
+      }
       return { valid: false, message: 'Certificate not found' };
     }
 
