@@ -93,16 +93,7 @@ export function AccreditedLogosCarousel() {
         <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: '80px', background: 'linear-gradient(to right, #ffffff, transparent)', zIndex: 10, pointerEvents: 'none' }}></div>
         <div style={{ position: 'absolute', top: 0, bottom: 0, right: 0, width: '80px', background: 'linear-gradient(to left, #ffffff, transparent)', zIndex: 10, pointerEvents: 'none' }}></div>
 
-        <div
-          style={{
-            display: 'flex',
-            gap: '1.5rem',
-            animation: 'scrollLogos 30s linear infinite',
-            whiteSpace: 'nowrap',
-            alignItems: 'center',
-            padding: '0.5rem 0',
-          }}
-        >
+        <div className="logo-carousel-track">
           {carouselItems.map((item, idx) => (
             <div
               key={`${item.id}-${idx}`}
@@ -182,7 +173,7 @@ export function AccreditedLogosCarousel() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes scrollLogos {
           0% {
             transform: translateX(0);
@@ -190,6 +181,18 @@ export function AccreditedLogosCarousel() {
           100% {
             transform: translateX(-50%);
           }
+        }
+        .logo-carousel-track {
+          display: flex !important;
+          gap: 1.5rem !important;
+          width: max-content !important;
+          animation: scrollLogos 25s linear infinite !important;
+          white-space: nowrap !important;
+          align-items: center !important;
+          padding: 0.5rem 0 !important;
+        }
+        .logo-carousel-track:hover {
+          animation-play-state: paused !important;
         }
       `}</style>
     </section>

@@ -3036,4 +3036,28 @@ a.header-action {
   }
 }
 
+/* Accredited Logos Infinite Carousel */
+@keyframes scrollLogos {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.logo-carousel-track {
+  display: flex !important;
+  gap: 1.5rem !important;
+  width: max-content !important;
+  animation: scrollLogos 25s linear infinite !important;
+  white-space: nowrap !important;
+  align-items: center !important;
+  padding: 0.5rem 0 !important;
+}
+
+.logo-carousel-track:hover {
+  animation-play-state: paused !important;
+}
+
 
