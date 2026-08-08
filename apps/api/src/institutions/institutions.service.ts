@@ -39,11 +39,16 @@ export class InstitutionsService {
   async findPublicAccredited() {
     const institutions = await this.prisma.institution.findMany({
       where: {
-        logoUrl: { not: null },
-        OR: [
-          { applications: { some: { status: 'approved' } } },
-          { accreditations: { some: { status: 'active' } } },
-        ],
+        isActive: true,
+        accreditations: {
+          some: {
+            status: 'active',
+            OR: [
+              { expiresAt: null },
+              { expiresAt: { gt: new Date() } },
+            ],
+          },
+        },
       },
       select: {
         id: true,
@@ -51,7 +56,7 @@ export class InstitutionsService {
         logoUrl: true,
         country: true,
       },
-      take: 20,
+      take: 50,
     });
 
     const rawUrl = process.env.FRONTEND_URL || 'https://ctsda.acecoterieconsulting.com';

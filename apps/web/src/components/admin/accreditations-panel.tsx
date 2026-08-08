@@ -111,13 +111,14 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
       const response = await api('/accreditations/all');
       if (response.ok) {
         const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           setAccreditations(data);
         } else {
-          setAccreditations(MOCK_ACCREDITATIONS);
+          setAccreditations([]);
         }
       } else {
-        setAccreditations(MOCK_ACCREDITATIONS);
+        setAccreditations([]);
+      }
       }
     } catch (err) {
       console.error(err);
