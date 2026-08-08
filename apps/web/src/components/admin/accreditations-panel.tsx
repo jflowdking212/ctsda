@@ -119,10 +119,9 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
       } else {
         setAccreditations([]);
       }
-      }
     } catch (err) {
       console.error(err);
-      setAccreditations(MOCK_ACCREDITATIONS);
+      setAccreditations([]);
     } finally {
       setLoading(false);
     }
