@@ -323,14 +323,16 @@ export function StudentVerificationWidget() {
                     </div>
                   )}
 
-                  <div>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
-                      Expiry Status
-                    </span>
-                    <span style={{ fontSize: '0.9rem', color: result.expiryDate ? '#475569' : '#16a34a', fontWeight: 700 }}>
-                      {result.expiryDate ? result.expiryDate : '♾️ Does Not Expire (Lifetime)'}
-                    </span>
-                  </div>
+                  {result.expiryDate && (
+                    <div>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
+                        Expiry Date
+                      </span>
+                      <span style={{ fontSize: '0.9rem', color: '#475569', fontWeight: 600 }}>
+                        {result.expiryDate}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

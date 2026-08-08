@@ -292,7 +292,7 @@ export default function StudentVerificationPanel({ api }: PanelProps) {
                   </td>
                   <td style={{ padding: '0.85rem 1rem', fontSize: '0.8125rem', color: '#64748b' }}>
                     <div>Issued: {new Date(cert.issueDate).toLocaleDateString()}</div>
-                    <div>Expires: {cert.expiryDate ? new Date(cert.expiryDate).toLocaleDateString() : 'Lifetime'}</div>
+                    {cert.expiryDate && <div>Expires: {new Date(cert.expiryDate).toLocaleDateString()}</div>}
                   </td>
                   <td style={{ padding: '0.85rem 1rem' }}>
                     <span style={{

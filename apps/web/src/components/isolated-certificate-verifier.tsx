@@ -64,9 +64,8 @@ export function IsolatedCertificateVerifier({
         institution: data.institution || 'Accredited Institution Partner',
         certificateNumber: data.certificateNumber || cleanToken,
         recipientName: data.recipientName || data.institution || 'Accredited Institution / Recipient',
-        courseProgram: data.courseProgram || 'Institutional Accreditation & Quality Standards',
-        dateIssued: data.issueDate || data.dateIssued ? new Date(data.issueDate || data.dateIssued).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Official Issue Date',
-        expirationDate: data.expiryDate || data.expirationDate ? new Date(data.expiryDate || data.expirationDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Active Expiry Date',
+        dateIssued: (data.issueDate || data.dateIssued) ? new Date(data.issueDate || data.dateIssued).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Official Issue Date',
+        expirationDate: (data.expiryDate || data.expirationDate) ? new Date(data.expiryDate || data.expirationDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : undefined,
         status: data.status || 'Active',
       });
     } catch {
@@ -360,10 +359,12 @@ export function IsolatedCertificateVerifier({
                     <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.9rem' }}>Date Issued</span>
                     <span style={{ color: '#0f172a', fontWeight: 600, fontSize: '0.9rem' }}>{result.dateIssued}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}>
-                    <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.9rem' }}>Expiration Date</span>
-                    <span style={{ color: '#0f172a', fontWeight: 600, fontSize: '0.9rem' }}>{result.expirationDate}</span>
-                  </div>
+                  {result.expirationDate && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}>
+                      <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.9rem' }}>Expiration Date</span>
+                      <span style={{ color: '#0f172a', fontWeight: 600, fontSize: '0.9rem' }}>{result.expirationDate}</span>
+                    </div>
+                  )}
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.9rem' }}>Certificate Status</span>
                     <span style={{ color: '#22c55e', fontWeight: 600, fontSize: '0.85rem', backgroundColor: '#dcfce7', padding: '0.2rem 0.75rem', borderRadius: '1rem' }}>{result.status}</span>
