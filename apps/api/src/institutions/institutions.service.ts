@@ -43,10 +43,7 @@ export class InstitutionsService {
         accreditations: {
           some: {
             status: 'active',
-            OR: [
-              { expiresAt: null },
-              { expiresAt: { gt: new Date() } },
-            ],
+            expiresAt: { gt: new Date() },
           },
         },
       },
