@@ -1,6 +1,7 @@
 import { PremiumHeader } from '../../components/premium-header';
 import { PremiumFooter } from '../../components/premium-footer';
 import { TrainingRegisterBtn } from '../../components/training-register-btn';
+import { StudentVerificationWidget } from '../../components/student-verification-widget';
 import Link from 'next/link';
 
 export const metadata = {
@@ -198,6 +199,9 @@ export default async function TrainingPage({ searchParams }: { searchParams?: an
               </div>
             </>
           )}
+
+          {/* Student Verification Widget */}
+          <StudentVerificationWidget />
         </div>
       </main>
       <PremiumFooter />
