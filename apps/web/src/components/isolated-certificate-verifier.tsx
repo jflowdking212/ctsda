@@ -119,12 +119,12 @@ export function IsolatedCertificateVerifier({
 
           {/* ── LEFT: Search Card (fixed 340px) ── */}
           <div style={{
-            flex: '0 0 320px',
-            minWidth: '280px',
+            flex: '0 0 208px',
+            minWidth: '182px',
             backgroundColor: '#ffffff',
             borderRadius: '0.875rem',
             boxShadow: '0 20px 40px -12px rgba(0,0,0,0.1)',
-            padding: '2rem 1.75rem',
+            padding: '1.5rem 1.25rem',
             border: '1px solid #e2e8f0',
             boxSizing: 'border-box',
           }}>
