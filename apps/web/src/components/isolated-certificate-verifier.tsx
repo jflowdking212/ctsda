@@ -110,7 +110,7 @@ export function IsolatedCertificateVerifier({
       <div style={{ maxWidth: '1220px', width: '94%', margin: '-4rem auto 0', position: 'relative', zIndex: 20, boxSizing: 'border-box' }}>
 
         {!hasValidResult ? (
-          /* INITIAL SEARCH STATE: Centered Wide Card matching exact size of the removed card */
+          /* INITIAL SEARCH STATE: Centered Search Card */
           <div style={{ maxWidth: '850px', margin: '0 auto' }}>
             <div
               style={{
@@ -247,144 +247,24 @@ export function IsolatedCertificateVerifier({
             </div>
           </div>
         ) : (
-          /* VERIFIED STATE: 2-Column layout with Search Card on left + Valid Certificate & Graphic Card on right */
-          <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '2rem', alignItems: 'start' }}>
-            {/* Search Card Left */}
-            <div
-              style={{
-                backgroundColor: '#ffffff',
-                borderRadius: '1rem',
-                boxShadow: '0 20px 40px -15px rgba(0,0,0,0.08)',
-                padding: '2rem 1.75rem',
-                border: '1px solid #e2e8f0',
-                boxSizing: 'border-box',
-              }}
-            >
-              <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.35rem 0' }}>
-                Verify Certificate
-              </h2>
-              <p style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: 1.55, marginBottom: '1.5rem', marginTop: 0 }}>
-                Please enter the certificate number exactly as it appears on the certificate.
-              </p>
-
-              <form onSubmit={handleSubmit}>
-                <label
-                  htmlFor="cert-input-side"
-                  style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', marginBottom: '0.45rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}
-                >
-                  Certificate Number
-                </label>
-
-                <div style={{ position: 'relative', marginBottom: '1rem' }}>
-                  <span style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', lineHeight: 1 }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
-                  </span>
-                  <input
-                    id="cert-input-side"
-                    type="text"
-                    value={token}
-                    onChange={(e) => setToken(e.target.value)}
-                    placeholder="e.g. CTSD-ACC-2024-00125"
-                    disabled={loading}
-                    style={{
-                      width: '100%',
-                      padding: '0.8rem 0.9rem 0.8rem 2.5rem',
-                      fontSize: '0.875rem',
-                      borderRadius: '0.5rem',
-                      border: '1.5px solid #cbd5e1',
-                      outline: 'none',
-                      backgroundColor: '#f8fafc',
-                      color: '#0f172a',
-                      boxSizing: 'border-box',
-                      fontWeight: 500,
-                    }}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    width: '100%',
-                    padding: '0.8rem 1rem',
-                    backgroundColor: '#00204a',
-                    color: '#ffffff',
-                    fontWeight: 700,
-                    fontSize: '0.9rem',
-                    borderRadius: '0.5rem',
-                    border: 'none',
-                    cursor: loading ? 'wait' : 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem',
-                    boxShadow: '0 4px 12px rgba(0,32,74,0.22)',
-                    marginBottom: '1rem',
-                  }}
-                >
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                  {loading ? 'Verifying...' : 'Verify Certificate'}
-                </button>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0.75rem 0' }}>
-                  <div style={{ flex: 1, height: '1px', backgroundColor: '#e2e8f0' }} />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8' }}>OR</span>
-                  <div style={{ flex: 1, height: '1px', backgroundColor: '#e2e8f0' }} />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => alert('Point your camera at the QR code on the certificate to auto-verify.')}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    backgroundColor: '#ffffff',
-                    color: '#334155',
-                    fontWeight: 700,
-                    fontSize: '0.875rem',
-                    borderRadius: '0.5rem',
-                    border: '1.5px solid #e2e8f0',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem',
-                    marginBottom: '1.5rem',
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
-                    <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
-                  </svg>
-                  Scan QR Code
-                </button>
-
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', color: '#94a3b8', fontSize: '0.775rem' }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                  Your information is secure and will not be shared.
-                </div>
-              </form>
-            </div>
-
-            {/* Valid Result Container Right */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          /* VERIFIED STATE: Search Card is hidden completely! Render full-width Valid Certificate Result */
+          <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {/* Green Valid Banner */}
-              <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '0.875rem', padding: '1.15rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 4px 12px rgba(22,101,52,0.06)' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#16a34a', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '1.1rem', fontWeight: 900 }}>✓</div>
+              <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '0.875rem', padding: '1.25rem 1.75rem', display: 'flex', alignItems: 'center', gap: '1.25rem', boxShadow: '0 4px 12px rgba(22,101,52,0.06)' }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#16a34a', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '1.25rem', fontWeight: 900 }}>✓</div>
                 <div>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#166534', margin: 0 }}>This Certificate is Valid</h3>
-                  <p style={{ margin: '0.15rem 0 0 0', color: '#15803d', fontSize: '0.85rem' }}>{result.message}</p>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#166534', margin: 0 }}>This Certificate is Valid</h3>
+                  <p style={{ margin: '0.2rem 0 0 0', color: '#15803d', fontSize: '0.875rem' }}>{result.message}</p>
                 </div>
               </div>
 
               {/* Details + Certificate Graphic Card */}
-              <div style={{ backgroundColor: '#ffffff', borderRadius: '0.875rem', border: '1px solid #e2e8f0', padding: '1.75rem', boxShadow: '0 10px 30px -8px rgba(0,0,0,0.06)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.75rem' }}>
+              <div style={{ backgroundColor: '#ffffff', borderRadius: '0.875rem', border: '1px solid #e2e8f0', padding: '2rem', boxShadow: '0 10px 30px -8px rgba(0,0,0,0.06)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
                 {/* Left sub-col: Details */}
                 <div>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginBottom: '1.1rem', marginTop: 0 }}>Certificate Details</h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '1.25rem', marginTop: 0 }}>Certificate Details</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
                     {[
                       { label: 'Certificate Number', value: result.certificateNumber, highlight: true },
                       { label: 'Organization Name', value: result.institution, bold: true },
@@ -392,29 +272,29 @@ export function IsolatedCertificateVerifier({
                       { label: 'Accreditation Date', value: result.dateIssued },
                       ...(result.expirationDate ? [{ label: 'Expiration Date', value: result.expirationDate }] : []),
                     ].map(({ label, value, highlight, bold }) => (
-                      <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.6rem', gap: '0.5rem' }}>
-                        <span style={{ color: '#64748b', fontSize: '0.825rem', fontWeight: 500, flexShrink: 0 }}>{label}</span>
-                        <span style={{ color: highlight ? '#2563eb' : bold ? '#00204a' : '#334155', fontWeight: highlight ? 700 : bold ? 800 : 600, fontSize: '0.825rem', textAlign: 'right' }}>{value}</span>
+                      <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.65rem', gap: '0.5rem' }}>
+                        <span style={{ color: '#64748b', fontSize: '0.85rem', fontWeight: 500, flexShrink: 0 }}>{label}</span>
+                        <span style={{ color: highlight ? '#2563eb' : bold ? '#00204a' : '#334155', fontWeight: highlight ? 700 : bold ? 800 : 600, fontSize: '0.85rem', textAlign: 'right' }}>{value}</span>
                       </div>
                     ))}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.1rem' }}>
-                      <span style={{ color: '#64748b', fontSize: '0.825rem', fontWeight: 500 }}>Certificate Status</span>
-                      <span style={{ backgroundColor: '#dcfce7', color: '#166534', padding: '0.15rem 0.7rem', borderRadius: '999px', fontSize: '0.725rem', fontWeight: 800, textTransform: 'uppercase' }}>{result.status}</span>
+                      <span style={{ color: '#64748b', fontSize: '0.85rem', fontWeight: 500 }}>Certificate Status</span>
+                      <span style={{ backgroundColor: '#dcfce7', color: '#166534', padding: '0.2rem 0.75rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>{result.status}</span>
                     </div>
                   </div>
 
                   {/* Info box */}
-                  <div style={{ backgroundColor: '#eff6ff', borderRadius: '0.5rem', padding: '0.75rem 0.9rem', display: 'flex', gap: '0.65rem', alignItems: 'flex-start', marginTop: '1.25rem' }}>
-                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#2563eb', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 'bold', flexShrink: 0, marginTop: '1px' }}>i</div>
-                    <p style={{ margin: 0, color: '#1e3a8a', fontSize: '0.78rem', lineHeight: 1.5 }}>
+                  <div style={{ backgroundColor: '#eff6ff', borderRadius: '0.5rem', padding: '0.85rem 1rem', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', marginTop: '1.5rem' }}>
+                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: '#2563eb', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 'bold', flexShrink: 0, marginTop: '1px' }}>i</div>
+                    <p style={{ margin: 0, color: '#1e3a8a', fontSize: '0.8125rem', lineHeight: 1.5 }}>
                       This verification confirms that the above organization is accredited by the Council for Training Skills and Development America.
                     </p>
                   </div>
                 </div>
 
                 {/* Right sub-col: Institutional Certificate Mockup */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc', borderRadius: '0.625rem', padding: '0.875rem', border: '1px solid #e2e8f0' }}>
-                  <div style={{ width: '100%', minHeight: '270px', backgroundColor: '#ffffff', borderRadius: '3px', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc', borderRadius: '0.625rem', padding: '1rem', border: '1px solid #e2e8f0' }}>
+                  <div style={{ width: '100%', minHeight: '280px', backgroundColor: '#ffffff', borderRadius: '3px', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', position: 'relative', overflow: 'hidden' }}>
                     {/* Corner Triangles */}
                     <div style={{ position: 'absolute', top: 0, left: 0, width: '42px', height: '42px', backgroundColor: '#00204a', clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
                     <div style={{ position: 'absolute', top: 0, right: 0, width: '42px', height: '42px', backgroundColor: '#00204a', clipPath: 'polygon(100% 0, 100% 100%, 0 0)' }} />
@@ -475,6 +355,50 @@ export function IsolatedCertificateVerifier({
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Action Buttons for Reset and Print */}
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => { setResult(null); setToken(''); }}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    backgroundColor: '#ffffff',
+                    color: '#334155',
+                    border: '1.5px solid #cbd5e1',
+                    borderRadius: '0.5rem',
+                    fontWeight: 700,
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                  }}
+                >
+                  🔄 Verify Another Certificate
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    backgroundColor: '#00204a',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    fontWeight: 700,
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    boxShadow: '0 4px 12px rgba(0, 32, 74, 0.25)',
+                  }}
+                >
+                  🖨️ Print / Download PDF
+                </button>
               </div>
             </div>
           </div>
