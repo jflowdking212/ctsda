@@ -23,7 +23,9 @@ export class StudentsService {
     const verificationToken = crypto.randomBytes(32).toString('base64url');
 
     const issueDate = data.issueDate ? new Date(data.issueDate) : new Date();
-    const expiryDate = data.expiryDate ? new Date(data.expiryDate) : undefined;
+    const expiryDate = (data.doesNotExpire || !data.expiryDate || data.expiryDate === '') 
+      ? null 
+      : new Date(data.expiryDate);
 
     const envUrl = process.env.FRONTEND_URL || '';
     const frontendUrl = (!envUrl || envUrl.includes('localhost')) ? 'https://ctsda.acecoterieconsulting.com' : envUrl;
@@ -77,13 +79,15 @@ export class StudentsService {
     });
   }
 
-  async updateExpiry(id: string, expiresAt: string) {
+  async updateExpiry(id: string, expiresAt?: string | null) {
     const cert = await this.prisma.studentCertificate.findUnique({ where: { id } });
     if (!cert) throw new NotFoundException('Student Certificate not found');
 
+    const expiryDate = (!expiresAt || expiresAt === '' || expiresAt === 'none') ? null : new Date(expiresAt);
+
     return this.prisma.studentCertificate.update({
       where: { id },
-      data: { expiryDate: new Date(expiresAt) },
+      data: { expiryDate },
     });
   }
 

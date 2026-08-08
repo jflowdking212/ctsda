@@ -47,9 +47,8 @@ export class StudentsController {
   @UseGuards(AuthGuard)
   async updateExpiry(
     @Param('id') id: string,
-    @Body() body: { expiresAt: string },
+    @Body() body: { expiresAt?: string },
   ) {
-    if (!body.expiresAt) throw new BadRequestException('Expiry date is required');
     return this.studentsService.updateExpiry(id, body.expiresAt);
   }
 

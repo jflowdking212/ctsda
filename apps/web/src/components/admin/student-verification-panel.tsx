@@ -42,8 +42,6 @@ export default function StudentVerificationPanel({ api }: PanelProps) {
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [editingCert, setEditingCert] = useState<StudentCertificate | null>(null);
-  const [newExpiryDate, setNewExpiryDate] = useState('');
-
   const initialForm = {
     studentName: '',
     studentEmail: '',
@@ -52,6 +50,7 @@ export default function StudentVerificationPanel({ api }: PanelProps) {
     certificateNumber: '',
     issueDate: new Date().toISOString().split('T')[0],
     expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    doesNotExpire: false,
     grade: '',
   };
 
@@ -131,16 +130,19 @@ export default function StudentVerificationPanel({ api }: PanelProps) {
     }
   }
 
-  async function handleUpdateExpiry() {
-    if (!editingCert || !newExpiryDate) return;
+  const [newExpiryDate, setNewExpiryDate] = useState('');
+
+  async function handleUpdateExpiry(clear = false) {
+    if (!editingCert) return;
+    const expiresAt = clear ? '' : newExpiryDate;
     try {
       const res = await fetchApi(`/students/${editingCert.id}/update-expiry`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ expiresAt: newExpiryDate }),
+        body: JSON.stringify({ expiresAt }),
       });
       if (res.ok) {
-        setMessage(`Expiry date updated for ${editingCert.studentName}.`);
+        setMessage(`Expiry status updated for ${editingCert.studentName}.`);
         setEditingCert(null);
         await loadData();
       }
@@ -460,11 +462,26 @@ export default function StudentVerificationPanel({ api }: PanelProps) {
                   </label>
                   <input
                     type="date"
-                    value={form.expiresAt}
+                    disabled={form.doesNotExpire}
+                    value={form.doesNotExpire ? '' : form.expiresAt}
                     onChange={(e) => setForm({ ...form, expiresAt: e.target.value })}
-                    style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box', opacity: form.doesNotExpire ? 0.5 : 1 }}
                   />
                 </div>
+              </div>
+
+              <div style={{ padding: '0.75rem 1rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', margin: 0 }}>
+                  <input
+                    type="checkbox"
+                    checked={form.doesNotExpire}
+                    onChange={(e) => setForm({ ...form, doesNotExpire: e.target.checked })}
+                    style={{ width: '1.1rem', height: '1.1rem', cursor: 'pointer' }}
+                  />
+                  <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#0f172a' }}>
+                    This certificate does not expire (Lifetime Validity)
+                  </span>
+                </label>
               </div>
 
               <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
@@ -491,18 +508,29 @@ export default function StudentVerificationPanel({ api }: PanelProps) {
       {/* EDIT EXPIRY MODAL */}
       {editingCert && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15,23,42,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ backgroundColor: '#ffffff', padding: '1.5rem', borderRadius: '12px', width: '100%', maxWidth: '400px' }}>
-            <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', fontWeight: 700 }}>Edit Expiry Date</h3>
-            <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1rem' }}>Updating certificate expiry for {editingCert.studentName}.</p>
-            <input
-              type="date"
-              value={newExpiryDate}
-              onChange={(e) => setNewExpiryDate(e.target.value)}
-              style={{ width: '100%', padding: '0.625rem', borderRadius: '6px', border: '1px solid #cbd5e1', marginBottom: '1.25rem', boxSizing: 'border-box' }}
-            />
+          <div style={{ backgroundColor: '#ffffff', padding: '1.5rem', borderRadius: '12px', width: '100%', maxWidth: '420px' }}>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', fontWeight: 700 }}>Edit Certificate Expiry</h3>
+            <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.25rem' }}>Updating expiry date for {editingCert.studentName}.</p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.25rem' }}>
+              <input
+                type="date"
+                value={newExpiryDate}
+                onChange={(e) => setNewExpiryDate(e.target.value)}
+                style={{ width: '100%', padding: '0.625rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+              />
+              <button
+                type="button"
+                onClick={() => handleUpdateExpiry(true)}
+                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #bfdbfe', backgroundColor: '#eff6ff', color: '#1d4ed8', fontSize: '0.8125rem', fontWeight: 700, cursor: 'pointer', textAlign: 'center' }}
+              >
+                ♾️ Set as Lifetime (Does Not Expire)
+              </button>
+            </div>
+
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-              <button type="button" onClick={() => setEditingCert(null)} style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: '#ffffff' }}>Cancel</button>
-              <button type="button" onClick={handleUpdateExpiry} style={{ padding: '0.5rem 1rem', borderRadius: '6px', backgroundColor: '#2563eb', color: '#ffffff', border: 'none', fontWeight: 700 }}>Save Expiry</button>
+              <button type="button" onClick={() => setEditingCert(null)} style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: '#ffffff', cursor: 'pointer' }}>Cancel</button>
+              <button type="button" onClick={() => handleUpdateExpiry(false)} style={{ padding: '0.5rem 1rem', borderRadius: '6px', backgroundColor: '#2563eb', color: '#ffffff', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Save Expiry</button>
             </div>
           </div>
         </div>
