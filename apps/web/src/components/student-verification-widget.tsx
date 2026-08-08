@@ -47,13 +47,13 @@ export function StudentVerificationWidget() {
       } else {
         setResult({
           valid: Boolean(data.valid),
-          message: data.message,
+          message: data.message || 'This certificate is authentic and was issued by the Council for Training Skills and Development America.',
           recipientName: data.recipientName || data.institution || 'Graduate / Recipient',
           courseProgram: data.courseProgram || 'Professional Training Program',
           institution: data.institution || 'CTSDA Accredited Partner',
           certificateNumber: data.certificateNumber || cleanToken,
           grade: data.grade,
-          issueDate: data.issueDate ? new Date(data.issueDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : undefined,
+          issueDate: data.issueDate ? new Date(data.issueDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Official Issue Date',
           expiryDate: data.expiryDate ? new Date(data.expiryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : undefined,
           status: data.status || (data.valid ? 'active' : 'invalid'),
         });
@@ -79,7 +79,7 @@ export function StudentVerificationWidget() {
         boxShadow: '0 10px 30px -5px rgba(15, 23, 42, 0.05)',
       }}
     >
-      <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
         <span
           style={{
             display: 'inline-block',
@@ -122,7 +122,7 @@ export function StudentVerificationWidget() {
           Enter a student certificate number or verification code below to verify course completion, student identity, and official accreditation status.
         </p>
 
-        {/* Verification Form */}
+        {/* Verification Search Form */}
         <form
           onSubmit={handleVerify}
           style={{
@@ -149,7 +149,6 @@ export function StudentVerificationWidget() {
                 backgroundColor: '#f8fafc',
                 boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.03)',
                 boxSizing: 'border-box',
-                transition: 'border-color 0.2s',
               }}
             />
           </div>
@@ -170,17 +169,11 @@ export function StudentVerificationWidget() {
               justifyContent: 'center',
               gap: '0.5rem',
               boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
-              transition: 'background-color 0.2s',
               whiteSpace: 'nowrap',
             }}
           >
             {loading ? (
-              <>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}>
-                  <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset="10" />
-                </svg>
-                Verifying...
-              </>
+              <>Verifying...</>
             ) : (
               <>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -199,8 +192,8 @@ export function StudentVerificationWidget() {
           </p>
         )}
 
-        {/* Result Output Card */}
-        {result && (
+        {/* Failed Verification Result */}
+        {result && !result.valid && (
           <div
             style={{
               maxWidth: '680px',
@@ -208,134 +201,232 @@ export function StudentVerificationWidget() {
               textAlign: 'left',
               borderRadius: '1rem',
               overflow: 'hidden',
-              border: result.valid ? '1px solid #bbf7d0' : '1px solid #fecaca',
-              backgroundColor: result.valid ? '#f0fdf4' : '#fef2f2',
-              boxShadow: '0 8px 25px rgba(0, 0, 0, 0.05)',
+              border: '1px solid #fecaca',
+              backgroundColor: '#fef2f2',
+              padding: '1.5rem',
             }}
           >
-            {/* Result Header */}
-            <div
-              style={{
-                padding: '1.25rem 1.5rem',
-                backgroundColor: result.valid ? '#166534' : '#991b1b',
-                color: '#ffffff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '1rem',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <span style={{ fontSize: '1.5rem' }}>{result.valid ? '✅' : '❌'}</span>
-                <div>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
-                    {result.valid ? 'Authentic & Verified Certificate' : 'Certificate Verification Failed'}
-                  </h3>
-                  <p style={{ fontSize: '0.8rem', color: result.valid ? '#bbf7d0' : '#fecaca', margin: '0.15rem 0 0 0' }}>
-                    {result.message}
-                  </p>
-                </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span style={{ fontSize: '1.5rem' }}>❌</span>
+              <div>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, color: '#991b1b' }}>
+                  Certificate Verification Failed
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: '#b91c1c', margin: '0.25rem 0 0 0' }}>
+                  {result.message}
+                </p>
               </div>
+            </div>
+          </div>
+        )}
 
-              {result.status && (
-                <span
-                  style={{
-                    fontSize: '0.75rem',
-                    fontWeight: 800,
-                    textTransform: 'uppercase',
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: '999px',
-                    backgroundColor: result.valid ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.2)',
-                    color: '#ffffff',
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  {result.status}
-                </span>
-              )}
+        {/* Valid Certificate Display (Matching /verify design) */}
+        {result && result.valid && (
+          <div
+            style={{
+              marginTop: '2.5rem',
+              textAlign: 'left',
+              backgroundColor: '#ffffff',
+              borderRadius: '1rem',
+              boxShadow: '0 20px 40px -15px rgba(0,0,0,0.1)',
+              padding: '2rem',
+              border: '1px solid #f1f5f9',
+            }}
+          >
+            {/* Success Banner */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', backgroundColor: '#f0fdf4', padding: '1.25rem 1.75rem', borderRadius: '0.75rem', marginBottom: '2rem' }}>
+              <div style={{ width: '44px', height: '44px', backgroundColor: '#4ade80', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#166534', margin: '0 0 0.2rem 0' }}>Valid & Authentic Certificate</h3>
+                <p style={{ margin: 0, color: '#166534', fontSize: '0.9rem' }}>{result.message}</p>
+              </div>
             </div>
 
-            {/* Result Details Grid */}
-            {result.valid && (
-              <div style={{ padding: '1.75rem 1.5rem', backgroundColor: '#ffffff' }}>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                    gap: '1.25rem',
-                  }}
-                >
-                  <div>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
-                      Student Name (Recipient)
-                    </span>
-                    <strong style={{ fontSize: '1.05rem', color: '#0f172a', fontWeight: 800 }}>
-                      {result.recipientName}
-                    </strong>
+            {/* Grid for Details and Graphic Certificate Card */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
+              {/* Left Column: Details */}
+              <div>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginBottom: '1.25rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+                  Certificate Details
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.65rem' }}>
+                    <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.875rem' }}>Certificate Number</span>
+                    <span style={{ color: '#0f172a', fontWeight: 700, fontSize: '0.875rem', fontFamily: 'monospace' }}>{result.certificateNumber}</span>
                   </div>
-
-                  <div>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
-                      Course / Program
-                    </span>
-                    <strong style={{ fontSize: '1.05rem', color: '#0f172a', fontWeight: 700 }}>
-                      {result.courseProgram}
-                    </strong>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.65rem' }}>
+                    <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.875rem' }}>Accredited Institution</span>
+                    <span style={{ color: '#00204a', fontWeight: 700, fontSize: '0.875rem', textAlign: 'right' }}>{result.institution}</span>
                   </div>
-
-                  <div>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
-                      Institution
-                    </span>
-                    <span style={{ fontSize: '0.95rem', color: '#334155', fontWeight: 600 }}>
-                      {result.institution}
-                    </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.65rem' }}>
+                    <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.875rem' }}>Recipient Name</span>
+                    <span style={{ color: '#00204a', fontWeight: 800, fontSize: '0.9rem' }}>{result.recipientName}</span>
                   </div>
-
-                  <div>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
-                      Certificate Number
-                    </span>
-                    <code style={{ fontSize: '0.95rem', color: '#2563eb', fontWeight: 800, backgroundColor: '#eff6ff', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
-                      {result.certificateNumber}
-                    </code>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.65rem' }}>
+                    <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.875rem' }}>Course / Program</span>
+                    <span style={{ color: '#00204a', fontWeight: 700, fontSize: '0.875rem', textAlign: 'right', maxWidth: '60%' }}>{result.courseProgram}</span>
                   </div>
-
                   {result.grade && (
-                    <div>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
-                        Grade / Distinction
-                      </span>
-                      <span style={{ fontSize: '0.95rem', color: '#16a34a', fontWeight: 700 }}>
-                        {result.grade}
-                      </span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.65rem' }}>
+                      <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.875rem' }}>Grade / Honors</span>
+                      <span style={{ color: '#16a34a', fontWeight: 700, fontSize: '0.875rem' }}>{result.grade}</span>
                     </div>
                   )}
-
-                  {result.issueDate && (
-                    <div>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
-                        Date Issued
-                      </span>
-                      <span style={{ fontSize: '0.9rem', color: '#475569', fontWeight: 600 }}>
-                        {result.issueDate}
-                      </span>
-                    </div>
-                  )}
-
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.65rem' }}>
+                    <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.875rem' }}>Date Issued</span>
+                    <span style={{ color: '#0f172a', fontWeight: 600, fontSize: '0.875rem' }}>{result.issueDate}</span>
+                  </div>
                   {result.expiryDate && (
-                    <div>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
-                        Expiry Date
-                      </span>
-                      <span style={{ fontSize: '0.9rem', color: '#475569', fontWeight: 600 }}>
-                        {result.expiryDate}
-                      </span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.65rem' }}>
+                      <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.875rem' }}>Expiration Date</span>
+                      <span style={{ color: '#0f172a', fontWeight: 600, fontSize: '0.875rem' }}>{result.expiryDate}</span>
                     </div>
                   )}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.25rem' }}>
+                    <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.875rem' }}>Certificate Status</span>
+                    <span style={{ color: '#166534', fontWeight: 800, fontSize: '0.75rem', backgroundColor: '#dcfce7', padding: '0.2rem 0.75rem', borderRadius: '1rem', textTransform: 'uppercase' }}>{result.status}</span>
+                  </div>
                 </div>
               </div>
-            )}
+
+              {/* Right Column: Visual Certificate Mockup Card */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fafafa', borderRadius: '0.75rem', padding: '1.25rem', border: '1px solid #f1f5f9' }}>
+                <div style={{ width: '100%', minHeight: '300px', backgroundColor: '#ffffff', border: '4px solid #f8fafc', borderRadius: '0.25rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(0,0,0,0.08)', position: 'relative', overflow: 'hidden' }}>
+                    {/* Certificate Borders */}
+                    <div style={{ position: 'absolute', top: '10px', bottom: '10px', left: '10px', right: '10px', border: '1px solid #cbd5e1' }}></div>
+                    <div style={{ position: 'absolute', top: '14px', bottom: '14px', left: '14px', right: '14px', border: '2px solid #00204a' }}></div>
+                    
+                    <div style={{ position: 'absolute', top: 0, left: 0, width: '50px', height: '50px', backgroundColor: '#00204a', clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}></div>
+                    <div style={{ position: 'absolute', bottom: 0, right: 0, width: '50px', height: '50px', backgroundColor: '#00204a', clipPath: 'polygon(100% 100%, 100% 0, 0 100%)' }}></div>
+
+                    {/* QR Code Graphic Box */}
+                    <div style={{ position: 'absolute', top: '20px', left: '20px', width: '38px', height: '38px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '4px', padding: '3px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 12, boxShadow: '0 2px 4px rgba(0,0,0,0.08)' }}>
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+                        <rect x="2" y="2" width="6" height="6" fill="#00204a" />
+                        <rect x="16" y="2" width="6" height="6" fill="#00204a" />
+                        <rect x="2" y="16" width="6" height="6" fill="#00204a" />
+                        <rect x="3.5" y="3.5" width="3" height="3" fill="#ffffff" />
+                        <rect x="17.5" y="3.5" width="3" height="3" fill="#ffffff" />
+                        <rect x="3.5" y="17.5" width="3" height="3" fill="#ffffff" />
+                        <rect x="4.5" y="4.5" width="1" height="1" fill="#00204a" />
+                        <rect x="18.5" y="4.5" width="1" height="1" fill="#00204a" />
+                        <rect x="4.5" y="18.5" width="1" height="1" fill="#00204a" />
+                        <rect x="10" y="2" width="2" height="2" fill="#00204a" />
+                        <rect x="10" y="6" width="2" height="2" fill="#00204a" />
+                        <rect x="2" y="10" width="2" height="2" fill="#00204a" />
+                        <rect x="6" y="10" width="2" height="2" fill="#00204a" />
+                        <rect x="10" y="10" width="4" height="4" fill="#00204a" />
+                        <rect x="16" y="10" width="2" height="2" fill="#00204a" />
+                        <rect x="20" y="10" width="2" height="2" fill="#00204a" />
+                        <rect x="10" y="16" width="2" height="2" fill="#00204a" />
+                        <rect x="14" y="16" width="4" height="2" fill="#00204a" />
+                        <rect x="20" y="16" width="2" height="4" fill="#00204a" />
+                      </svg>
+                    </div>
+
+                    {/* Certificate Body Text */}
+                    <div style={{ textAlign: 'center', padding: '1.25rem', zIndex: 5, width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                         <img src="/images/logo-ctsda.png" alt="CTSDA Logo" style={{ height: '32px', objectFit: 'contain' }} />
+                         <div style={{ fontSize: '0.5rem', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.02em', fontWeight: 800, textAlign: 'left', lineHeight: 1.2 }}>
+                           Council For Training Skills &<br/>Development America
+                         </div>
+                      </div>
+                      <div style={{ fontSize: '0.55rem', color: '#94a3b8', marginBottom: '0.35rem' }}>This is to certify that</div>
+                      
+                      <div style={{ fontSize: '1.15rem', fontWeight: 'bold', color: '#0f172a', marginBottom: '0.35rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.2rem', display: 'inline-block' }}>
+                        {result.recipientName}
+                      </div>
+                      
+                      <div style={{ fontSize: '0.525rem', color: '#64748b', marginTop: '0.15rem' }}>has successfully completed the training program:</div>
+                      
+                      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0.35rem 0' }}>
+                        <div style={{ fontSize: '0.725rem', fontWeight: 'bold', color: '#0f172a', padding: '0 0.5rem' }}>{result.courseProgram}</div>
+                      </div>
+                      
+                      <div style={{ fontSize: '0.525rem', color: '#64748b', marginBottom: '0.75rem' }}>and is hereby awarded this certificate.</div>
+                      
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto', padding: '0 0.25rem' }}>
+                        <div style={{ textAlign: 'left' }}>
+                          <div style={{ fontSize: '0.425rem', color: '#64748b', fontWeight: 600 }}>Cert No: <span style={{ color: '#0f172a' }}>{result.certificateNumber}</span></div>
+                          <div style={{ fontSize: '0.425rem', color: '#64748b', fontWeight: 600 }}>Issued: <span style={{ color: '#0f172a' }}>{result.issueDate}</span></div>
+                        </div>
+                        
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ borderBottom: '1px solid #0f172a', width: '80px', marginBottom: '0.2rem', display: 'flex', justifyContent: 'center' }}>
+                              <span style={{ fontFamily: "'Brush Script MT', 'Lucida Handwriting', cursive", fontSize: '0.9rem', color: '#1e293b', lineHeight: 1 }}>James H.</span>
+                          </div>
+                          <div style={{ fontSize: '0.425rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Director of Training</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Gold Stamp Seal */}
+                    <div style={{ position: 'absolute', bottom: '1.25rem', right: '1.25rem', width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)', zIndex: 10 }}>
+                       <div style={{ width: '22px', height: '22px', borderRadius: '50%', border: '1px dashed #fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ fontSize: '0.3rem', color: '#fff', fontWeight: 'bold' }}>CTSD</span>
+                       </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Info Banner */}
+            <div style={{ backgroundColor: '#eff6ff', padding: '1.25rem 1.5rem', borderRadius: '0.5rem', display: 'flex', gap: '0.875rem', alignItems: 'center', marginBottom: '1.75rem' }}>
+              <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>i</span>
+              </div>
+              <p style={{ margin: 0, color: '#1e3a8a', fontSize: '0.9rem' }}>
+                This verification confirms that the certificate above is valid and was issued by the Council for Training Skills and Development America.
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => { setResult(null); setToken(''); }}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: '#f1f5f9',
+                  color: '#475569',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '0.5rem',
+                  fontWeight: 600,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
+                🔄 Verify Another Certificate
+              </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: '#2563eb',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+                }}
+              >
+                🖨️ Print / Download PDF
+              </button>
+            </div>
           </div>
         )}
       </div>
