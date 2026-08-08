@@ -125,6 +125,9 @@ export default async function TrainingPage({ searchParams }: { searchParams?: an
         </div>
 
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: 'clamp(2rem, 5vw, 4rem) 1rem', boxSizing: 'border-box' }}>
+          {/* Student Verification Widget on top of courses */}
+          <StudentVerificationWidget />
+
           {items.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '5rem 1rem', color: '#94a3b8' }}>
               <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎓</div>
@@ -150,7 +153,7 @@ export default async function TrainingPage({ searchParams }: { searchParams?: an
                 </div>
               )}
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '2rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '2rem' }}>
                 {items.map((item: any) => {
                   const catStyle = CATEGORY_COLORS[item.category] || DEFAULT_COLOR;
                   return (
@@ -199,9 +202,6 @@ export default async function TrainingPage({ searchParams }: { searchParams?: an
               </div>
             </>
           )}
-
-          {/* Student Verification Widget */}
-          <StudentVerificationWidget />
         </div>
       </main>
       <PremiumFooter />

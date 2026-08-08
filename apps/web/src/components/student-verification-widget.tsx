@@ -71,7 +71,7 @@ export function StudentVerificationWidget() {
   return (
     <section
       style={{
-        marginTop: '4rem',
+        marginBottom: '3.5rem',
         padding: '3rem 2rem',
         backgroundColor: '#ffffff',
         borderRadius: '1.25rem',
