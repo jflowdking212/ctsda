@@ -1128,18 +1128,18 @@ export function ApplicationDetail({
             Mark Under Review
           </button>
         )}
-        {['submitted', 'initial_screening', 'under_review', 'changes_requested', 'resubmitted', 'final_review'].includes(application.status) && (
+        {['submitted', 'initial_screening', 'under_review', 'changes_requested', 'resubmitted', 'final_review', 'approved'].includes(application.status) && (
           <button
             className={`admin-button ${workingAction.endsWith('/approve') ? 'is-loading' : ''}`}
-            style={{ backgroundColor: '#10b981', color: 'white', borderColor: '#10b981', fontWeight: 700, padding: '0.5rem 1rem', borderRadius: '0.375rem' }}
+            style={{ backgroundColor: application.status === 'approved' ? '#9ca3af' : '#10b981', color: 'white', borderColor: application.status === 'approved' ? '#9ca3af' : '#10b981', fontWeight: 700, padding: '0.5rem 1rem', borderRadius: '0.375rem' }}
             type="button"
             onClick={() => onAction(`/admin/applications/${application.id}/approve`, { reason: 'Approved in dashboard' })}
-            disabled={actionBusy}
+            disabled={actionBusy || application.status === 'approved'}
           >
-            {workingAction.endsWith('/approve') ? 'Approving...' : '✓ Approve Application'}
+            {workingAction.endsWith('/approve') ? 'Approving...' : application.status === 'approved' ? '✓ Already Approved' : '✓ Approve Application'}
           </button>
         )}
-        {['submitted', 'under_review', 'initial_screening', 'changes_requested', 'resubmitted'].includes(application.status) && (
+        {['submitted', 'under_review', 'initial_screening', 'changes_requested', 'resubmitted', 'approved'].includes(application.status) && (
           <button
             className={`admin-button ${workingAction.endsWith('/request-changes') ? 'is-loading' : ''}`}
             style={{ backgroundColor: '#f59e0b', color: 'white', borderColor: '#f59e0b', fontWeight: 600, padding: '0.5rem 1rem', borderRadius: '0.375rem' }}
@@ -1155,7 +1155,7 @@ export function ApplicationDetail({
             {workingAction.endsWith('/request-changes') ? 'Sending...' : 'Request Changes'}
           </button>
         )}
-        {['submitted', 'initial_screening', 'under_review', 'changes_requested', 'resubmitted', 'final_review'].includes(application.status) && (
+        {['submitted', 'initial_screening', 'under_review', 'changes_requested', 'resubmitted', 'final_review', 'approved'].includes(application.status) && (
           <button
             className={`admin-button ${workingAction.endsWith('/reject') && !workingAction.endsWith('/undo-reject') ? 'is-loading' : ''}`}
             style={{ backgroundColor: '#ef4444', color: 'white', borderColor: '#ef4444', fontWeight: 600, padding: '0.5rem 1rem', borderRadius: '0.375rem' }}

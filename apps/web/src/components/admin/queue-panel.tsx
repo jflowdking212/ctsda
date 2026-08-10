@@ -238,12 +238,12 @@ export function QueuePanel({
         <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem', textAlign: 'left' }}>
           <thead style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
             <tr>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Applicant</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Institution</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Country</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Submitted Date</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Status</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Actions</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase', width: '22%' }}>Applicant</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase', width: '18%' }}>Institution</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase', width: '12%' }}>Country</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase', width: '14%' }}>Submitted Date</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase', width: '15%' }}>Status</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase', width: '19%' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -377,11 +377,21 @@ export function QueuePanel({
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', marginBottom: '1.5rem', paddingBottom: '1.25rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 {viewingApp.institution?.logoUrl ? (
-                  <img
-                    src={viewingApp.institution.logoUrl}
-                    alt="Logo"
-                    style={{ width: '56px', height: '56px', borderRadius: '10px', objectFit: 'contain', border: '1px solid #e2e8f0', padding: '0.25rem', backgroundColor: '#ffffff' }}
-                  />
+                  <>
+                    <img
+                      src={viewingApp.institution.logoUrl}
+                      alt="Logo"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const fallback = e.currentTarget.parentElement?.querySelector('.fallback-initial') as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                      style={{ width: '56px', height: '56px', borderRadius: '10px', objectFit: 'contain', border: '1px solid #e2e8f0', padding: '0.25rem', backgroundColor: '#ffffff' }}
+                    />
+                    <div className="fallback-initial" style={{ width: '56px', height: '56px', borderRadius: '10px', backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 800, fontSize: '1.5rem', display: 'none', alignItems: 'center', justifyContent: 'center', border: '1px solid #bfdbfe' }}>
+                      {(viewingApp.institution?.name || 'I')[0]}
+                    </div>
+                  </>
                 ) : (
                   <div style={{ width: '56px', height: '56px', borderRadius: '10px', backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 800, fontSize: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #bfdbfe' }}>
                     {(viewingApp.institution?.name || 'I')[0]}
@@ -573,11 +583,11 @@ export function QueuePanel({
             </div>
 
             {/* SECTION 4: SUBMITTED COMPLIANCE & QUALITY DOCUMENTS */}
-            {viewingApp.documents && viewingApp.documents.length > 0 && (
-              <div style={{ marginBottom: '1.75rem' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', borderBottom: '2px solid #eff6ff', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>📎</span> Submitted Verification &amp; Compliance Documents ({viewingApp.documents.length})
-                </h3>
+            <div style={{ marginBottom: '1.75rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', borderBottom: '2px solid #eff6ff', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span>📎</span> Submitted Verification &amp; Compliance Documents {viewingApp.documents ? `(${viewingApp.documents.length})` : ''}
+              </h3>
+              {viewingApp.documents && viewingApp.documents.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {viewingApp.documents.map((doc: any, i: number) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', backgroundColor: '#ffffff', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
@@ -596,15 +606,19 @@ export function QueuePanel({
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div style={{ padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', border: '1px dashed #cbd5e1', color: '#64748b', textAlign: 'center', fontSize: '0.875rem' }}>
+                  No compliance documents were submitted with this application.
+                </div>
+              )}
+            </div>
 
             {/* SECTION 5: INVOICES & FINANCIAL SUMMARY */}
-            {viewingApp.invoices && viewingApp.invoices.length > 0 && (
-              <div style={{ marginBottom: '1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', borderBottom: '2px solid #eff6ff', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>💳</span> Billing &amp; Invoices
-                </h3>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', borderBottom: '2px solid #eff6ff', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span>💳</span> Billing &amp; Invoices
+              </h3>
+              {viewingApp.invoices && viewingApp.invoices.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {viewingApp.invoices.map((inv: any, i: number) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', backgroundColor: '#ffffff', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
@@ -619,8 +633,12 @@ export function QueuePanel({
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div style={{ padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', border: '1px dashed #cbd5e1', color: '#64748b', textAlign: 'center', fontSize: '0.875rem' }}>
+                  No invoices are currently associated with this application.
+                </div>
+              )}
+            </div>
 
             {/* Modal Actions Footer */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', borderTop: '1px solid #e2e8f0', paddingTop: '1.25rem', marginTop: '1.5rem' }}>
