@@ -160,35 +160,40 @@ export class PaymentsService {
     const envUrl = process.env.FRONTEND_URL || '';
     const frontendUrl = (!envUrl || envUrl.includes('localhost')) ? 'https://ctsda.acecoterieconsulting.com' : envUrl;
     
-    const session = await stripe.checkout.sessions.create(
-      {
-        mode: 'payment',
-        success_url: `${frontendUrl}/payment/${invoice.id}?payment=success`,
-        cancel_url: `${frontendUrl}/payment/${invoice.id}?payment=cancelled`,
-        customer_email: invoice.application?.institution?.email,
-        metadata: {
-          invoiceId: invoice.id,
-          applicationId: invoice.applicationId,
-          isPublic: 'true',
-        },
-        line_items: [
-          {
-            quantity: 1,
-            price_data: {
-              currency: invoice.currency.toLowerCase(),
-              unit_amount: Math.round(Number(invoice.amount) * 100),
-              product_data: {
-                name: invoice.description || 'CTSDA accreditation application fee',
-                description: invoice.application?.institution?.name || 'Accreditation',
+    try {
+      const session = await stripe.checkout.sessions.create(
+        {
+          mode: 'payment',
+          success_url: `${frontendUrl}/payment/${invoice.id}?payment=success`,
+          cancel_url: `${frontendUrl}/payment/${invoice.id}?payment=cancelled`,
+          customer_email: invoice.application?.institution?.email || undefined,
+          metadata: {
+            invoiceId: invoice.id,
+            applicationId: invoice.applicationId || 'unknown',
+            isPublic: 'true',
+          },
+          line_items: [
+            {
+              quantity: 1,
+              price_data: {
+                currency: (invoice.currency || 'usd').toLowerCase(),
+                unit_amount: Math.round(Number(invoice.amount) * 100),
+                product_data: {
+                  name: invoice.description || 'CTSDA accreditation application fee',
+                  description: invoice.application?.institution?.name || 'Accreditation',
+                },
               },
             },
-          },
-        ],
-      },
-      { idempotencyKey: `public_checkout:${invoice.id}` },
-    );
+          ],
+        },
+        { idempotencyKey: `public_checkout:${invoice.id}` },
+      );
 
-    return { url: session.url, sessionId: session.id, invoiceId: invoice.id };
+      return { url: session.url, sessionId: session.id, invoiceId: invoice.id };
+    } catch (error: any) {
+      console.error('Stripe public checkout error:', error.message, error.stack);
+      throw new BadRequestException(`Payment provider error: ${error.message}`);
+    }
   }
 
   async handleWebhook(payload: any, signature?: string, rawBody?: Buffer | string) {
