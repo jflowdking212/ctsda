@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import { MapPin, Mail, Globe, Calendar, Building, CheckCircle2, ShieldCheck, Share2, Star } from 'lucide-react';
-import api from '../../../lib/api';
 import MainHeader from '../../../components/main-header';
 import Footer from '../../../components/footer';
 
@@ -15,11 +14,13 @@ export default function InstitutionPage() {
   useEffect(() => {
     async function fetchInstitution() {
       try {
-        const response = await api.get(`/institutions/public-accredited/${slug}`);
-        if (!response.data) {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const response = await fetch(`${apiUrl}/institutions/public-accredited/${slug}`);
+        if (!response.ok) {
           setInstitution(null);
         } else {
-          setInstitution(response.data);
+          const data = await response.json();
+          setInstitution(data);
         }
       } catch (err) {
         console.error('Failed to load institution', err);

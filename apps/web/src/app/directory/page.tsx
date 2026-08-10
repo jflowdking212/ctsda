@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Search, MapPin } from 'lucide-react';
-import api from '../../lib/api';
 import MainHeader from '../../components/main-header';
 import Footer from '../../components/footer';
 
@@ -15,8 +14,12 @@ export default function DirectoryPage() {
   useEffect(() => {
     async function fetchDirectory() {
       try {
-        const response = await api.get('/institutions/public-accredited');
-        setInstitutions(response.data);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const response = await fetch(`${apiUrl}/institutions/public-accredited`);
+        if (response.ok) {
+          const data = await response.json();
+          setInstitutions(data);
+        }
       } catch (err) {
         console.error('Failed to load directory', err);
       } finally {
