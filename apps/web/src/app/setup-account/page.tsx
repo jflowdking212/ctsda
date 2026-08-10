@@ -50,7 +50,7 @@ function SetupAccountForm() {
       
       setSuccess(true);
       setTimeout(() => {
-        router.push('/login');
+        router.push('/portal/login');
       }, 3000);
     } catch (err: any) {
       setError(err.message);
