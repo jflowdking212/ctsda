@@ -8,7 +8,7 @@ import { EmailTemplateName, renderEmailTemplate } from './email-templates';
 export class NotificationsService {
   constructor(private prisma: PrismaService, @InjectQueue('email') private emailQueue: Queue) {}
 
-  async enqueueEmail(data: { to: string; subject: string; html: string; userId: string }) {
+  async enqueueEmail(data: { to: string; subject: string; html: string; userId?: string }) {
     const isUuid =
       typeof data.userId === 'string' &&
       /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(data.userId);
@@ -95,7 +95,7 @@ export class NotificationsService {
 
   async enqueueTemplateEmail(data: {
     to: string;
-    userId: string;
+    userId?: string;
     template: EmailTemplateName;
     values?: Record<string, string>;
   }) {
