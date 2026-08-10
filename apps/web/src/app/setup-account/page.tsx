@@ -2,6 +2,8 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { PremiumHeader } from '../../components/premium-header';
+import { PremiumFooter } from '../../components/premium-footer';
 
 function SetupAccountForm() {
   const [password, setPassword] = useState('');
@@ -58,66 +60,103 @@ function SetupAccountForm() {
   };
 
   return (
-    <main className="content-page narrow" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <div className="content-panel content-form max-w-md mx-auto w-full p-8">
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h1 className="text-2xl font-bold text-slate-900">Setup Your Account</h1>
-          <p className="text-slate-500 mt-2">Welcome to CTSDA! Please create a password for your account.</p>
-        </div>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f8fafc' }}>
+      <PremiumHeader />
 
-        {success ? (
-          <div className="text-center">
-            <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">✓</div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Account Ready!</h3>
-            <p className="text-slate-600 mb-6">Your password has been set successfully.</p>
-            <p className="text-sm text-slate-500">Redirecting to login...</p>
+      <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem 1rem', background: 'radial-gradient(ellipse at top, rgba(37,99,235,0.06), transparent 70%)' }}>
+        <div style={{ width: '100%', maxWidth: '460px', backgroundColor: '#ffffff', borderRadius: '1rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px -15px rgba(15,23,42,0.08)', overflow: 'hidden' }}>
+          
+          <div style={{ backgroundColor: '#0f172a', padding: '2rem 1.5rem', textAlign: 'center', color: '#ffffff', position: 'relative' }}>
+            <img src="/images/logo-ctsda.png" alt="CTSDA Logo" style={{ width: '56px', height: '56px', objectFit: 'contain', margin: '0 auto 0.75rem auto', display: 'block' }} />
+            <span style={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.12em', color: '#60a5fa', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
+              ACCOUNT SETUP
+            </span>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>Create Your Password</h1>
+            <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '0.35rem', marginBottom: 0, lineHeight: 1.4 }}>
+              Set a secure password to access your CTSDA portal.
+            </p>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <label className="block w-full">
-              <span className="block text-sm font-semibold text-slate-700 mb-1">New Password *</span>
-              <input 
-                type="password" 
-                required 
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                disabled={loading || !token}
-                className="w-full border border-slate-300 rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-            </label>
-            <label className="block w-full">
-              <span className="block text-sm font-semibold text-slate-700 mb-1">Confirm Password *</span>
-              <input 
-                type="password" 
-                required 
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                disabled={loading || !token}
-                className="w-full border border-slate-300 rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-            </label>
 
-            {error && <p className="text-red-600 text-sm mt-1 p-2 bg-red-50 rounded border border-red-100">{error}</p>}
-            
-            <button 
-              type="submit" 
-              disabled={loading || !token}
-              className={`w-full py-2 px-4 rounded-md text-white font-medium transition-colors mt-2 ${loading || !token ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
-            >
-              {loading ? 'Setting up...' : 'Save Password & Continue'}
-            </button>
-          </form>
-        )}
-      </div>
-    </main>
+          {success ? (
+            <div style={{ padding: '2.5rem 1.75rem', textAlign: 'center' }}>
+              <div style={{ width: '64px', height: '64px', backgroundColor: '#dcfce7', color: '#16a34a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto', fontSize: '1.75rem', fontWeight: 800 }}>✓</div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.5rem' }}>Account Ready!</h3>
+              <p style={{ color: '#475569', marginBottom: '1.5rem', fontSize: '0.95rem' }}>Your password has been set successfully.</p>
+              <p style={{ fontSize: '0.85rem', color: '#64748b' }}>Redirecting to login...</p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} style={{ padding: '2rem 1.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>
+                  New Password <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input 
+                  type="password" 
+                  required 
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  disabled={loading || !token}
+                  placeholder="At least 8 characters"
+                  style={{ padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', fontSize: '0.9rem', outline: 'none', width: '100%', transition: 'all 0.15s' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>
+                  Confirm Password <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input 
+                  type="password" 
+                  required 
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  disabled={loading || !token}
+                  placeholder="Repeat new password"
+                  style={{ padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', fontSize: '0.9rem', outline: 'none', width: '100%', transition: 'all 0.15s' }}
+                />
+              </div>
+
+              {error && (
+                <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '0.75rem 1rem', borderRadius: '0.5rem', fontSize: '0.85rem', lineHeight: 1.4 }}>
+                  {error}
+                </div>
+              )}
+              
+              <button 
+                type="submit" 
+                disabled={loading || !token}
+                style={{
+                  width: '100%',
+                  padding: '0.85rem 1.5rem',
+                  backgroundColor: (loading || !token) ? '#94a3b8' : '#2563eb',
+                  color: '#ffffff',
+                  fontWeight: 700,
+                  fontSize: '0.95rem',
+                  borderRadius: '0.5rem',
+                  border: 'none',
+                  cursor: (loading || !token) ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.15s ease-in-out',
+                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+                  marginTop: '0.25rem',
+                }}
+              >
+                {loading ? 'Setting up...' : 'Save Password & Continue'}
+              </button>
+            </form>
+          )}
+        </div>
+      </main>
+      
+      <PremiumFooter />
+    </div>
   );
 }
 
 export default function SetupAccountPage() {
   return (
     <Suspense fallback={
-      <main className="content-page narrow" style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <p>Loading account setup...</p>
+      <main style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc' }}>
+        <p style={{ color: '#64748b' }}>Loading account setup...</p>
       </main>
     }>
       <SetupAccountForm />
