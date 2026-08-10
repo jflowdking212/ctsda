@@ -234,16 +234,16 @@ export function QueuePanel({
       </div>
 
       {/* Applications Table */}
-      <div className="admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.5rem', overflow: 'auto' }}>
-        <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', fontSize: '0.875rem', textAlign: 'left' }}>
+      <div className="admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.5rem', overflowX: 'auto' }}>
+        <table className="admin-table" style={{ width: '100%', minWidth: '950px', borderCollapse: 'collapse', fontSize: '0.875rem', textAlign: 'left' }}>
           <thead style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
             <tr>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase', width: '25%' }}>Applicant</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase', width: '17%' }}>Institution</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase', width: '11%' }}>Country</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase', width: '12%' }}>Submitted Date</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase', width: '21%' }}>Status</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase', width: '14%' }}>Actions</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Applicant</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Institution</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Country</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Submitted Date</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Status</th>
+              <th style={{ padding: '0.75rem 1rem', textAlign: 'right', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -288,8 +288,8 @@ export function QueuePanel({
                       </div>
                     )}
                   </td>
-                  <td style={{ padding: '0.75rem 1rem', textAlign: 'left' }}>
-                    <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                  <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
+                    <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', justifyContent: 'flex-end' }}>
                       <button
                         className="admin-button"
                         style={{
@@ -373,25 +373,18 @@ export function QueuePanel({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header with Logo */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', marginBottom: '1.5rem', paddingBottom: '1.25rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            {/* Modal Content Header */}
+            <div style={{ padding: '2rem 2.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
                 {viewingApp.institution?.logoUrl ? (
-                  <>
-                    <img
-                      src={viewingApp.institution.logoUrl}
-                      alt="Logo"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        const fallback = e.currentTarget.parentElement?.querySelector('.fallback-initial') as HTMLElement;
-                        if (fallback) fallback.style.display = 'flex';
-                      }}
-                      style={{ width: '56px', height: '56px', borderRadius: '10px', objectFit: 'contain', border: '1px solid #e2e8f0', padding: '0.25rem', backgroundColor: '#ffffff' }}
-                    />
-                    <div className="fallback-initial" style={{ width: '56px', height: '56px', borderRadius: '10px', backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 800, fontSize: '1.5rem', display: 'none', alignItems: 'center', justifyContent: 'center', border: '1px solid #bfdbfe' }}>
-                      {(viewingApp.institution?.name || 'I')[0]}
-                    </div>
-                  </>
+                  <img
+                    src={viewingApp.institution.logoUrl.startsWith('http') ? viewingApp.institution.logoUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/accreditations/logo-file?key=${encodeURIComponent(viewingApp.institution.logoUrl)}`}
+                    alt="Logo"
+                    style={{ width: '56px', height: '56px', borderRadius: '10px', objectFit: 'contain', border: '1px solid #e2e8f0', padding: '0.25rem', backgroundColor: '#ffffff' }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
                 ) : (
                   <div style={{ width: '56px', height: '56px', borderRadius: '10px', backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 800, fontSize: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #bfdbfe' }}>
                     {(viewingApp.institution?.name || 'I')[0]}
