@@ -70,6 +70,58 @@ export class InstitutionsService {
     });
   }
 
+  async findPublicAccreditedBySlug(slug: string) {
+    const institution = await this.prisma.institution.findFirst({
+      where: {
+        slug,
+        isActive: true,
+        accreditations: {
+          some: {
+            status: 'active',
+            expiresAt: { gt: new Date() },
+          },
+        },
+      },
+      include: {
+        accreditations: {
+          where: {
+            status: 'active',
+            expiresAt: { gt: new Date() },
+          },
+          orderBy: { expiresAt: 'desc' },
+          take: 1,
+        },
+        socialLinks: true,
+        applications: {
+          where: {
+            status: 'approved',
+          },
+          orderBy: { submittedAt: 'desc' },
+          take: 1,
+          include: {
+            offeredCertificates: true,
+            trainingAreas: { include: { trainingArea: true } },
+          },
+        },
+      },
+    });
+
+    if (!institution) {
+      return null;
+    }
+
+    const publicUrl = process.env.API_PUBLIC_URL || 'http://localhost:4000';
+    let logo = institution.logoUrl;
+    if (logo && !logo.startsWith('http') && !logo.startsWith('data:')) {
+      logo = `${publicUrl}/uploads/${logo}`;
+    }
+
+    return {
+      ...institution,
+      logoUrl: logo,
+    };
+  }
+
   async findAll() {
     return this.prisma.institution.findMany({
       select: {

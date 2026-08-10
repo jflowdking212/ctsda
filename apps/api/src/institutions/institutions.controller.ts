@@ -152,6 +152,11 @@ export class InstitutionsController {
     return this.institutionsService.findPublicAccredited();
   }
 
+  @Get('public-accredited/:slug')
+  async findPublicAccreditedBySlug(@Param('slug') slug: string) {
+    return this.institutionsService.findPublicAccreditedBySlug(slug);
+  }
+
   @Get()
   async findAll() {
     return this.institutionsService.findAll();
