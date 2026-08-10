@@ -1,29 +1,64 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { notFound, useParams } from 'next/navigation';
-import { MapPin, Mail, Globe, Calendar, Building, CheckCircle2, ShieldCheck, Share2, Star } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { PremiumHeader } from '../../../components/premium-header';
 import { PremiumFooter } from '../../../components/premium-footer';
+
+function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div style={{
+      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+      padding: '14px 0', borderBottom: '1px solid #f1f5f9',
+    }}>
+      <span style={{ color: '#64748b', fontSize: '14px' }}>{label}</span>
+      <span style={{ fontWeight: 600, color: '#0f172a', fontSize: '14px', textAlign: 'right' as const, maxWidth: '60%' }}>{value}</span>
+    </div>
+  );
+}
+
+function ContactItem({ icon, label, value, href }: { icon: string; label: string; value: string; href?: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '14px 0', borderBottom: '1px solid #f1f5f9' }}>
+      <div style={{
+        width: '38px', height: '38px', borderRadius: '10px',
+        background: 'linear-gradient(135deg, #eff6ff, #e0e7ff)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: '18px', flexShrink: 0,
+      }}>{icon}</div>
+      <div>
+        <p style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.05em', margin: '0 0 3px' }}>{label}</p>
+        {href ? (
+          <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', fontSize: '14px', textDecoration: 'none', wordBreak: 'break-all' as const }}>
+            {value}
+          </a>
+        ) : (
+          <p style={{ color: '#334155', fontSize: '14px', margin: 0, lineHeight: 1.5 }}>{value}</p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function InstitutionPage() {
   const { slug } = useParams();
   const [institution, setInstitution] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     async function fetchInstitution() {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
         const response = await fetch(`${apiUrl}/institutions/public-accredited/${slug}`);
-        if (!response.ok) {
-          setInstitution(null);
-        } else {
+        if (response.ok) {
           const data = await response.json();
           setInstitution(data);
+        } else {
+          setInstitution(null);
         }
-      } catch (err) {
-        console.error('Failed to load institution', err);
+      } catch {
         setInstitution(null);
       } finally {
         setLoading(false);
@@ -32,25 +67,49 @@ export default function InstitutionPage() {
     if (slug) fetchInstitution();
   }, [slug]);
 
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const pageStyle: React.CSSProperties = {
+    minHeight: '100vh', display: 'flex', flexDirection: 'column',
+    background: '#f0f4f8', fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-50">
+      <div style={pageStyle}>
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); @keyframes spin { to { transform: rotate(360deg); } }`}</style>
         <PremiumHeader />
-        <div className="flex-grow flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+          <div style={{ width: '48px', height: '48px', border: '4px solid #e2e8f0', borderTop: '4px solid #2563eb', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <p style={{ color: '#64748b' }}>Loading institution profile...</p>
         </div>
+        <PremiumFooter />
       </div>
     );
   }
 
   if (!institution) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-50">
+      <div style={pageStyle}>
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');`}</style>
         <PremiumHeader />
-        <div className="flex-grow flex flex-col items-center justify-center p-4">
-          <Building className="h-16 w-16 text-slate-300 mb-4" />
-          <h1 className="text-2xl font-bold text-slate-800">Institution Not Found</h1>
-          <p className="text-slate-500 mt-2">The institution you are looking for does not exist or is no longer accredited.</p>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 24px', textAlign: 'center' }}>
+          <div style={{ fontSize: '64px', marginBottom: '20px' }}>🏛️</div>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', margin: '0 0 12px' }}>Institution Not Found</h1>
+          <p style={{ color: '#64748b', fontSize: '16px', margin: '0 0 28px', maxWidth: '400px' }}>
+            The institution you are looking for does not exist or is no longer accredited.
+          </p>
+          <Link href="/directory" style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            background: '#2563eb', color: '#fff', textDecoration: 'none',
+            borderRadius: '12px', padding: '12px 28px', fontWeight: 600, fontSize: '15px',
+          }}>
+            ← Back to Directory
+          </Link>
         </div>
         <PremiumFooter />
       </div>
@@ -58,223 +117,340 @@ export default function InstitutionPage() {
   }
 
   const latestAccreditation = institution.accreditations?.[0];
-  const validUntil = latestAccreditation?.expiresAt 
+  const validUntil = latestAccreditation?.expiresAt
     ? new Date(latestAccreditation.expiresAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     : 'N/A';
-
   const approvedApp = institution.applications?.[0];
   const programs = approvedApp?.offeredCertificates || [];
-  const trainingAreas = approvedApp?.trainingAreas?.map((ta: any) => ta.trainingArea.name) || [];
+  const trainingAreas = approvedApp?.trainingAreas?.map((ta: any) => ta.trainingArea?.name).filter(Boolean) || [];
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div style={pageStyle}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .prog-item:hover { background: #eff6ff !important; border-color: #bfdbfe !important; }
+        .share-btn:hover { background: #f8fafc !important; }
+      `}</style>
       <PremiumHeader />
-      <main className="flex-grow pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          {/* Top Header Card */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden mb-8">
-            <div className="h-32 sm:h-48 bg-gradient-to-r from-blue-600 to-indigo-700 relative">
-              {/* Decorative pattern */}
-              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
+
+      {/* Hero Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%)',
+        padding: '60px 24px 80px',
+        position: 'relative', overflow: 'hidden',
+      }}>
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.06) 1px, transparent 0)',
+          backgroundSize: '28px 28px',
+        }} />
+        {/* Breadcrumb */}
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '1100px', margin: '0 auto', marginBottom: '12px' }}>
+          <Link href="/directory" style={{ color: '#93c5fd', textDecoration: 'none', fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            ← All Accredited Institutions
+          </Link>
+        </div>
+      </div>
+
+      {/* Profile Card overlapping hero */}
+      <div style={{ maxWidth: '1100px', margin: '-60px auto 0', padding: '0 24px', position: 'relative', zIndex: 10, width: '100%', boxSizing: 'border-box' }}>
+        <div style={{
+          background: '#ffffff', borderRadius: '24px',
+          boxShadow: '0 8px 40px rgba(0,0,0,0.12)',
+          border: '1px solid #e8eef5', overflow: 'hidden',
+          animation: 'fadeUp 0.5s ease both',
+        }}>
+          {/* Header inside card */}
+          <div style={{ padding: '32px 36px', display: 'flex', alignItems: 'flex-start', gap: '28px', flexWrap: 'wrap' }}>
+            {/* Logo */}
+            <div style={{
+              width: '100px', height: '100px', flexShrink: 0,
+              borderRadius: '20px', background: '#f8fafc',
+              border: '2px solid #e8eef5',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+            }}>
+              {institution.logoUrl ? (
+                <img src={institution.logoUrl} alt={`${institution.name} logo`} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
+              ) : (
+                <div style={{
+                  width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'linear-gradient(135deg, #dbeafe, #e0e7ff)',
+                  fontSize: '28px', fontWeight: 800, color: '#1d4ed8',
+                }}>
+                  {institution.name.substring(0, 2).toUpperCase()}
+                </div>
+              )}
             </div>
-            
-            <div className="px-6 sm:px-10 pb-8">
-              <div className="flex flex-col sm:flex-row sm:items-end -mt-16 sm:-mt-20 mb-6 gap-6 relative z-10">
-                {/* Logo */}
-                <div className="w-32 h-32 sm:w-40 sm:h-40 bg-white rounded-2xl shadow-md border border-slate-100 flex items-center justify-center p-4 overflow-hidden shrink-0">
-                  {institution.logoUrl ? (
-                    <img
-                      src={institution.logoUrl}
-                      alt={`${institution.name} logo`}
-                      className="max-w-full max-h-full object-contain"
-                    />
-                  ) : (
-                    <span className="text-slate-300 font-bold text-4xl">
-                      {institution.name.substring(0, 2).toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                
-                {/* Title & Badge */}
-                <div className="flex-grow pb-2">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-3 mb-2 flex-wrap">
-                        <h1 className="text-3xl font-bold text-slate-900">{institution.name}</h1>
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
-                          <ShieldCheck className="w-4 h-4 mr-1" />
-                          Accredited
-                        </span>
-                      </div>
-                      <p className="text-slate-500 font-medium flex items-center">
-                        <Calendar className="w-4 h-4 mr-1.5" />
-                        Valid until: {validUntil}
-                      </p>
-                    </div>
-                    
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-3">
-                      <button className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors">
-                        <Star className="w-4 h-4 mr-2" />
-                        Review / Evaluate
-                      </button>
-                      <button 
-                        onClick={() => navigator.clipboard.writeText(window.location.href)}
-                        className="inline-flex items-center justify-center px-4 py-2 border border-slate-200 text-sm font-medium rounded-lg shadow-sm text-slate-700 bg-white hover:bg-slate-50 transition-colors"
-                      >
-                        <Share2 className="w-4 h-4 mr-2 text-slate-400" />
-                        Share Profile
-                      </button>
-                    </div>
-                  </div>
-                </div>
+
+            {/* Name & Info */}
+            <div style={{ flex: 1, minWidth: '200px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '10px' }}>
+                <h1 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                  {institution.name}
+                </h1>
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '5px',
+                  background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0',
+                  borderRadius: '100px', padding: '4px 14px', fontSize: '13px', fontWeight: 600,
+                }}>
+                  ✓ Accredited
+                </span>
               </div>
-              
-              {/* Badges row for training areas (instead of certificates to keep it clean) */}
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', color: '#64748b', fontSize: '14px', marginBottom: '16px' }}>
+                {institution.country && <span>📍 {institution.country}</span>}
+                {institution.institutionType && <span>🏢 {institution.institutionType}</span>}
+                {institution.yearEstablished && <span>📅 Est. {institution.yearEstablished}</span>}
+                <span style={{ color: latestAccreditation ? '#15803d' : '#dc2626', fontWeight: 600 }}>
+                  🛡️ Valid until: {validUntil}
+                </span>
+              </div>
+
+              {/* Training Area Tags */}
               {trainingAreas.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-4">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                   {trainingAreas.map((area: string, idx: number) => (
-                    <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
-                      {area}
-                    </span>
+                    <span key={idx} style={{
+                      background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe',
+                      borderRadius: '100px', padding: '4px 12px', fontSize: '12px', fontWeight: 500,
+                    }}>{area}</span>
                   ))}
                 </div>
               )}
             </div>
+
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', gap: '10px', flexShrink: 0, flexWrap: 'wrap' }}>
+              <button
+                className="share-btn"
+                onClick={handleShare}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '8px',
+                  background: '#f8fafc', color: '#334155', border: '1px solid #e2e8f0',
+                  borderRadius: '10px', padding: '10px 20px', fontSize: '14px',
+                  fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s',
+                }}
+              >
+                {copied ? '✓ Copied!' : '🔗 Share'}
+              </button>
+            </div>
           </div>
 
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            {/* Left Column (About & Programs) */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* About Section */}
-              <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
-                <h2 className="text-xl font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">About the Institute</h2>
-                <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed">
-                  {institution.description ? (
-                    <p>{institution.description}</p>
-                  ) : (
-                    <p className="text-slate-400 italic">No description provided.</p>
-                  )}
-                </div>
-              </div>
+          {/* Divider */}
+          <div style={{ height: '1px', background: '#f1f5f9', margin: '0 36px' }} />
 
-              {/* Programs Section */}
-              <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
-                <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Programs & Certificates Offered</h2>
-                {programs.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {programs.map((prog: any, idx: number) => (
-                      <div key={idx} className="flex items-start p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-white hover:shadow-md hover:border-blue-100 transition-all">
-                        <CheckCircle2 className="w-5 h-5 text-blue-500 mr-3 shrink-0 mt-0.5" />
-                        <span className="font-medium text-slate-800">{prog.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-slate-500 italic">No specific programs listed.</p>
-                )}
-              </div>
+          {/* Accreditation Banner */}
+          <div style={{
+            margin: '20px 36px',
+            background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
+            border: '1px solid #bbf7d0', borderRadius: '14px',
+            padding: '16px 20px',
+            display: 'flex', alignItems: 'center', gap: '14px',
+          }}>
+            <div style={{ fontSize: '28px' }}>🏆</div>
+            <div>
+              <p style={{ fontWeight: 700, color: '#15803d', margin: '0 0 3px', fontSize: '15px' }}>
+                Officially Accredited by CTSDA
+              </p>
+              <p style={{ color: '#166534', fontSize: '13px', margin: 0 }}>
+                This institution has met all requirements set by the Council For Training Skills & Development America.
+                Accreditation valid until {validUntil}.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main style={{ maxWidth: '1100px', margin: '28px auto 60px', padding: '0 24px', width: '100%', boxSizing: 'border-box' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 360px', gap: '24px' }}>
+
+          {/* Left Column */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', minWidth: 0 }}>
+
+            {/* About */}
+            <div style={{
+              background: '#fff', borderRadius: '20px', padding: '32px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)', border: '1px solid #e8eef5',
+              animation: 'fadeUp 0.5s 0.1s ease both',
+            }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', margin: '0 0 20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '20px' }}>📖</span> About the Institution
+              </h2>
+              <p style={{ color: institution.description ? '#475569' : '#94a3b8', lineHeight: 1.8, margin: 0, fontStyle: institution.description ? 'normal' : 'italic' }}>
+                {institution.description || 'No description has been provided for this institution yet.'}
+              </p>
             </div>
 
-            {/* Right Column (Quick Info & Contact) */}
-            <div className="space-y-8">
-              {/* Quick Info */}
-              <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
-                <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Quick Info</h2>
-                <div className="space-y-5">
-                  <div className="flex justify-between items-center pb-4 border-b border-slate-50">
-                    <span className="text-slate-500">Founded</span>
-                    <span className="font-semibold text-slate-900">{institution.yearEstablished || 'N/A'}</span>
-                  </div>
-                  <div className="flex justify-between items-center pb-4 border-b border-slate-50">
-                    <span className="text-slate-500">Type</span>
-                    <span className="font-semibold text-slate-900 capitalize">{institution.institutionType || 'Institute'}</span>
-                  </div>
-                  <div className="flex justify-between items-center pb-4 border-b border-slate-50">
-                    <span className="text-slate-500">Reg. Number</span>
-                    <span className="font-semibold text-slate-900">{institution.registrationNumber}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-500">Programs</span>
-                    <span className="font-semibold text-slate-900">{programs.length > 0 ? programs.length : 'N/A'}</span>
-                  </div>
+            {/* Programs */}
+            <div style={{
+              background: '#fff', borderRadius: '20px', padding: '32px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)', border: '1px solid #e8eef5',
+              animation: 'fadeUp 0.5s 0.2s ease both',
+            }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', margin: '0 0 20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '20px' }}>🎓</span> Programs & Certificates Offered
+              </h2>
+              {programs.length > 0 ? (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
+                  {programs.map((prog: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className="prog-item"
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '10px',
+                        padding: '14px 16px', borderRadius: '12px',
+                        background: '#f8fafc', border: '1px solid #e2e8f0',
+                        transition: 'all 0.2s',
+                      }}
+                    >
+                      <span style={{ color: '#2563eb', fontSize: '16px', flexShrink: 0 }}>✓</span>
+                      <span style={{ color: '#334155', fontSize: '14px', fontWeight: 500 }}>{prog.name}</span>
+                    </div>
+                  ))}
                 </div>
-              </div>
-
-              {/* Contact Information */}
-              <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
-                <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Contact Information</h2>
-                <div className="space-y-6">
-                  {institution.email && (
-                    <div className="flex items-start">
-                      <div className="bg-blue-50 p-2 rounded-lg text-blue-600 mr-4">
-                        <Mail className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900 mb-1">Email</p>
-                        <a href={`mailto:${institution.email}`} className="text-slate-600 hover:text-blue-600 transition-colors">
-                          {institution.email}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-
-                  {institution.website && (
-                    <div className="flex items-start">
-                      <div className="bg-blue-50 p-2 rounded-lg text-blue-600 mr-4">
-                        <Globe className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900 mb-1">Website</p>
-                        <a href={institution.website.startsWith('http') ? institution.website : `https://${institution.website}`} target="_blank" rel="noopener noreferrer" className="text-slate-600 hover:text-blue-600 transition-colors">
-                          {institution.website}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex items-start">
-                    <div className="bg-blue-50 p-2 rounded-lg text-blue-600 mr-4">
-                      <MapPin className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900 mb-1">Address</p>
-                      <p className="text-slate-600 leading-relaxed">
-                        {institution.address}
-                        {institution.country && <><br/>{institution.country}</>}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {/* Social Media Links (if any) */}
-                  {institution.socialLinks && institution.socialLinks.length > 0 && (
-                    <div className="pt-6 border-t border-slate-100">
-                      <p className="text-sm font-semibold text-slate-900 mb-3">Social Media</p>
-                      <div className="flex gap-3">
-                        {institution.socialLinks.map((social: any) => (
-                          <a 
-                            key={social.id}
-                            href={social.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2 rounded-lg transition-colors capitalize text-xs font-medium"
-                          >
-                            {social.platform}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              ) : (
+                <p style={{ color: '#94a3b8', fontStyle: 'italic', margin: 0 }}>No specific programs have been listed yet.</p>
+              )}
             </div>
-            
+
+            {/* Training Areas (if any separate from tags) */}
+            {trainingAreas.length > 0 && (
+              <div style={{
+                background: '#fff', borderRadius: '20px', padding: '32px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.05)', border: '1px solid #e8eef5',
+                animation: 'fadeUp 0.5s 0.3s ease both',
+              }}>
+                <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', margin: '0 0 20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '20px' }}>📚</span> Training Areas
+                </h2>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                  {trainingAreas.map((area: string, idx: number) => (
+                    <span key={idx} style={{
+                      background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe',
+                      borderRadius: '10px', padding: '8px 16px', fontSize: '13px', fontWeight: 500,
+                    }}>{area}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+            {/* Quick Info */}
+            <div style={{
+              background: '#fff', borderRadius: '20px', padding: '28px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)', border: '1px solid #e8eef5',
+              animation: 'fadeUp 0.5s 0.1s ease both',
+            }}>
+              <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', margin: '0 0 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>ℹ️</span> Quick Info
+              </h2>
+              <InfoRow label="Founded" value={institution.yearEstablished || 'N/A'} />
+              <InfoRow label="Institution Type" value={<span style={{ textTransform: 'capitalize' }}>{institution.institutionType || 'N/A'}</span>} />
+              <InfoRow label="Reg. Number" value={institution.registrationNumber || 'N/A'} />
+              <InfoRow label="Country" value={institution.country || 'N/A'} />
+              <InfoRow label="Accred. Status" value={
+                <span style={{ color: '#15803d', fontWeight: 700 }}>● Active</span>
+              } />
+              {programs.length > 0 && <InfoRow label="No. of Programs" value={programs.length} />}
+            </div>
+
+            {/* Contact Information */}
+            <div style={{
+              background: '#fff', borderRadius: '20px', padding: '28px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)', border: '1px solid #e8eef5',
+              animation: 'fadeUp 0.5s 0.2s ease both',
+            }}>
+              <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', margin: '0 0 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>📬</span> Contact Information
+              </h2>
+              {institution.email && (
+                <ContactItem icon="✉️" label="Email" value={institution.email} href={`mailto:${institution.email}`} />
+              )}
+              {institution.website && (
+                <ContactItem
+                  icon="🌐" label="Website"
+                  value={institution.website}
+                  href={institution.website.startsWith('http') ? institution.website : `https://${institution.website}`}
+                />
+              )}
+              {institution.phone && (
+                <ContactItem icon="📞" label="Phone" value={institution.phone} href={`tel:${institution.phone}`} />
+              )}
+              {institution.address && (
+                <ContactItem
+                  icon="📍" label="Address"
+                  value={`${institution.address}${institution.country ? `, ${institution.country}` : ''}`}
+                />
+              )}
+            </div>
+
+            {/* Social Links */}
+            {institution.socialLinks && institution.socialLinks.length > 0 && (
+              <div style={{
+                background: '#fff', borderRadius: '20px', padding: '28px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.05)', border: '1px solid #e8eef5',
+                animation: 'fadeUp 0.5s 0.3s ease both',
+              }}>
+                <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', margin: '0 0 16px' }}>🌐 Social Media</h2>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                  {institution.socialLinks.map((social: any) => (
+                    <a
+                      key={social.id}
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '6px',
+                        background: '#f8fafc', color: '#334155', border: '1px solid #e2e8f0',
+                        borderRadius: '10px', padding: '8px 16px', fontSize: '13px',
+                        fontWeight: 600, textDecoration: 'none', textTransform: 'capitalize',
+                        transition: 'all 0.2s',
+                      }}
+                    >
+                      {social.platform}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Verify Credentials CTA */}
+            <div style={{
+              background: 'linear-gradient(135deg, #1e3a5f, #1d4ed8)',
+              borderRadius: '20px', padding: '28px',
+              boxShadow: '0 4px 20px rgba(29,78,216,0.3)',
+              animation: 'fadeUp 0.5s 0.4s ease both',
+            }}>
+              <p style={{ color: '#bfdbfe', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>
+                Certificate Verification
+              </p>
+              <h3 style={{ color: '#fff', fontSize: '16px', fontWeight: 700, margin: '0 0 8px' }}>
+                Verify a Certificate
+              </h3>
+              <p style={{ color: '#93c5fd', fontSize: '13px', margin: '0 0 20px', lineHeight: 1.6 }}>
+                Verify the authenticity of certificates issued by this institution through CTSDA's official verification system.
+              </p>
+              <Link href="/verify-certificate" style={{
+                display: 'block', textAlign: 'center',
+                background: '#fff', color: '#1d4ed8',
+                borderRadius: '10px', padding: '11px',
+                fontSize: '14px', fontWeight: 700, textDecoration: 'none',
+                transition: 'all 0.2s',
+              }}>
+                🔍 Verify Certificate
+              </Link>
+            </div>
           </div>
         </div>
       </main>
+
       <PremiumFooter />
     </div>
   );
