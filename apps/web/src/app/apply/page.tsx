@@ -103,7 +103,7 @@ export default function ApplyPage() {
         return;
       }
       setStep(2);
-      setSuccess('Verification code sent to your email.');
+      setSuccess('Verification code sent to your email. Please check your spam/junk folder if you do not see it in your inbox.');
     } catch (err) {
       setError('Service is temporarily unavailable.');
     } finally {
@@ -334,7 +334,7 @@ export default function ApplyPage() {
           <form className="content-panel p-5 sm:p-10" onSubmit={handleVerifyOtp} style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.05)' }}>
             <div style={{ marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #f1f5f9' }}>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>Step 2: Email Verification Code</h3>
-              <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>We sent a 6-digit verification code to <strong>{applicantForm.email}</strong>.</p>
+              <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>We sent a 6-digit verification code to <strong>{applicantForm.email}</strong>. Please check your spam/junk folder if you don't see it in your inbox.</p>
             </div>
             
             {success && <p className="status-message success" style={{ marginBottom: '1.25rem', backgroundColor: '#ecfdf5', color: '#047857', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #a7f3d0', fontSize: '0.875rem' }}>{success}</p>}

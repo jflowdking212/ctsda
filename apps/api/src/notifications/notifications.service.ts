@@ -48,7 +48,7 @@ export class NotificationsService {
       });
 
       const info = await transporter.sendMail({
-        from: `CTSDA Accreditation <${from}>`,
+        from: from,
         to: data.to,
         subject: data.subject,
         html: data.html,
