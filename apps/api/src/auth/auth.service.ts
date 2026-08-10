@@ -78,13 +78,13 @@ export class AuthService {
         <h2 style="padding: 10px; background-color: #f4f4f4; border-radius: 5px; display: inline-block;">${otp}</h2>
         <p>This code expires in 15 minutes.</p>
       `,
-      userId: 'system',
+      userId: undefined,
     });
 
     return { success: true, message: 'OTP sent successfully.' };
   }
 
-  async verifyOtp(email: string, otp: string, markUsed: boolean = true) {
+  async verifyOtp(email: string, otp: string, fromInstitution?: boolean, markUsed: boolean = true) {
     const record = await this.prisma.emailVerificationOTP.findFirst({
       where: {
         email: email.toLowerCase(),

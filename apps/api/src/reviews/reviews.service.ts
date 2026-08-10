@@ -274,7 +274,7 @@ export class ReviewsService {
                     <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} CTSDA - Council For Training Skills & Development America.</p>
                   </div>
                 `,
-                userId: app.applicantId || 'system',
+                userId: app.applicantId || undefined,
               });
             }
 
@@ -332,7 +332,7 @@ export class ReviewsService {
                     <p>You can access your portal to view and download your accreditation credentials.</p>
                   </div>
                 `,
-                userId: app.applicantId || 'system',
+                userId: app.applicantId || undefined,
               });
             }
           }
@@ -352,7 +352,7 @@ export class ReviewsService {
                     <p style="font-size: 12px; color: #94a3b8; text-align: center;">&copy; ${new Date().getFullYear()} CTSDA - Council For Training Skills & Development America.</p>
                 </div>
               `,
-              userId: app.applicantId || 'system',
+              userId: app.applicantId || undefined,
             });
           }
         } else if (newStatus === 'rejected') {
@@ -371,7 +371,7 @@ export class ReviewsService {
                   <p>If you have questions or require further clarification, please contact our support team at <a href="mailto:management@ctsdamerica.com">management@ctsdamerica.com</a>.</p>
                 </div>
               `,
-              userId: app.applicantId || 'system',
+              userId: app.applicantId || undefined,
             });
           }
         } else if (newStatus === 'changes_requested') {
@@ -390,7 +390,7 @@ export class ReviewsService {
                   <p>Please respond or submit the requested updates to <a href="mailto:management@ctsdamerica.com">management@ctsdamerica.com</a>.</p>
                 </div>
               `,
-              userId: app.applicantId || 'system',
+              userId: app.applicantId || undefined,
             });
           }
         }
