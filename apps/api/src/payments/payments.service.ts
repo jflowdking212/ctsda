@@ -100,6 +100,97 @@ export class PaymentsService {
     return { url: session.url, sessionId: session.id, invoiceId: invoice.id };
   }
 
+  async getInvoicePublic(invoiceId: string) {
+    const invoice = await this.prisma.invoice.findUnique({
+      where: { id: invoiceId },
+      include: {
+        application: {
+          include: {
+            institution: true,
+            applicant: true,
+          }
+        }
+      }
+    });
+
+    if (!invoice) {
+      throw new BadRequestException('Invoice not found');
+    }
+
+    const app = invoice.application;
+    const applicantName = app?.applicantFirstName && app?.applicantLastName
+      ? `${app.applicantFirstName} ${app.applicantLastName}`
+      : app?.applicant?.firstName && app?.applicant?.lastName
+        ? `${app.applicant.firstName} ${app.applicant.lastName}`
+        : 'Applicant';
+        
+    const applicantEmail = app?.applicantEmail || app?.applicant?.email || app?.institution?.email || 'N/A';
+
+    return {
+      id: invoice.id,
+      invoiceNumber: invoice.invoiceNumber,
+      amount: invoice.amount,
+      currency: invoice.currency,
+      status: invoice.status,
+      institutionName: app?.institution?.name || 'Institution',
+      applicantName,
+      applicantEmail,
+    };
+  }
+
+  async createPublicCheckoutSession(invoiceId: string) {
+    const invoice = await this.prisma.invoice.findUnique({
+      where: { id: invoiceId },
+      include: {
+        application: {
+          include: { institution: true },
+        },
+      },
+    });
+
+    if (!invoice) {
+      throw new BadRequestException('Invoice not found');
+    }
+
+    if (invoice.status === 'paid') {
+      return { url: null, message: 'Already paid' };
+    }
+
+    const stripe = this.getStripe();
+    const envUrl = process.env.FRONTEND_URL || '';
+    const frontendUrl = (!envUrl || envUrl.includes('localhost')) ? 'https://ctsda.acecoterieconsulting.com' : envUrl;
+    
+    const session = await stripe.checkout.sessions.create(
+      {
+        mode: 'payment',
+        success_url: `${frontendUrl}/payment/${invoice.id}?payment=success`,
+        cancel_url: `${frontendUrl}/payment/${invoice.id}?payment=cancelled`,
+        customer_email: invoice.application?.institution?.email,
+        metadata: {
+          invoiceId: invoice.id,
+          applicationId: invoice.applicationId,
+          isPublic: 'true',
+        },
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: invoice.currency.toLowerCase(),
+              unit_amount: Math.round(Number(invoice.amount) * 100),
+              product_data: {
+                name: invoice.description || 'CTSDA accreditation application fee',
+                description: invoice.application?.institution?.name || 'Accreditation',
+              },
+            },
+          },
+        ],
+      },
+      { idempotencyKey: `public_checkout:${invoice.id}` },
+    );
+
+    return { url: session.url, sessionId: session.id, invoiceId: invoice.id };
+  }
+
   async handleWebhook(payload: any, signature?: string, rawBody?: Buffer | string) {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
     const event = webhookSecret

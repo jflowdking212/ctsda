@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Post, Req, UseGuards, Param } from '@nestjs/common';
+import { Body, Controller, Headers, Post, Get, Req, UseGuards, Param } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { AuthGuard } from '../common/guards/auth.guard';
@@ -11,6 +11,16 @@ export class PaymentsController {
   @UseGuards(AuthGuard)
   async createCheckout(@CurrentUser() user: any, @Body() body: { applicationId: string }) {
     return this.paymentsService.createCheckoutSession(user.userId, body.applicationId);
+  }
+
+  @Get('invoice/:id')
+  async getPublicInvoice(@Param('id') invoiceId: string) {
+    return this.paymentsService.getInvoicePublic(invoiceId);
+  }
+
+  @Post('public-checkout')
+  async createPublicCheckout(@Body() body: { invoiceId: string }) {
+    return this.paymentsService.createPublicCheckoutSession(body.invoiceId);
   }
 
   @Post('webhook')
