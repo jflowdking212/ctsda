@@ -56,15 +56,12 @@ export class InstitutionsService {
       take: 50,
     });
 
-    const rawUrl = process.env.FRONTEND_URL || 'https://ctsda.acecoterieconsulting.com';
-    const baseUrl = (rawUrl.includes('localhost') && process.env.NODE_ENV === 'production')
-      ? 'https://ctsda.acecoterieconsulting.com'
-      : rawUrl;
+    const publicUrl = process.env.API_PUBLIC_URL || 'http://localhost:4000';
 
     return institutions.map((inst) => {
       let logo = inst.logoUrl;
       if (logo && !logo.startsWith('http') && !logo.startsWith('data:')) {
-        logo = `${baseUrl}/accreditations/logo-file?key=${encodeURIComponent(logo)}`;
+        logo = `${publicUrl}/uploads/${logo}`;
       }
       return {
         ...inst,

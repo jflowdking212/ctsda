@@ -84,7 +84,7 @@ async function bootstrap() {
   });
 
   // Static file serving for uploads (logos, documents)
-  const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
+  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
   const fs = await import('fs');
   if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
   await app.register(fastifyStatic, {

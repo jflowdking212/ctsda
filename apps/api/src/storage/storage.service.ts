@@ -9,7 +9,7 @@ export interface StoredFile {
   size: number;
 }
 
-const UPLOADS_DIR = path.join(__dirname, '..', '..', 'public', 'uploads');
+const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
 
 function ensureUploadsDir() {
   if (!fs.existsSync(UPLOADS_DIR)) {
