@@ -50,6 +50,8 @@ export default function NewApplicationPage() {
     address: '',
     email: '',
     phone: '',
+    website: '',
+    yearEstablished: '',
     contactName: '',
   });
 
@@ -151,6 +153,8 @@ export default function NewApplicationPage() {
             address: instForm.address.trim() || 'N/A',
             phone: instForm.phone.trim() || 'N/A',
             email: instForm.email.trim(),
+            website: instForm.website.trim() || undefined,
+            yearEstablished: instForm.yearEstablished ? parseInt(instForm.yearEstablished) : undefined,
             contacts: [
               {
                 fullName: instForm.contactName.trim() || instForm.name.trim(),
@@ -353,6 +357,30 @@ export default function NewApplicationPage() {
                 value={instForm.address}
                 onChange={(e) => setInstForm({ ...instForm, address: e.target.value })}
                 placeholder="e.g. Commercial Avenue, Lagos"
+                disabled={loading}
+              />
+            </label>
+
+            <label>
+              Official Website
+              <input
+                type="url"
+                value={instForm.website}
+                onChange={(e) => setInstForm({ ...instForm, website: e.target.value })}
+                placeholder="e.g. https://www.jayblisstech.com"
+                disabled={loading}
+              />
+            </label>
+
+            <label>
+              Year Established
+              <input
+                type="number"
+                min="1800"
+                max={new Date().getFullYear()}
+                value={instForm.yearEstablished}
+                onChange={(e) => setInstForm({ ...instForm, yearEstablished: e.target.value })}
+                placeholder="e.g. 2015"
                 disabled={loading}
               />
             </label>
