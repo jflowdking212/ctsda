@@ -117,7 +117,7 @@ export default function PaymentPage() {
                   disabled={paying}
                   style={{ width: '100%', padding: '0.875rem', backgroundColor: '#2563eb', color: '#ffffff', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(37,99,235,0.2)', marginBottom: '1rem' }}
                 >
-                  {paying ? 'Connecting to Gateway...' : `Pay \$${invoice.amount} via Credit Card / Stripe`}
+                  {paying ? 'Connecting to Gateway...' : `Pay $${invoice.amount} via Credit Card / Stripe`}
                 </button>
 
                 <button
