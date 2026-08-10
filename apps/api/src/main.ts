@@ -10,6 +10,8 @@ import fastifyCookie from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
 import fastifyMultipart from '@fastify/multipart';
 import fastifyCsrf from '@fastify/csrf-protection';
+import fastifyStatic from '@fastify/static';
+import * as path from 'path';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { TraceIdInterceptor } from './common/interceptors/trace-id.interceptor';
@@ -79,6 +81,16 @@ async function bootstrap() {
       fileSize: 50 * 1024 * 1024, // 50MB max
       files: 10,
     },
+  });
+
+  // Static file serving for uploads (logos, documents)
+  const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
+  const fs = await import('fs');
+  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+  await app.register(fastifyStatic, {
+    root: uploadsDir,
+    prefix: '/uploads/',
+    decorateReply: false,
   });
 
   // Global pipes

@@ -1,7 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export interface StoredFile {
   buffer: Buffer;
@@ -9,76 +9,62 @@ export interface StoredFile {
   size: number;
 }
 
+const UPLOADS_DIR = path.join(__dirname, '..', '..', 'public', 'uploads');
+
+function ensureUploadsDir() {
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
+}
+
 @Injectable()
 export class StorageService {
-  constructor(@Inject('S3_CLIENT') private s3: S3Client) {}
-
   generateStorageKey(file: StoredFile): string {
-    const extension = file.originalname.split('.').pop() || '';
+    const extension = (file.originalname || 'bin').split('.').pop() || 'bin';
     const random = crypto.randomBytes(16).toString('hex');
     const timestamp = Date.now();
     return `${timestamp}-${random}.${extension}`;
   }
 
-  async upload(file: StoredFile, key: string, contentType: string): Promise<{ key: string; size: number }> {
-    const buffer = file.buffer;
-
-    await this.s3.send(
-      new PutObjectCommand({
-        Bucket: process.env.MINIO_BUCKET || 'ctsda-documents',
-        Key: key,
-        Body: buffer,
-        ContentType: contentType,
-        Metadata: {
-          'original-filename': Buffer.from(file.originalname).toString('base64'),
-        },
-      }),
-    );
-
+  async upload(file: StoredFile, key: string, _contentType: string): Promise<{ key: string; size: number }> {
+    ensureUploadsDir();
+    const filePath = path.join(UPLOADS_DIR, key);
+    fs.writeFileSync(filePath, file.buffer);
     return { key, size: file.size };
   }
 
-  async getSignedUrl(key: string, expiresIn = 3600): Promise<string> {
-    const command = new GetObjectCommand({
-      Bucket: process.env.MINIO_BUCKET || 'ctsda-documents',
-      Key: key,
-    });
-
-    return getSignedUrl(this.s3 as any, command, { expiresIn });
+  async getSignedUrl(key: string, _expiresIn = 3600): Promise<string> {
+    // Return a plain public URL — served as static files by the API
+    const baseUrl = process.env.API_PUBLIC_URL || `http://localhost:${process.env.API_PORT || 4000}`;
+    return `${baseUrl}/uploads/${key}`;
   }
 
   async getObjectStream(key: string): Promise<{ stream: any; contentType: string }> {
-    const command = new GetObjectCommand({
-      Bucket: process.env.MINIO_BUCKET || 'ctsda-documents',
-      Key: key,
-    });
-    const response = await this.s3.send(command);
-    return {
-      stream: response.Body,
-      contentType: response.ContentType || 'image/png',
+    const filePath = path.join(UPLOADS_DIR, key);
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`File not found: ${key}`);
+    }
+    const ext = (key.split('.').pop() || 'bin').toLowerCase();
+    const mimeMap: Record<string, string> = {
+      png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg',
+      gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml',
+      pdf: 'application/pdf',
     };
+    const contentType = mimeMap[ext] || 'application/octet-stream';
+    const stream = fs.createReadStream(filePath);
+    return { stream, contentType };
   }
 
-  async delete(key: string) {
-    await this.s3.send(
-      new DeleteObjectCommand({
-        Bucket: process.env.MINIO_BUCKET || 'ctsda-documents',
-        Key: key,
-      }),
-    );
+  async delete(key: string): Promise<void> {
+    const filePath = path.join(UPLOADS_DIR, key);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
   }
 
   async exists(key: string): Promise<boolean> {
-    try {
-      await this.s3.send(
-        new HeadObjectCommand({
-          Bucket: process.env.MINIO_BUCKET || 'ctsda-documents',
-          Key: key,
-        }),
-      );
-      return true;
-    } catch {
-      return false;
-    }
+    const filePath = path.join(UPLOADS_DIR, key);
+    return fs.existsSync(filePath);
   }
 }
+
