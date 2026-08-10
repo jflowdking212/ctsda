@@ -73,7 +73,10 @@ export class InstitutionsService {
   async findPublicAccreditedBySlug(slug: string) {
     const institution = await this.prisma.institution.findFirst({
       where: {
-        slug,
+        OR: [
+          { slug },
+          { id: slug }
+        ],
         isActive: true,
         accreditations: {
           some: {
