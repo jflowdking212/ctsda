@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import { MapPin, Mail, Globe, Calendar, Building, CheckCircle2, ShieldCheck, Share2, Star } from 'lucide-react';
-import MainHeader from '../../../components/main-header';
-import Footer from '../../../components/footer';
+import { PremiumHeader } from '../../../components/premium-header';
+import { PremiumFooter } from '../../../components/premium-footer';
 
 export default function InstitutionPage() {
   const { slug } = useParams();
@@ -35,7 +35,7 @@ export default function InstitutionPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50">
-        <MainHeader />
+        <PremiumHeader />
         <div className="flex-grow flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
@@ -46,13 +46,13 @@ export default function InstitutionPage() {
   if (!institution) {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50">
-        <MainHeader />
+        <PremiumHeader />
         <div className="flex-grow flex flex-col items-center justify-center p-4">
           <Building className="h-16 w-16 text-slate-300 mb-4" />
           <h1 className="text-2xl font-bold text-slate-800">Institution Not Found</h1>
           <p className="text-slate-500 mt-2">The institution you are looking for does not exist or is no longer accredited.</p>
         </div>
-        <Footer />
+        <PremiumFooter />
       </div>
     );
   }
@@ -68,7 +68,7 @@ export default function InstitutionPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <MainHeader />
+      <PremiumHeader />
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
@@ -275,7 +275,7 @@ export default function InstitutionPage() {
           </div>
         </div>
       </main>
-      <Footer />
+      <PremiumFooter />
     </div>
   );
 }

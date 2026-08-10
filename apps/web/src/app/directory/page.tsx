@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Search, MapPin } from 'lucide-react';
-import MainHeader from '../../components/main-header';
-import Footer from '../../components/footer';
+import { PremiumHeader } from '../../components/premium-header';
+import { PremiumFooter } from '../../components/premium-footer';
 
 export default function DirectoryPage() {
   const [institutions, setInstitutions] = useState<any[]>([]);
@@ -36,7 +36,7 @@ export default function DirectoryPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <MainHeader />
+      <PremiumHeader />
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header Section */}
@@ -125,7 +125,7 @@ export default function DirectoryPage() {
           )}
         </div>
       </main>
-      <Footer />
+      <PremiumFooter />
     </div>
   );
 }
