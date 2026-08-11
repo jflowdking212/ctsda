@@ -20,16 +20,6 @@ const CheckIcon = () => (
     <path d="M20 6 9 17l-5-5"/>
   </svg>
 );
-const BuildingIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-  </svg>
-);
-const GlobeIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-  </svg>
-);
 
 export default function DirectoryPage() {
   const [institutions, setInstitutions] = useState<any[]>([]);
@@ -42,8 +32,9 @@ export default function DirectoryPage() {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
         const res = await fetch(`${apiUrl}/institutions/public-accredited`);
         if (res.ok) setInstitutions(await res.json());
-      } catch {}
-      finally { setLoading(false); }
+      } catch (err) {
+        console.error('Failed to load directory', err);
+      } finally { setLoading(false); }
     }
     fetchDirectory();
   }, []);
