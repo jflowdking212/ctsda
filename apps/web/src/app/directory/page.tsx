@@ -5,422 +5,236 @@ import Link from 'next/link';
 import { PremiumHeader } from '../../components/premium-header';
 import { PremiumFooter } from '../../components/premium-footer';
 
-const S = {
-  page: {
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    background: '#f0f4f8',
-    fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
-  },
-  hero: {
-    background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f2d6e 100%)',
-    padding: '80px 24px 60px',
-    textAlign: 'center' as const,
-    position: 'relative' as const,
-    overflow: 'hidden' as const,
-  },
-  heroBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    background: 'rgba(255,255,255,0.12)',
-    border: '1px solid rgba(255,255,255,0.2)',
-    borderRadius: '100px',
-    padding: '6px 16px',
-    marginBottom: '24px',
-    color: '#93c5fd',
-    fontSize: '13px',
-    fontWeight: 600,
-    letterSpacing: '0.04em',
-    textTransform: 'uppercase' as const,
-  },
-  heroTitle: {
-    color: '#ffffff',
-    fontSize: 'clamp(32px, 5vw, 56px)',
-    fontWeight: 800,
-    lineHeight: 1.1,
-    margin: '0 0 20px',
-    letterSpacing: '-0.02em',
-  },
-  heroSubtitle: {
-    color: '#94a3b8',
-    fontSize: '18px',
-    lineHeight: 1.6,
-    margin: '0 auto 40px',
-    maxWidth: '560px',
-  },
-  searchWrapper: {
-    maxWidth: '540px',
-    margin: '0 auto',
-    position: 'relative' as const,
-  },
-  searchInput: {
-    width: '100%',
-    padding: '16px 24px 16px 56px',
-    fontSize: '16px',
-    border: '2px solid rgba(255,255,255,0.15)',
-    borderRadius: '14px',
-    background: 'rgba(255,255,255,0.1)',
-    color: '#ffffff',
-    outline: 'none',
-    backdropFilter: 'blur(10px)',
-    boxSizing: 'border-box' as const,
-    transition: 'all 0.2s',
-  },
-  searchIcon: {
-    position: 'absolute' as const,
-    left: '18px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    color: '#94a3b8',
-    fontSize: '20px',
-    pointerEvents: 'none' as const,
-  },
-  main: {
-    flex: 1,
-    padding: '48px 24px',
-    maxWidth: '1200px',
-    margin: '0 auto',
-    width: '100%',
-    boxSizing: 'border-box' as const,
-  },
-  statsRow: {
-    display: 'flex',
-    gap: '16px',
-    marginBottom: '32px',
-    flexWrap: 'wrap' as const,
-  },
-  statCard: {
-    background: '#ffffff',
-    borderRadius: '12px',
-    padding: '16px 24px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-    border: '1px solid #e2e8f0',
-  },
-  statIcon: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '10px',
-    background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#fff',
-    fontSize: '18px',
-    flexShrink: 0,
-  },
-  statLabel: { color: '#64748b', fontSize: '13px', margin: 0 },
-  statValue: { color: '#0f172a', fontSize: '20px', fontWeight: 700, margin: 0 },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: '24px',
-  },
-  card: {
-    background: '#ffffff',
-    borderRadius: '20px',
-    overflow: 'hidden',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-    border: '1px solid #e8eef5',
-    transition: 'transform 0.2s, box-shadow 0.2s',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    cursor: 'pointer',
-    textDecoration: 'none',
-  },
-  cardTop: {
-    background: 'linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 100%)',
-    padding: '24px 24px 48px',
-    position: 'relative' as const,
-    height: '80px',
-  },
-  cardLogoWrapper: {
-    position: 'absolute' as const,
-    bottom: '-40px',
-    left: '24px',
-    width: '80px',
-    height: '80px',
-    borderRadius: '16px',
-    background: '#ffffff',
-    border: '3px solid #ffffff',
-    boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-    overflow: 'hidden',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoImg: { width: '100%', height: '100%', objectFit: 'contain' as const, padding: '6px' },
-  logoFallback: {
-    fontSize: '24px',
-    fontWeight: 800,
-    color: '#1d4ed8',
-    background: 'linear-gradient(135deg, #dbeafe, #e0e7ff)',
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cardBody: {
-    padding: '52px 24px 20px',
-    flex: 1,
-  },
-  cardBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '5px',
-    background: '#f0fdf4',
-    color: '#15803d',
-    border: '1px solid #bbf7d0',
-    borderRadius: '100px',
-    padding: '3px 10px',
-    fontSize: '11px',
-    fontWeight: 600,
-    letterSpacing: '0.03em',
-    marginBottom: '10px',
-  },
-  cardName: {
-    fontSize: '17px',
-    fontWeight: 700,
-    color: '#0f172a',
-    margin: '0 0 8px',
-    lineHeight: 1.3,
-  },
-  cardCountry: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '5px',
-    color: '#64748b',
-    fontSize: '13px',
-    margin: 0,
-  },
-  cardFooter: {
-    padding: '14px 24px',
-    borderTop: '1px solid #f1f5f9',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  viewProfile: {
-    color: '#2563eb',
-    fontSize: '13px',
-    fontWeight: 600,
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-  },
-  loadingWrapper: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '80px',
-    gap: '16px',
-  },
-  spinner: {
-    width: '48px',
-    height: '48px',
-    border: '4px solid #e2e8f0',
-    borderTop: '4px solid #2563eb',
-    borderRadius: '50%',
-    animation: 'spin 0.8s linear infinite',
-  },
-  emptyState: {
-    textAlign: 'center' as const,
-    padding: '80px 24px',
-    background: '#ffffff',
-    borderRadius: '20px',
-    border: '1px dashed #cbd5e1',
-  },
-};
+const SearchIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+  </svg>
+);
+const MapPinIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+  </svg>
+);
+const CheckIcon = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 6 9 17l-5-5"/>
+  </svg>
+);
+const BuildingIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+  </svg>
+);
+const GlobeIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+  </svg>
+);
 
 export default function DirectoryPage() {
   const [institutions, setInstitutions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [hovered, setHovered] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchDirectory() {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-        const response = await fetch(`${apiUrl}/institutions/public-accredited`);
-        if (response.ok) {
-          const data = await response.json();
-          setInstitutions(data);
-        }
-      } catch (err) {
-        console.error('Failed to load directory', err);
-      } finally {
-        setLoading(false);
-      }
+        const res = await fetch(`${apiUrl}/institutions/public-accredited`);
+        if (res.ok) setInstitutions(await res.json());
+      } catch {}
+      finally { setLoading(false); }
     }
     fetchDirectory();
   }, []);
 
-  const filteredInstitutions = institutions.filter((inst) =>
-    inst.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inst.country?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filtered = institutions.filter(i =>
+    i.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    i.country?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const countries = new Set(institutions.map(i => i.country).filter(Boolean)).size;
+
   return (
-    <div style={S.page}>
+    <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .dir-card { animation: fadeUp 0.4s ease both; }
-        .dir-card:hover { transform: translateY(-4px) !important; box-shadow: 0 12px 40px rgba(0,0,0,0.12) !important; }
-        .search-input::placeholder { color: rgba(255,255,255,0.45); }
-        .search-input:focus { border-color: rgba(255,255,255,0.4) !important; background: rgba(255,255,255,0.15) !important; }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes shimmer { 0%,100% { opacity:.6; } 50% { opacity:1; } }
+        .dir-card { animation: fadeInUp .5s ease both; transition: transform .25s ease, box-shadow .25s ease; }
+        .dir-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(15,23,42,.14) !important; }
+        .dir-card:hover .card-cta { background: linear-gradient(135deg,#2563eb,#4f46e5) !important; color: #fff !important; }
+        .search-input { transition: all .2s ease; }
+        .search-input:focus { outline: none; border-color: rgba(255,255,255,.5) !important; box-shadow: 0 0 0 4px rgba(255,255,255,.1) !important; background: rgba(255,255,255,.18) !important; }
+        .search-input::placeholder { color: rgba(255,255,255,.4); }
+        .stat-pill:hover { transform: scale(1.02); }
       `}</style>
 
-      <PremiumHeader />
+      <div style={{ fontFamily: "'Inter',system-ui,sans-serif", minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#f4f6fb' }}>
+        <PremiumHeader />
 
-      {/* Hero Section */}
-      <div style={S.hero}>
-        {/* Background pattern */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.06) 1px, transparent 0)',
-          backgroundSize: '28px 28px',
-        }} />
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={S.heroBadge}>
-            <span>✦</span> Official CTSDA Accredited Directory
-          </div>
-          <h1 style={S.heroTitle}>Accredited Institutions<br />Directory</h1>
-          <p style={S.heroSubtitle}>
-            Discover verified training providers and institutions that meet CTSDA's rigorous international quality standards.
-          </p>
-          <div style={S.searchWrapper}>
-            <span style={S.searchIcon}>🔍</span>
-            <input
-              className="search-input"
-              style={S.searchInput}
-              type="text"
-              placeholder="Search by institution name or country..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
+        {/* ── HERO ── */}
+        <section style={{
+          background: 'linear-gradient(160deg, #0b1428 0%, #0f2258 45%, #0a1a6e 100%)',
+          padding: '72px 24px 120px',
+          position: 'relative', overflow: 'hidden',
+          textAlign: 'center',
+        }}>
+          {/* animated orbs */}
+          <div style={{ position:'absolute', top:'-80px', left:'-80px', width:'400px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(59,130,246,.25) 0%, transparent 70%)', pointerEvents:'none' }}/>
+          <div style={{ position:'absolute', bottom:'-60px', right:'-60px', width:'350px', height:'350px', borderRadius:'50%', background:'radial-gradient(circle, rgba(99,102,241,.2) 0%, transparent 70%)', pointerEvents:'none' }}/>
+          {/* dot grid */}
+          <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(rgba(255,255,255,.07) 1px, transparent 0)', backgroundSize:'30px 30px', pointerEvents:'none' }}/>
 
-      <main style={S.main}>
-        {/* Stats Row */}
-        {!loading && (
-          <div style={S.statsRow}>
-            <div style={S.statCard}>
-              <div style={S.statIcon}>🏛️</div>
-              <div>
-                <p style={S.statLabel}>Total Accredited</p>
-                <p style={S.statValue}>{institutions.length}</p>
-              </div>
+          <div style={{ position:'relative', zIndex:2, maxWidth:'700px', margin:'0 auto' }}>
+            <div style={{ display:'inline-flex', alignItems:'center', gap:'8px', background:'rgba(255,255,255,.1)', border:'1px solid rgba(255,255,255,.18)', borderRadius:'100px', padding:'6px 18px', marginBottom:'28px', color:'#93c5fd', fontSize:'12px', fontWeight:700, letterSpacing:'.08em', textTransform:'uppercase' }}>
+              <div style={{ width:'6px', height:'6px', borderRadius:'50%', background:'#4ade80', animation:'shimmer 2s ease infinite' }}/>
+              Official CTSDA Accredited Directory
             </div>
-            <div style={S.statCard}>
-              <div style={{ ...S.statIcon, background: 'linear-gradient(135deg, #059669, #10b981)' }}>🌍</div>
-              <div>
-                <p style={S.statLabel}>Countries Represented</p>
-                <p style={S.statValue}>{new Set(institutions.map(i => i.country).filter(Boolean)).size}</p>
+
+            <h1 style={{ fontSize:'clamp(36px,6vw,64px)', fontWeight:900, color:'#fff', lineHeight:1.08, letterSpacing:'-.03em', marginBottom:'20px' }}>
+              Accredited<br /><span style={{ background:'linear-gradient(135deg,#60a5fa,#a78bfa)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>Institutions</span> Directory
+            </h1>
+            <p style={{ fontSize:'18px', color:'rgba(255,255,255,.65)', lineHeight:1.7, marginBottom:'44px', fontWeight:400 }}>
+              Discover verified training providers and institutions that meet<br />CTSDA's rigorous international quality standards.
+            </p>
+
+            {/* Search */}
+            <div style={{ position:'relative', maxWidth:'520px', margin:'0 auto' }}>
+              <div style={{ position:'absolute', left:'18px', top:'50%', transform:'translateY(-50%)', color:'rgba(255,255,255,.5)', pointerEvents:'none' }}>
+                <SearchIcon />
               </div>
+              <input
+                className="search-input"
+                type="text"
+                placeholder="Search by institution name or country..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                style={{
+                  width:'100%', padding:'16px 20px 16px 52px', fontSize:'15px', fontWeight:500,
+                  background:'rgba(255,255,255,.12)', border:'1.5px solid rgba(255,255,255,.2)',
+                  borderRadius:'14px', color:'#fff', backdropFilter:'blur(12px)',
+                }}
+              />
             </div>
-            {searchTerm && (
-              <div style={S.statCard}>
-                <div style={{ ...S.statIcon, background: 'linear-gradient(135deg, #7c3aed, #6d28d9)' }}>🔎</div>
-                <div>
-                  <p style={S.statLabel}>Search Results</p>
-                  <p style={S.statValue}>{filteredInstitutions.length}</p>
+          </div>
+        </section>
+
+        {/* ── CONTENT ── */}
+        <main style={{ flex:1, maxWidth:'1200px', width:'100%', margin:'-56px auto 0', padding:'0 24px 80px', zIndex:10, position:'relative' }}>
+
+          {/* Stats row */}
+          {!loading && (
+            <div style={{ display:'flex', gap:'12px', marginBottom:'32px', flexWrap:'wrap' }}>
+              {[
+                { value: institutions.length, label: 'Accredited Institutions', color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe' },
+                { value: countries, label: 'Countries Represented', color: '#059669', bg: '#f0fdf4', border: '#bbf7d0' },
+                { value: 'Active', label: 'All Statuses', color: '#7c3aed', bg: '#f5f3ff', border: '#ddd6fe' },
+              ].map((s, i) => (
+                <div key={i} className="stat-pill" style={{
+                  display:'flex', alignItems:'center', gap:'14px',
+                  background:'#fff', border:`1px solid ${s.border}`, borderRadius:'14px',
+                  padding:'14px 22px', boxShadow:'0 2px 12px rgba(0,0,0,.06)',
+                  transition:'transform .2s',
+                }}>
+                  <div style={{ width:'8px', height:'8px', borderRadius:'50%', background:s.color, boxShadow:`0 0 0 4px ${s.bg}` }}/>
+                  <div>
+                    <p style={{ fontSize:'22px', fontWeight:800, color:'#0f172a', lineHeight:1 }}>{s.value}</p>
+                    <p style={{ fontSize:'12px', color:'#64748b', fontWeight:500, marginTop:'3px' }}>{s.label}</p>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
 
-        {loading ? (
-          <div style={S.loadingWrapper}>
-            <div style={S.spinner} />
-            <p style={{ color: '#64748b', fontSize: '15px' }}>Loading accredited institutions...</p>
-          </div>
-        ) : filteredInstitutions.length > 0 ? (
-          <div style={S.grid}>
-            {filteredInstitutions.map((inst, idx) => (
-              <Link
-                key={inst.id}
-                href={`/directory/${inst.slug || inst.id}`}
-                style={{ textDecoration: 'none' }}
-              >
-                <div
-                  className="dir-card"
-                  style={{
-                    ...S.card,
-                    animationDelay: `${idx * 60}ms`,
-                  }}
-                >
-                  <div style={S.cardTop}>
-                    <div style={S.cardLogoWrapper}>
-                      {inst.logoUrl ? (
-                        <img src={inst.logoUrl} alt={`${inst.name} logo`} style={S.logoImg} />
-                      ) : (
-                        <div style={S.logoFallback}>
-                          {inst.name.substring(0, 2).toUpperCase()}
+          {/* Section header */}
+          {!loading && filtered.length > 0 && (
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'24px' }}>
+              <h2 style={{ fontSize:'20px', fontWeight:700, color:'#0f172a' }}>
+                {searchTerm ? `${filtered.length} result${filtered.length !== 1 ? 's' : ''} for "${searchTerm}"` : 'All Accredited Institutions'}
+              </h2>
+              {searchTerm && (
+                <button onClick={() => setSearchTerm('')} style={{ background:'none', border:'none', color:'#2563eb', cursor:'pointer', fontSize:'14px', fontWeight:600 }}>
+                  Clear ✕
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Grid */}
+          {loading ? (
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'300px', gap:'16px' }}>
+              <div style={{ width:'44px', height:'44px', border:'3px solid #e2e8f0', borderTop:'3px solid #2563eb', borderRadius:'50%', animation:'spin .7s linear infinite' }}/>
+              <p style={{ color:'#64748b', fontSize:'15px', fontWeight:500 }}>Loading accredited institutions...</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div style={{ textAlign:'center', padding:'80px 24px', background:'#fff', borderRadius:'20px', border:'1px dashed #cbd5e1' }}>
+              <div style={{ width:'64px', height:'64px', borderRadius:'16px', background:'#f1f5f9', margin:'0 auto 20px', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <SearchIcon />
+              </div>
+              <h3 style={{ fontSize:'20px', fontWeight:700, color:'#0f172a', marginBottom:'10px' }}>No institutions found</h3>
+              <p style={{ color:'#64748b', marginBottom:'24px' }}>No results matching "{searchTerm}"</p>
+              <button onClick={() => setSearchTerm('')} style={{ background:'#2563eb', color:'#fff', border:'none', borderRadius:'10px', padding:'11px 28px', fontSize:'14px', fontWeight:600, cursor:'pointer' }}>Clear Search</button>
+            </div>
+          ) : (
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))', gap:'20px' }}>
+              {filtered.map((inst, idx) => (
+                <Link key={inst.id} href={`/directory/${inst.slug || inst.id}`} style={{ textDecoration:'none', color:'inherit' }}>
+                  <article className="dir-card" style={{ background:'#fff', borderRadius:'20px', overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,.07)', border:'1px solid #e8eef5', animationDelay:`${idx*55}ms` }}>
+                    {/* Card top banner */}
+                    <div style={{ height:'72px', background:'linear-gradient(135deg, #0f2258 0%, #1d4ed8 100%)', position:'relative' }}>
+                      <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(rgba(255,255,255,.08) 1px, transparent 0)', backgroundSize:'16px 16px' }}/>
+                    </div>
+
+                    <div style={{ padding:'0 24px 24px' }}>
+                      {/* Logo floating over banner */}
+                      <div style={{
+                        width:'72px', height:'72px', borderRadius:'16px',
+                        background:'#fff', border:'3px solid #fff',
+                        boxShadow:'0 4px 20px rgba(0,0,0,.12)',
+                        marginTop:'-36px', marginBottom:'16px',
+                        overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center',
+                      }}>
+                        {inst.logoUrl ? (
+                          <img src={inst.logoUrl} alt={inst.name} style={{ width:'100%', height:'100%', objectFit:'contain', padding:'6px' }}/>
+                        ) : (
+                          <div style={{ width:'100%', height:'100%', background:'linear-gradient(135deg,#dbeafe,#e0e7ff)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'22px', fontWeight:800, color:'#1d4ed8' }}>
+                            {inst.name.substring(0,2).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Badge */}
+                      <div style={{ display:'inline-flex', alignItems:'center', gap:'5px', background:'#f0fdf4', color:'#15803d', border:'1px solid #bbf7d0', borderRadius:'100px', padding:'3px 10px', fontSize:'11px', fontWeight:700, letterSpacing:'.02em', marginBottom:'10px' }}>
+                        <CheckIcon /> ACCREDITED
+                      </div>
+
+                      <h3 style={{ fontSize:'17px', fontWeight:700, color:'#0f172a', lineHeight:1.3, marginBottom:'10px' }}>{inst.name}</h3>
+
+                      {inst.country && (
+                        <div style={{ display:'flex', alignItems:'center', gap:'5px', color:'#64748b', fontSize:'13px', fontWeight:500 }}>
+                          <MapPinIcon /> {inst.country}
                         </div>
                       )}
                     </div>
-                  </div>
-                  <div style={S.cardBody}>
-                    <div style={S.cardBadge}>
-                      ✓ Accredited
-                    </div>
-                    <p style={S.cardName}>{inst.name}</p>
-                    {inst.country && (
-                      <p style={S.cardCountry}>
-                        📍 {inst.country}
-                      </p>
-                    )}
-                  </div>
-                  <div style={S.cardFooter}>
-                    <span style={S.viewProfile}>View Full Profile →</span>
-                    <span style={{
-                      background: '#f0f9ff',
-                      color: '#0369a1',
-                      fontSize: '11px',
-                      fontWeight: 600,
-                      padding: '3px 10px',
-                      borderRadius: '100px',
-                      border: '1px solid #bae6fd',
-                    }}>CTSDA Member</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div style={S.emptyState}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
-            <h3 style={{ color: '#0f172a', fontSize: '20px', fontWeight: 700, margin: '0 0 8px' }}>No institutions found</h3>
-            <p style={{ color: '#64748b', margin: '0 0 20px' }}>
-              No results for "{searchTerm}". Try a different search term.
-            </p>
-            <button
-              onClick={() => setSearchTerm('')}
-              style={{
-                background: '#2563eb', color: '#fff', border: 'none',
-                borderRadius: '10px', padding: '10px 24px', fontSize: '14px',
-                fontWeight: 600, cursor: 'pointer',
-              }}
-            >
-              Clear Search
-            </button>
-          </div>
-        )}
-      </main>
 
-      <PremiumFooter />
-    </div>
+                    {/* CTA footer */}
+                    <div className="card-cta" style={{ margin:'0 16px 16px', borderRadius:'12px', padding:'12px 16px', background:'#f8fafc', border:'1px solid #e2e8f0', display:'flex', alignItems:'center', justifyContent:'space-between', transition:'all .25s ease' }}>
+                      <span style={{ fontSize:'13px', fontWeight:600, color:'inherit' }}>View Full Profile</span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </div>
+                  </article>
+                </Link>
+              ))}
+            </div>
+          )}
+        </main>
+
+        <PremiumFooter />
+      </div>
+    </>
   );
 }
