@@ -38,6 +38,7 @@ const adminNav: AdminNavItem[] = [
     ]
   },
   { href: '/admin/student-verification', section: 'student_verification', label: 'Student Verification', roles: ['super_admin', 'support_officer'] },
+  { href: '/admin/institutions', section: 'institutions', label: 'Directory', roles: ['super_admin', 'support_officer'] },
   { href: '/admin/billing', section: 'billing', label: 'Billing & Orders', roles: ['super_admin', 'finance_officer'] },
   { href: '/admin/users', section: 'users', label: 'Users', roles: ['super_admin'] },
   { href: '/admin/blog', section: 'blog', label: 'CMS / Blog', roles: ['super_admin', 'content_manager'] },

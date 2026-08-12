@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom';
 const PORTAL_SESSION_KEY = 'ctsda_portal_session';
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-export type PortalSection = 'overview' | 'credentials' | 'billing' | 'registration' | 'training';
+export type PortalSection = 'overview' | 'credentials' | 'billing' | 'registration' | 'training' | 'directory';
 
 export type PortalNavItem = {
   href: string;
@@ -20,6 +20,7 @@ const portalNav: PortalNavItem[] = [
   { href: '/portal/credentials', section: 'credentials', label: 'Official Verification' },
   { href: '/portal/billing', section: 'billing', label: 'Billing & Invoices' },
   { href: '/portal/registration', section: 'registration', label: 'Registration Info' },
+  { href: '/directory', section: 'directory', label: 'Public Directory' },
 ];
 
 const sectionMeta: Record<PortalSection, { title: string; eyebrow: string; description: string }> = {
@@ -47,6 +48,11 @@ const sectionMeta: Record<PortalSection, { title: string; eyebrow: string; descr
     title: 'Training Resources',
     eyebrow: 'Knowledge Base',
     description: 'Access course materials, orientation videos, and downloadable resources.',
+  },
+  directory: {
+    title: 'Public Directory',
+    eyebrow: 'Institution Listing',
+    description: 'View the official public directory of accredited institutions.',
   },
 };
 

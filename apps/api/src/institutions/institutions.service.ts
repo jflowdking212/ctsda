@@ -49,6 +49,7 @@ export class InstitutionsService {
       },
       select: {
         id: true,
+        slug: true,
         name: true,
         logoUrl: true,
         country: true,
@@ -71,11 +72,13 @@ export class InstitutionsService {
   }
 
   async findPublicAccreditedBySlug(slug: string) {
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(slug);
+
     const institution = await this.prisma.institution.findFirst({
       where: {
         OR: [
           { slug },
-          { id: slug }
+          ...(isUuid ? [{ id: slug }] : [])
         ],
         isActive: true,
         accreditations: {
