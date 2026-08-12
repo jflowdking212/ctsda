@@ -93,7 +93,8 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
       });
       if (!res.ok) throw new Error('Upload failed');
       const data = await res.json();
-      setCurrent({ ...current, imageUrl: data.url });
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      setCurrent({ ...current, imageUrl: `${apiBase}${data.url}` });
     } catch (err) {
       console.error(err);
       alert('Error uploading image');
