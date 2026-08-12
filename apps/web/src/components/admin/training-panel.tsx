@@ -166,15 +166,21 @@ export function TrainingPanel({
               </div>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Resource / Video URL</label>
-              <input type="url" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.resourceUrl || ''} onChange={e => setCurrent({...current, resourceUrl: e.target.value})} placeholder="https://" />
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Resource URL</label>
+              <input type="text" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.resourceUrl || ''} onChange={e => setCurrent({...current, resourceUrl: e.target.value})} placeholder="https://" />
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Duration (mins)</label>
-              <input type="number" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.durationMinutes || current.duration || ''} onChange={e => setCurrent({...current, duration: e.target.value})} />
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Video URL</label>
+              <input type="text" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.videoUrl || ''} onChange={e => setCurrent({...current, videoUrl: e.target.value})} placeholder="https://" />
             </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Duration</label>
+              <input type="text" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.durationMinutes || current.duration || ''} onChange={e => setCurrent({...current, duration: e.target.value})} placeholder="e.g. 45 mins" />
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Price ($)</label>
               <input type="number" step="0.01" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} required value={current.price || 0} onChange={e => setCurrent({...current, price: e.target.value})} />
