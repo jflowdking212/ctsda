@@ -13,6 +13,7 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
   const [view, setView] = useState<'list' | 'editor'>('list');
   const [current, setCurrent] = useState<any>({});
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     async function fetchModules() {
@@ -77,6 +78,30 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
     }
   }
 
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!e.target.files || !e.target.files[0]) return;
+    const file = e.target.files[0];
+    setUploading(true);
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const res = await api('/admin/upload', {
+        method: 'POST',
+        body: formData
+      });
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      setCurrent({ ...current, imageUrl: data.url });
+    } catch (err) {
+      console.error(err);
+      alert('Error uploading image');
+    } finally {
+      setUploading(false);
+    }
+  }
+
   if (view === 'editor') {
     return (
       <div className="admin-section">
@@ -112,7 +137,13 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Image URL</label>
-              <input type="url" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.imageUrl || ''} onChange={e => setCurrent({...current, imageUrl: e.target.value})} placeholder="https://" />
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input type="url" className="admin-input" style={{ flex: 1, padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.imageUrl || ''} onChange={e => setCurrent({...current, imageUrl: e.target.value})} placeholder="https://" />
+                <label className="admin-button" style={{ cursor: 'pointer', padding: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {uploading ? '...' : 'Upload'}
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} disabled={uploading} />
+                </label>
+              </div>
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Resource / Video URL</label>

@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Header, Param, Patch, Post, Query, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Header, Param, Patch, Post, Query, Res, UseGuards, Req, BadRequestException } from '@nestjs/common';
 import { ApplicationStatus, UserRole } from '@prisma/client';
 import { AdminService } from './admin.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { AuthGuard } from '../common/guards/auth.guard';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Controller('admin')
 @UseGuards(AuthGuard)
@@ -189,5 +191,27 @@ export class AdminController {
     reply.header('Content-Type', 'application/pdf');
     reply.header('Content-Disposition', 'attachment; filename="ctsda-board-report.pdf"');
     return pdf;
+  }
+
+  @Post('upload')
+  async uploadImage(@CurrentUser() user: any, @Req() req: any) {
+    if (!req.isMultipart || !req.isMultipart()) {
+      throw new BadRequestException('Request is not multipart');
+    }
+    const data = await req.file();
+    if (!data) throw new BadRequestException('No file uploaded');
+
+    const fileName = `${Date.now()}-${data.filename.replace(/[^a-zA-Z0-9.\-]/g, '')}`;
+    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+    const filePath = path.join(uploadsDir, fileName);
+    
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    
+    const buffer = await data.toBuffer();
+    fs.writeFileSync(filePath, buffer);
+
+    return { url: `/uploads/${fileName}` };
   }
 }
