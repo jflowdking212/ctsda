@@ -30,11 +30,29 @@ export class TrainingService {
   }
 
   async create(data: any) {
-    return this.prisma.training.create({ data });
+    const { id, createdAt, updatedAt, enrollments, ...rest } = data;
+    const clean = this.sanitize(rest);
+    return this.prisma.training.create({ data: clean });
   }
 
   async update(id: string, data: any) {
-    return this.prisma.training.update({ where: { id }, data });
+    const { id: _id, createdAt, updatedAt, enrollments, ...rest } = data;
+    const clean = this.sanitize(rest);
+    return this.prisma.training.update({ where: { id }, data: clean });
+  }
+
+  private sanitize(data: any) {
+    return {
+      title: data.title ?? undefined,
+      description: data.description || undefined,
+      category: data.category || undefined,
+      imageUrl: data.imageUrl || null,
+      videoUrl: data.videoUrl || null,
+      resourceUrl: data.resourceUrl || null,
+      duration: data.duration ? String(data.duration) : null,
+      price: data.price !== undefined ? Number(data.price) : 0,
+      isPublished: typeof data.isPublished === 'boolean' ? data.isPublished : false,
+    };
   }
 
   async remove(id: string) {
