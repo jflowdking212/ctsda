@@ -35,8 +35,17 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
     e.preventDefault();
     setSaving(true);
     
-    // Parse price to number
-    const payload = { ...current, price: Number(current.price) || 0 };
+    const payload = {
+      title: current.title,
+      description: current.description,
+      category: current.category,
+      imageUrl: current.imageUrl,
+      videoUrl: current.videoUrl,
+      resourceUrl: current.resourceUrl,
+      duration: (current.durationMinutes || current.duration || '').toString(),
+      price: Number(current.price) || 0,
+      isPublished: current.isPublished || false
+    };
     
     try {
       if (!current.id) {
@@ -154,7 +163,7 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Duration (mins)</label>
-              <input type="number" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.durationMinutes || ''} onChange={e => setCurrent({...current, durationMinutes: e.target.value})} />
+              <input type="number" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.durationMinutes || current.duration || ''} onChange={e => setCurrent({...current, duration: e.target.value})} />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Price ($)</label>
