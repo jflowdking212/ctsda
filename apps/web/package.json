@@ -10,9 +10,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "lucide-react": "^0.300.0",
     "@ctsda/contracts": "workspace:*",
     "@ctsda/ui": "workspace:*",
+    "framer-motion": "^13.1.0",
+    "lucide-react": "^0.300.0",
     "next": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
