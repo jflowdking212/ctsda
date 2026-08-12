@@ -246,8 +246,8 @@ export function StudentVerificationWidget() {
               </div>
             </div>
 
-            {/* Grid for Details and Graphic Certificate Card */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
+            {/* Container for Details */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginBottom: '2rem' }}>
               {/* Left Column: Details */}
               <div>
                 <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginBottom: '1.25rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>
@@ -293,86 +293,7 @@ export function StudentVerificationWidget() {
                 </div>
               </div>
 
-              {/* Right Column: Visual Certificate Mockup Card */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fafafa', borderRadius: '0.75rem', padding: '1.25rem', border: '1px solid #f1f5f9' }}>
-                <div style={{ width: '100%', minHeight: '300px', backgroundColor: '#ffffff', border: '4px solid #f8fafc', borderRadius: '0.25rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(0,0,0,0.08)', position: 'relative', overflow: 'hidden' }}>
-                    {/* Certificate Borders */}
-                    <div style={{ position: 'absolute', top: '10px', bottom: '10px', left: '10px', right: '10px', border: '1px solid #cbd5e1' }}></div>
-                    <div style={{ position: 'absolute', top: '14px', bottom: '14px', left: '14px', right: '14px', border: '2px solid #00204a' }}></div>
-                    
-                    <div style={{ position: 'absolute', top: 0, left: 0, width: '50px', height: '50px', backgroundColor: '#00204a', clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}></div>
-                    <div style={{ position: 'absolute', bottom: 0, right: 0, width: '50px', height: '50px', backgroundColor: '#00204a', clipPath: 'polygon(100% 100%, 100% 0, 0 100%)' }}></div>
-
-                    {/* QR Code Graphic Box */}
-                    <div style={{ position: 'absolute', top: '20px', left: '20px', width: '38px', height: '38px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '4px', padding: '3px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 12, boxShadow: '0 2px 4px rgba(0,0,0,0.08)' }}>
-                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
-                        <rect x="2" y="2" width="6" height="6" fill="#00204a" />
-                        <rect x="16" y="2" width="6" height="6" fill="#00204a" />
-                        <rect x="2" y="16" width="6" height="6" fill="#00204a" />
-                        <rect x="3.5" y="3.5" width="3" height="3" fill="#ffffff" />
-                        <rect x="17.5" y="3.5" width="3" height="3" fill="#ffffff" />
-                        <rect x="3.5" y="17.5" width="3" height="3" fill="#ffffff" />
-                        <rect x="4.5" y="4.5" width="1" height="1" fill="#00204a" />
-                        <rect x="18.5" y="4.5" width="1" height="1" fill="#00204a" />
-                        <rect x="4.5" y="18.5" width="1" height="1" fill="#00204a" />
-                        <rect x="10" y="2" width="2" height="2" fill="#00204a" />
-                        <rect x="10" y="6" width="2" height="2" fill="#00204a" />
-                        <rect x="2" y="10" width="2" height="2" fill="#00204a" />
-                        <rect x="6" y="10" width="2" height="2" fill="#00204a" />
-                        <rect x="10" y="10" width="4" height="4" fill="#00204a" />
-                        <rect x="16" y="10" width="2" height="2" fill="#00204a" />
-                        <rect x="20" y="10" width="2" height="2" fill="#00204a" />
-                        <rect x="10" y="16" width="2" height="2" fill="#00204a" />
-                        <rect x="14" y="16" width="4" height="2" fill="#00204a" />
-                        <rect x="20" y="16" width="2" height="4" fill="#00204a" />
-                      </svg>
-                    </div>
-
-                    {/* Certificate Body Text */}
-                    <div style={{ textAlign: 'center', padding: '1.25rem', zIndex: 5, width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                         <img src="/images/logo-ctsda.png" alt="CTSDA Logo" style={{ height: '32px', objectFit: 'contain' }} />
-                         <div style={{ fontSize: '0.5rem', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.02em', fontWeight: 800, textAlign: 'left', lineHeight: 1.2 }}>
-                           Council For Training Skills &<br/>Development America
-                         </div>
-                      </div>
-                      <div style={{ fontSize: '0.55rem', color: '#94a3b8', marginBottom: '0.35rem' }}>This is to certify that</div>
-                      
-                      <div style={{ fontSize: '1.15rem', fontWeight: 'bold', color: '#0f172a', marginBottom: '0.35rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.2rem', display: 'inline-block' }}>
-                        {result.recipientName}
-                      </div>
-                      
-                      <div style={{ fontSize: '0.525rem', color: '#64748b', marginTop: '0.15rem' }}>has successfully completed the training program:</div>
-                      
-                      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0.35rem 0' }}>
-                        <div style={{ fontSize: '0.725rem', fontWeight: 'bold', color: '#0f172a', padding: '0 0.5rem' }}>{result.courseProgram}</div>
-                      </div>
-                      
-                      <div style={{ fontSize: '0.525rem', color: '#64748b', marginBottom: '0.75rem' }}>and is hereby awarded this certificate.</div>
-                      
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto', padding: '0 0.25rem' }}>
-                        <div style={{ textAlign: 'left' }}>
-                          <div style={{ fontSize: '0.425rem', color: '#64748b', fontWeight: 600 }}>Cert No: <span style={{ color: '#0f172a' }}>{result.certificateNumber}</span></div>
-                          <div style={{ fontSize: '0.425rem', color: '#64748b', fontWeight: 600 }}>Issued: <span style={{ color: '#0f172a' }}>{result.issueDate}</span></div>
-                        </div>
-                        
-                        <div style={{ textAlign: 'center' }}>
-                          <div style={{ borderBottom: '1px solid #0f172a', width: '80px', marginBottom: '0.2rem', display: 'flex', justifyContent: 'center' }}>
-                              <span style={{ fontFamily: "'Brush Script MT', 'Lucida Handwriting', cursive", fontSize: '0.9rem', color: '#1e293b', lineHeight: 1 }}>James H.</span>
-                          </div>
-                          <div style={{ fontSize: '0.425rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Director of Training</div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Gold Stamp Seal */}
-                    <div style={{ position: 'absolute', bottom: '1.25rem', right: '1.25rem', width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)', zIndex: 10 }}>
-                       <div style={{ width: '22px', height: '22px', borderRadius: '50%', border: '1px dashed #fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <span style={{ fontSize: '0.3rem', color: '#fff', fontWeight: 'bold' }}>CTSD</span>
-                       </div>
-                    </div>
-                </div>
-              </div>
+              {/* Right Column removed as requested - visual certificate mockup card is inappropriate here as each institution issues its own */}
             </div>
 
             {/* Info Banner */}
@@ -405,26 +326,6 @@ export function StudentVerificationWidget() {
                 }}
               >
                 🔄 Verify Another Certificate
-              </button>
-              <button
-                type="button"
-                onClick={() => window.print()}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  backgroundColor: '#2563eb',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '0.5rem',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
-                }}
-              >
-                🖨️ Print / Download PDF
               </button>
             </div>
           </div>

@@ -260,7 +260,7 @@ export function IsolatedCertificateVerifier({
               </div>
 
               {/* Details + Certificate Graphic Card */}
-              <div style={{ backgroundColor: '#ffffff', borderRadius: '0.875rem', border: '1px solid #e2e8f0', padding: '2rem', boxShadow: '0 10px 30px -8px rgba(0,0,0,0.06)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+              <div style={{ backgroundColor: '#ffffff', borderRadius: '0.875rem', border: '1px solid #e2e8f0', padding: '2rem', boxShadow: '0 10px 30px -8px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                 {/* Left sub-col: Details */}
                 <div>
                   <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '1.25rem', marginTop: 0 }}>Certificate Details</h4>
@@ -292,69 +292,7 @@ export function IsolatedCertificateVerifier({
                   </div>
                 </div>
 
-                {/* Right sub-col: Institutional Certificate Mockup */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc', borderRadius: '0.625rem', padding: '1rem', border: '1px solid #e2e8f0' }}>
-                  <div style={{ width: '100%', minHeight: '280px', backgroundColor: '#ffffff', borderRadius: '3px', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', position: 'relative', overflow: 'hidden' }}>
-                    {/* Corner Triangles */}
-                    <div style={{ position: 'absolute', top: 0, left: 0, width: '42px', height: '42px', backgroundColor: '#00204a', clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
-                    <div style={{ position: 'absolute', top: 0, right: 0, width: '42px', height: '42px', backgroundColor: '#00204a', clipPath: 'polygon(100% 0, 100% 100%, 0 0)' }} />
-                    <div style={{ position: 'absolute', bottom: 0, left: 0, width: '42px', height: '42px', backgroundColor: '#00204a', clipPath: 'polygon(0 100%, 100% 100%, 0 0)' }} />
-                    <div style={{ position: 'absolute', bottom: 0, right: 0, width: '42px', height: '42px', backgroundColor: '#00204a', clipPath: 'polygon(100% 100%, 100% 0, 0 100%)' }} />
-
-                    {/* Gold + Navy Border Lines */}
-                    <div style={{ position: 'absolute', top: '9px', bottom: '9px', left: '9px', right: '9px', border: '1px solid #d97706' }} />
-                    <div style={{ position: 'absolute', top: '13px', bottom: '13px', left: '13px', right: '13px', border: '2px solid #00204a' }} />
-
-                    {/* Certificate Body */}
-                    <div style={{ position: 'relative', zIndex: 5, padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', boxSizing: 'border-box', textAlign: 'center' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                        <img src="/images/logo-ctsda.png" alt="CTSDA Logo" style={{ height: '28px', objectFit: 'contain' }} />
-                        <div style={{ fontSize: '0.46rem', color: '#00204a', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.03em', lineHeight: 1.2, textAlign: 'left' }}>
-                          COUNCIL FOR TRAINING<br />SKILLS AND DEVELOPMENT AMERICA
-                        </div>
-                      </div>
-
-                      <div style={{ margin: '0.6rem 0 0.2rem' }}>
-                        <div style={{ fontSize: '0.825rem', fontWeight: 900, color: '#00204a', letterSpacing: '0.07em', textTransform: 'uppercase' }}>
-                          CERTIFICATE OF ACCREDITATION
-                        </div>
-                        <div style={{ fontSize: '0.46rem', color: '#64748b', marginTop: '0.2rem' }}>This is to certify that</div>
-                      </div>
-
-                      <div style={{ fontSize: '1rem', fontWeight: 900, color: '#00204a', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.2rem', margin: '0.2rem auto', display: 'inline-block' }}>
-                        {result.institution}
-                      </div>
-
-                      <p style={{ fontSize: '0.46rem', color: '#475569', lineHeight: 1.5, maxWidth: '85%', margin: '0.2rem auto 0.6rem' }}>
-                        has met the required standards and is hereby accredited by the Council for Training Skills and Development America.
-                      </p>
-
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 0.25rem' }}>
-                        <div style={{ textAlign: 'left' }}>
-                          <div style={{ fontSize: '0.42rem', color: '#00204a', fontWeight: 800 }}>{result.certificateNumber}</div>
-                          <div style={{ fontSize: '0.38rem', color: '#64748b' }}>Certificate Number</div>
-                        </div>
-                        <div style={{ textAlign: 'center' }}>
-                          <div style={{ borderBottom: '1px solid #00204a', width: '70px', display: 'flex', justifyContent: 'center', paddingBottom: '1px' }}>
-                            <span style={{ fontFamily: "'Brush Script MT', cursive", fontSize: '0.8rem', color: '#00204a', lineHeight: 1 }}>John H. W.</span>
-                          </div>
-                          <div style={{ fontSize: '0.37rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginTop: '1px' }}>Director of Accreditation</div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: '0.42rem', color: '#00204a', fontWeight: 800 }}>{result.dateIssued}</div>
-                          <div style={{ fontSize: '0.38rem', color: '#64748b' }}>Date Issued</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Gold Seal */}
-                    <div style={{ position: 'absolute', bottom: '1rem', right: '1rem', width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #fbbf24, #d97706)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(217,119,6,0.4)', zIndex: 10 }}>
-                      <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '1px dashed #fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: '0.28rem', color: '#fff', fontWeight: 'bold' }}>CTSD</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                {/* Right sub-col removed: visual certificate mockup card is inappropriate here as each institution issues its own */}
               </div>
 
               {/* Action Buttons for Reset and Print */}
@@ -378,26 +316,6 @@ export function IsolatedCertificateVerifier({
                   }}
                 >
                   🔄 Verify Another Certificate
-                </button>
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  style={{
-                    padding: '0.75rem 1.5rem',
-                    backgroundColor: '#00204a',
-                    color: '#ffffff',
-                    border: 'none',
-                    borderRadius: '0.5rem',
-                    fontWeight: 700,
-                    fontSize: '0.9rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    boxShadow: '0 4px 12px rgba(0, 32, 74, 0.25)',
-                  }}
-                >
-                  🖨️ Print / Download PDF
                 </button>
               </div>
             </div>
