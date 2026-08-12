@@ -49,8 +49,9 @@ export class TrainingController {
     @Param('id') id: string, 
     @Body('userId') userId?: string,
     @Body('email') email?: string,
+    @Body('name') name?: string,
   ) {
-    return this.trainingService.register(userId || null, id, email || null);
+    return this.trainingService.register(userId || null, id, email || null, name || null);
   }
 
   // User: Get enrolled trainings

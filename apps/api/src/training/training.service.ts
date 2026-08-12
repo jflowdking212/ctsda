@@ -1,9 +1,14 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class TrainingService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @InjectQueue('email') private emailQueue: Queue,
+  ) {}
 
   async findAllPublic() {
     return this.prisma.training.findMany({
@@ -36,7 +41,7 @@ export class TrainingService {
     return this.prisma.training.delete({ where: { id } });
   }
 
-  async register(userId: string | null, trainingId: string, email: string | null = null) {
+  async register(userId: string | null, trainingId: string, email: string | null = null, name: string | null = null) {
     const training = await this.prisma.training.findUnique({
       where: { id: trainingId }
     });
@@ -45,117 +50,51 @@ export class TrainingService {
       throw new NotFoundException('Training not found');
     }
 
-    let actualUserId = userId;
+    const adminEmail = 'ctsdausa@gmail.com';
+    const userName = name || 'A user';
+    const userEmail = email || 'Unknown email';
 
-    if (!actualUserId && email) {
-      // Check if user exists
-      const existingUser = await this.prisma.user.findUnique({ where: { email } });
-      if (existingUser) {
-        return { requiresLogin: true, message: 'An account with this email already exists. Please log in to continue.' };
-      }
-    }
+    const subject = `New Training Enrollment Request: ${training.title}`;
+    const html = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #334155;">
+        <h2 style="color: #0f172a;">New Training Enrollment Request</h2>
+        <p>A new user has requested to enroll in a training module.</p>
+        
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; width: 120px;">Name:</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">${userName}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Email:</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;"><a href="mailto:${userEmail}">${userEmail}</a></td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Module:</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">${training.title}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Price:</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">$${training.price}</td>
+          </tr>
+        </table>
+        
+        <p>Please contact them directly to provide the payment link or enrollment instructions.</p>
+      </div>
+    `;
 
-    if (!actualUserId && !email) {
-      throw new BadRequestException('Must provide either userId or email');
-    }
+    // Queue the email to be sent by the worker
+    await this.emailQueue.add('send-email', {
+      to: adminEmail,
+      subject,
+      html,
+      userId: userId || 'system',
+    });
 
-    // If we have a user ID, check existing enrollments
-    if (actualUserId) {
-      const existing = await this.prisma.trainingEnrollment.findUnique({
-        where: { userId_trainingId: { userId: actualUserId, trainingId } }
-      });
-
-      if (existing && existing.status === 'paid') {
-        return { url: null, message: 'Already enrolled' };
-      }
-      if (existing && existing.status === 'free') {
-        return { url: null, message: 'Already enrolled' };
-      }
-    }
-
-    const priceNum = Number(training.price);
-    
-    if (priceNum === 0) {
-      // Free training
-      if (!actualUserId && email) {
-        // Create user for free training
-        const bcrypt = require('bcryptjs');
-        const passwordHash = await bcrypt.hash(Math.random().toString(36).slice(-10), 10);
-        const newUser = await this.prisma.user.create({
-          data: {
-            email,
-            passwordHash,
-            firstName: 'Guest',
-            lastName: 'User',
-            role: 'applicant',
-            isActive: true,
-          }
-        });
-        actualUserId = newUser.id;
-      }
-
-      await this.prisma.trainingEnrollment.upsert({
-        where: { userId_trainingId: { userId: actualUserId!, trainingId } },
-        update: { status: 'free', amountPaid: 0 },
-        create: {
-          userId: actualUserId!,
-          trainingId,
-          status: 'free',
-          amountPaid: 0,
-        }
-      });
-      return { url: null, status: 'free' };
-    } else {
-      // Paid training
-      let enrollmentId: string | null = null;
-      if (actualUserId) {
-        const enrollment = await this.prisma.trainingEnrollment.upsert({
-          where: { userId_trainingId: { userId: actualUserId, trainingId } },
-          update: { status: 'pending', amountPaid: priceNum },
-          create: {
-            userId: actualUserId,
-            trainingId,
-            status: 'pending',
-            amountPaid: priceNum,
-          }
-        });
-        enrollmentId = enrollment.id;
-      }
-
-      // Generate Stripe checkout
-      const Stripe = require('stripe');
-      const secretKey = process.env.STRIPE_SECRET_KEY;
-      if (!secretKey) throw new Error('Stripe is not configured');
-      const stripe = new Stripe(secretKey);
-
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
-        success_url: `${frontendUrl}/portal/training?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${frontendUrl}/training`,
-        customer_email: email || undefined,
-        metadata: {
-          trainingId,
-          ...(enrollmentId ? { trainingEnrollmentId: enrollmentId } : {}),
-          ...(actualUserId ? { userId: actualUserId } : {}),
-          ...(email ? { guestEmail: email } : {}),
-        },
-        line_items: [
-          {
-            quantity: 1,
-            price_data: {
-              currency: 'usd',
-              unit_amount: Math.round(priceNum * 100), // convert to cents
-              product_data: {
-                name: `Training: ${training.title}`,
-              },
-            },
-          },
-        ],
-      });
-
-      return { url: session.url, sessionId: session.id };
-    }
+    return { 
+      success: true, 
+      message: 'Your registration request has been received. An admin will contact you with payment instructions shortly.' 
+    };
   }
 
   async getMyEnrollments(userId: string) {

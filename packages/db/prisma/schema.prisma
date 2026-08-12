@@ -767,6 +767,7 @@ model Training {
   title       String   @db.VarChar(255)
   description String?  @db.Text
   category    String?  @db.VarChar(100)
+  imageUrl    String?  @db.VarChar(500)
   videoUrl    String?  @db.VarChar(2048)
   resourceUrl String?  @db.VarChar(2048)
   duration    String?  @db.VarChar(50)
