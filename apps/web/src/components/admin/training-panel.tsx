@@ -8,7 +8,15 @@ const MOCK_MODULES = [
   { id: '3', title: 'Advanced Assessment Techniques', description: 'For experienced evaluators.', type: 'video', isPublished: false, createdAt: '2024-08-01T09:15:00Z' },
 ];
 
-export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit) => Promise<Response> }) {
+export function TrainingPanel({
+  api,
+  onSuccess,
+  onError,
+}: {
+  api: (path: string, init?: RequestInit) => Promise<Response>;
+  onSuccess?: (title: string, message?: string) => void;
+  onError?: (title: string, message?: string) => void;
+}) {
   const [modules, setModules] = useState<any[]>([]);
   const [view, setView] = useState<'list' | 'editor'>('list');
   const [current, setCurrent] = useState<any>({});
@@ -68,9 +76,10 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
         setModules(modules.map(m => m.id === current.id ? saved : m));
       }
       setView('list');
+      (onSuccess || (() => {}))('Saved!', current.id ? 'Training module updated.' : 'Training module created.');
     } catch (err) {
       console.error(err);
-      alert('Error saving training module');
+      (onError || ((t: string) => alert(t)))('Error saving training module', 'Please check all fields and try again.');
     } finally {
       setSaving(false);
     }
@@ -82,8 +91,9 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
       const res = await api(`/admin/training/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
       setModules(modules.filter(m => m.id !== id));
+      (onSuccess || (() => {}))('Deleted', 'Training module removed.');
     } catch (err) {
-      alert('Error deleting training module');
+      (onError || ((t: string) => alert(t)))('Delete failed', 'Could not remove this module.');
     }
   }
 
@@ -106,7 +116,7 @@ export function TrainingPanel({ api }: { api: (path: string, init?: RequestInit)
       setCurrent({ ...current, imageUrl: `${apiBase}${data.url}` });
     } catch (err) {
       console.error(err);
-      alert('Error uploading image');
+      (onError || ((t: string) => alert(t)))('Upload failed', 'Could not upload the image. Try again.');
     } finally {
       setUploading(false);
     }

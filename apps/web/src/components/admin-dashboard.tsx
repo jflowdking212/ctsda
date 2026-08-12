@@ -13,6 +13,7 @@ import { AccreditationsPanel } from './admin/accreditations-panel';
 import StudentVerificationPanel from './admin/student-verification-panel';
 import { SettingsPanel } from './admin/settings-panel';
 import { PagesPanel } from './admin/pages-panel';
+import { ToastProvider, useToast } from './toast';
 
 const ADMIN_SESSION_KEY = 'ctsda_admin_session';
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -210,6 +211,15 @@ type AdminUser = {
 let globalAdminProfile: AdminUser | null = null;
 
 export function AdminDashboard({ section = 'reports' }: { section?: AdminSection }) {
+  return (
+    <ToastProvider>
+      <AdminDashboardInner section={section} />
+    </ToastProvider>
+  );
+}
+
+function AdminDashboardInner({ section = 'reports' }: { section?: AdminSection }) {
+  const { success: toastSuccess, error: toastError } = useToast();
   const [profile, setProfile] = useState<AdminUser | null>(globalAdminProfile);
   const [checkingSession, setCheckingSession] = useState(!globalAdminProfile);
   const [email, setEmail] = useState('');
@@ -882,7 +892,7 @@ export function AdminDashboard({ section = 'reports' }: { section?: AdminSection
             )}
 
             {section === 'training' && (
-              <TrainingPanel api={api} />
+              <TrainingPanel api={api} onSuccess={toastSuccess} onError={toastError} />
             )}
 
             {section === 'pages' && (
