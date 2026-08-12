@@ -62,7 +62,10 @@ export function TrainingPanel({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error('Failed to create');
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || 'Failed to create');
+        }
         const saved = await res.json();
         setModules([saved, ...modules]);
       } else {
@@ -71,15 +74,18 @@ export function TrainingPanel({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error('Failed to update');
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || 'Failed to update');
+        }
         const saved = await res.json();
         setModules(modules.map(m => m.id === current.id ? saved : m));
       }
       setView('list');
       (onSuccess || (() => {}))('Saved!', current.id ? 'Training module updated.' : 'Training module created.');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      (onError || ((t: string) => alert(t)))('Error saving training module', 'Please check all fields and try again.');
+      (onError || ((t: string) => alert(t)))('Error saving training module', err.message || 'Please check all fields and try again.');
     } finally {
       setSaving(false);
     }
