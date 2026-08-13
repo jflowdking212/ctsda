@@ -137,12 +137,38 @@ export class AccreditationsService {
 
   async delete(id: string, actorId: string) {
     await this.assertAccreditationAdmin(actorId);
-    const accreditation = await this.findById(id);
+    const accreditation = await this.prisma.accreditation.findUnique({
+      where: { id },
+      include: {
+        application: true,
+      },
+    });
+
+    if (!accreditation) {
+      throw new NotFoundException('Accreditation not found');
+    }
 
     return this.prisma.$transaction(async (tx) => {
       await tx.certificateStatusHistory.deleteMany({ where: { accreditationId: id } });
       await tx.certificate.deleteMany({ where: { accreditationId: id } });
       await tx.accreditation.delete({ where: { id } });
+
+      if (accreditation.applicationId) {
+        await tx.invoice.deleteMany({ where: { applicationId: accreditation.applicationId } });
+        await tx.application.delete({ where: { id: accreditation.applicationId } });
+      }
+
+      if (accreditation.application?.applicantId) {
+        const applicantId = accreditation.application.applicantId;
+        const otherApps = await tx.application.count({ where: { applicantId } });
+        if (otherApps === 0) {
+          await tx.auditLog.deleteMany({ where: { userId: applicantId } });
+          const user = await tx.user.findUnique({ where: { id: applicantId } });
+          if (user && user.role === 'applicant') {
+            await tx.user.delete({ where: { id: applicantId } });
+          }
+        }
+      }
 
       const remainingActive = await tx.accreditation.count({
         where: { institutionId: accreditation.institutionId, status: 'active' },
