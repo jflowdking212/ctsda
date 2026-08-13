@@ -456,11 +456,29 @@ export default function InstitutionPage() {
           @media (max-width: 640px) {
             .profile-card-header {
               flex-direction: column;
-              align-items: stretch;
+              align-items: center;
+              text-align: center;
+              padding: 1.25rem 1rem;
             }
             .profile-logo-box {
-              width: 70px;
-              height: 70px;
+              width: 90px;
+              height: 90px;
+              margin: 0 auto;
+            }
+            .profile-card-header > div {
+              width: 100%;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+            }
+            .profile-card-header h2 {
+              text-align: center;
+              width: 100%;
+              font-size: 1.75rem !important;
+            }
+            .profile-share-btn {
+              width: 100%;
+              margin-top: 1rem;
             }
             .profile-share-btn {
               width: 100%;
