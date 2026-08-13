@@ -42,9 +42,9 @@ async function handleProxy(req: NextRequest) {
   }
 }
 
-export const GET = handleProxy;
-export const POST = handleProxy;
-export const PUT = handleProxy;
-export const DELETE = handleProxy;
-export const PATCH = handleProxy;
-export const OPTIONS = handleProxy;
+export async function GET(req: NextRequest) { return handleProxy(req); }
+export async function POST(req: NextRequest) { return handleProxy(req); }
+export async function PUT(req: NextRequest) { return handleProxy(req); }
+export async function DELETE(req: NextRequest) { return handleProxy(req); }
+export async function PATCH(req: NextRequest) { return handleProxy(req); }
+export async function OPTIONS(req: NextRequest) { return handleProxy(req); }
