@@ -12,7 +12,7 @@ export const metadata = {
 async function getTraining() {
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
   try {
-    const res = await fetch(`${API_BASE}/training`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_BASE}/training`, { cache: 'no-store' });
     if (!res.ok) return [];
     return res.json();
   } catch {
@@ -34,12 +34,69 @@ const DEFAULT_COLOR = { bg: '#f1f5f9', text: '#475569' };
 async function getSettings() {
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
   try {
-    const res = await fetch(`${API_BASE}/settings/public`, { next: { revalidate: 30 } });
+    const res = await fetch(`${API_BASE}/settings/public`, { cache: 'no-store' });
     if (!res.ok) return {};
     return res.json();
   } catch {
     return {};
   }
+}
+
+const CATEGORY_IMAGES: Record<string, string> = {
+  'Safety': '/uploads/road-safety.jpg',
+  'Road Safety': '/uploads/road-safety.jpg',
+  'Professional Development': '/uploads/instructor-training.jpg',
+  'Instructor Training': '/uploads/instructor-training.jpg',
+  'Compliance': '/uploads/compliance-training.jpg',
+  'Compliance & Regulations': '/uploads/compliance-training.jpg',
+  'Vehicle Inspection': '/uploads/vehicle-inspection.jpg',
+  'First Aid': '/uploads/first-aid.jpg',
+  'Advanced Driving': '/uploads/advanced-driving.jpg',
+};
+
+function getValidImageUrl(url?: string | null, category?: string, title?: string): string {
+  // Server-safe: NEXT_PUBLIC_API_URL is available both server and client.
+  // Never reference `window` here — this is a Server Component.
+  const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'https://ctsda.acecoterieconsulting.com/api').replace(/\/$/, '');
+
+  let targetUrl = url;
+
+  // If the DB record has a real URL (from the admin upload), use it after sanitizing localhost
+  if (targetUrl) {
+    if (targetUrl.includes('localhost:4000')) {
+      targetUrl = targetUrl.replace(/https?:\/\/localhost:\d+/, apiBase);
+    }
+    // If it's already an absolute URL (production), return as-is
+    if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) return targetUrl;
+    // Relative path — prefix with apiBase
+    const cleanPath = targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`;
+    return `${apiBase}${cleanPath}`;
+  }
+
+  // No imageUrl in DB — pick a category/title-based fallback
+  let fallbackPath: string;
+  const lowerCategory = (category || '').toLowerCase();
+  const lowerTitle = (title || '').toLowerCase();
+
+  if (CATEGORY_IMAGES[category || '']) {
+    fallbackPath = CATEGORY_IMAGES[category || ''];
+  } else if (lowerCategory.includes('safety') || lowerTitle.includes('safety') || lowerTitle.includes('road')) {
+    fallbackPath = '/uploads/road-safety.jpg';
+  } else if (lowerCategory.includes('professional') || lowerCategory.includes('instructor') || lowerTitle.includes('instructor')) {
+    fallbackPath = '/uploads/instructor-training.jpg';
+  } else if (lowerCategory.includes('compliance') || lowerTitle.includes('compliance') || lowerTitle.includes('hazmat') || lowerTitle.includes('hazardous')) {
+    fallbackPath = '/uploads/compliance-training.jpg';
+  } else if (lowerCategory.includes('inspection') || lowerTitle.includes('inspection') || lowerTitle.includes('vehicle')) {
+    fallbackPath = '/uploads/vehicle-inspection.jpg';
+  } else if (lowerCategory.includes('first aid') || lowerTitle.includes('aid') || lowerTitle.includes('first')) {
+    fallbackPath = '/uploads/first-aid.jpg';
+  } else if (lowerCategory.includes('driving') || lowerTitle.includes('defensive') || lowerTitle.includes('advanced') || lowerTitle.includes('driving')) {
+    fallbackPath = '/uploads/advanced-driving.jpg';
+  } else {
+    fallbackPath = '/uploads/road-safety.jpg';
+  }
+
+  return `${apiBase}${fallbackPath}`;
 }
 
 export default async function TrainingPage({ searchParams }: { searchParams?: any }) {
@@ -158,15 +215,9 @@ export default async function TrainingPage({ searchParams }: { searchParams?: an
                   const catStyle = CATEGORY_COLORS[item.category] || DEFAULT_COLOR;
                   return (
                     <div key={item.id} style={{ backgroundColor: 'white', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
-                      {item.imageUrl ? (
-                        <div style={{ height: '180px', width: '100%', overflow: 'hidden', position: 'relative', backgroundColor: '#e2e8f0' }}>
-                          <img src={item.imageUrl} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </div>
-                      ) : (
-                        <div style={{ height: '140px', backgroundColor: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6', fontSize: '3rem' }}>
-                          📚
-                        </div>
-                      )}
+                      <div style={{ height: '180px', width: '100%', overflow: 'hidden', position: 'relative', backgroundColor: '#e2e8f0' }}>
+                        <img src={getValidImageUrl(item.imageUrl, item.category, item.title)} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
                       
                       <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>

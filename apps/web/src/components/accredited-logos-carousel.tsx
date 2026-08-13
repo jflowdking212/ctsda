@@ -45,8 +45,9 @@ export function AccreditedLogosCarousel() {
     return null;
   }
 
-  // Duplicate list for a seamless, continuous infinite carousel
-  const carouselItems = [...institutions, ...institutions];
+  // Duplicate list multiple times to guarantee filling full screen width
+  const repeatCount = institutions.length < 3 ? 6 : institutions.length < 6 ? 4 : 2;
+  const carouselItems = Array(repeatCount).fill(institutions).flat();
 
   return (
     <section className="accredited-logos-section" style={{ backgroundColor: '#ffffff', padding: '4rem 0', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', overflow: 'hidden' }}>
@@ -63,7 +64,7 @@ export function AccreditedLogosCarousel() {
       </div>
 
       {/* INFINITE SCROLL CAROUSEL */}
-      <div style={{ display: 'flex', overflow: 'hidden', userSelect: 'none', position: 'relative', width: '100%' }}>
+      <div style={{ display: 'flex', overflow: 'hidden', userSelect: 'none', position: 'relative', width: '100%', justifyContent: 'flex-start' }}>
         {/* Left & Right subtle gradient fade edges */}
         <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: '80px', background: 'linear-gradient(to right, #ffffff, transparent)', zIndex: 10, pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', top: 0, bottom: 0, right: 0, width: '80px', background: 'linear-gradient(to left, #ffffff, transparent)', zIndex: 10, pointerEvents: 'none' }} />
@@ -161,7 +162,7 @@ export function AccreditedLogosCarousel() {
           display: flex !important;
           gap: 1.5rem !important;
           width: max-content !important;
-          animation: scrollLogos 25s linear infinite !important;
+          animation: scrollLogos 30s linear infinite !important;
           white-space: nowrap !important;
           align-items: center !important;
           padding: 0.5rem 0 !important;

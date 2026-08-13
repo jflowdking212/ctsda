@@ -3,42 +3,60 @@
 import React, { useState } from 'react';
 
 export function DirectoryPanel({ 
-  institutions, 
+  institutions: initialInstitutions, 
   api 
 }: { 
   institutions: any[];
   api: (path: string, init?: RequestInit) => Promise<Response>;
 }) {
+  const [institutionsList, setInstitutionsList] = useState<any[]>(initialInstitutions || []);
   const [searchQuery, setSearchQuery] = useState('');
   const [countryFilter, setCountryFilter] = useState<string>('all');
   const [selectedInst, setSelectedInst] = useState<any | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [hoverRowId, setHoverRowId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // Form edit states for modal
-  const [editEmail, setEditEmail] = useState('');
-  const [editStatus, setEditStatus] = useState<string>('active');
+  // Edit Form State
+  const [editForm, setEditForm] = useState({
+    name: '',
+    registrationNumber: '',
+    institutionType: 'corporate',
+    country: '',
+    address: '',
+    phone: '',
+    email: '',
+    website: '',
+    yearEstablished: '',
+    description: '',
+    isActive: true,
+  });
+
+  // Keep internal list in sync if prop changes
+  React.useEffect(() => {
+    setInstitutionsList(initialInstitutions || []);
+  }, [initialInstitutions]);
 
   // Extract unique countries
-  const countries = Array.from(new Set(institutions.map((i) => i.country).filter(Boolean))).sort();
+  const countries = Array.from(new Set(institutionsList.map((i) => i.country).filter(Boolean))).sort();
 
-  // Dynamic metrics calculation
-  const totalListed = institutions.length;
-  const activeCount = institutions.filter((i) => i.isActive).length;
+  // Metrics
+  const totalListed = institutionsList.length;
+  const activeCount = institutionsList.filter((i) => i.isActive).length;
   const suspendedCount = totalListed - activeCount;
   const uniqueCountriesCount = countries.length;
 
-  const filteredInstitutions = institutions.filter((inst) => {
+  const filteredInstitutions = institutionsList.filter((inst) => {
     if (countryFilter !== 'all' && inst.country !== countryFilter) {
       return false;
     }
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();
-      const matchName = inst.name?.toLowerCase().includes(q) || '';
-      const matchCode = inst.registrationNumber?.toLowerCase().includes(q) || '';
-      const matchCountry = inst.country?.toLowerCase().includes(q) || '';
-      return matchName || matchCode || matchCountry;
+      const matchName = inst.name?.toLowerCase().includes(q) || false;
+      const matchCode = inst.registrationNumber?.toLowerCase().includes(q) || false;
+      const matchCountry = inst.country?.toLowerCase().includes(q) || false;
+      const matchEmail = inst.email?.toLowerCase().includes(q) || false;
+      return matchName || matchCode || matchCountry || matchEmail;
     }
     return true;
   });
@@ -61,25 +79,22 @@ export function DirectoryPanel({
     );
   };
 
-  const handleToggleStatus = async (id: string, currentActive: boolean) => {
-    try {
-      // In a real app, we'd hit the API here, e.g.
-      // await api(`/admin/institutions/${id}/status`, { method: 'POST', body: JSON.stringify({ isActive: !currentActive }) });
-      setMessage({
-        type: 'success',
-        text: `Visibility toggle requested. (API connection pending for this route)`,
-      });
-    } catch (e) {
-      setMessage({ type: 'error', text: 'Failed to toggle status.' });
-    }
-    setTimeout(() => setMessage(null), 4000);
-  };
-
-  const handleOpenDetailModal = (inst: any, edit: boolean = false) => {
+  const handleOpenModal = (inst: any, edit: boolean = false) => {
     setSelectedInst(inst);
     setIsEditMode(edit);
-    setEditEmail(inst.email || '');
-    setEditStatus(inst.isActive ? 'active' : 'suspended');
+    setEditForm({
+      name: inst.name || '',
+      registrationNumber: inst.registrationNumber || '',
+      institutionType: inst.institutionType || 'corporate',
+      country: inst.country || '',
+      address: inst.address || '',
+      phone: inst.phone || '',
+      email: inst.email || '',
+      website: inst.website || '',
+      yearEstablished: inst.yearEstablished ? String(inst.yearEstablished) : '',
+      description: inst.description || '',
+      isActive: inst.isActive ?? true,
+    });
   };
 
   const handleCloseModal = () => {
@@ -87,19 +102,62 @@ export function DirectoryPanel({
     setIsEditMode(false);
   };
 
-  const handleSaveEdit = async () => {
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!selectedInst) return;
+    setSaving(true);
+    setMessage(null);
+
     try {
+      const payload = {
+        name: editForm.name,
+        registrationNumber: editForm.registrationNumber,
+        institutionType: editForm.institutionType,
+        country: editForm.country,
+        address: editForm.address,
+        phone: editForm.phone,
+        email: editForm.email,
+        website: editForm.website,
+        yearEstablished: editForm.yearEstablished ? Number(editForm.yearEstablished) : null,
+        description: editForm.description,
+        isActive: editForm.isActive,
+      };
+
+      const res = await api(`/admin/institutions/${selectedInst.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        setMessage({ type: 'error', text: errData.message || 'Failed to update institution profile.' });
+        return;
+      }
+
+      const updated = await res.json().catch(() => null);
+
+      // Update local state
+      setInstitutionsList((prev) =>
+        prev.map((item) =>
+          item.id === selectedInst.id
+            ? { ...item, ...payload, ...(updated || {}) }
+            : item
+        )
+      );
+
       setMessage({
         type: 'success',
-        text: `Institution details updated for ${selectedInst.name}. (API connection pending)`,
+        text: `Institution profile updated successfully for "${editForm.name}"!`,
       });
-    } catch (e) {
-      setMessage({ type: 'error', text: 'Update failed.' });
+      setSelectedInst(null);
+      setIsEditMode(false);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Network or server error updating institution.' });
+    } finally {
+      setSaving(false);
+      setTimeout(() => setMessage(null), 5000);
     }
-    setSelectedInst(null);
-    setIsEditMode(false);
-    setTimeout(() => setMessage(null), 4000);
   };
 
   return (
@@ -119,17 +177,16 @@ export function DirectoryPanel({
         </div>
       </div>
 
-      {/* Message Notification */}
       {message && (
         <div
-          className={`admin-message ${message.type}`}
           style={{
-            padding: '0.75rem 1rem',
+            padding: '0.85rem 1.25rem',
             borderRadius: '0.5rem',
             marginBottom: '1.25rem',
             fontSize: '0.875rem',
-            background: message.type === 'success' ? '#f0fdf4' : '#fef2f2',
-            color: message.type === 'success' ? '#166534' : '#991b1b',
+            fontWeight: 600,
+            background: message.type === 'success' ? '#dcfce7' : '#fee2e2',
+            color: message.type === 'success' ? '#14532d' : '#991b1b',
             border: `1px solid ${message.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
           }}
         >
@@ -137,9 +194,8 @@ export function DirectoryPanel({
         </div>
       )}
 
-      {/* Top Metric Cards */}
+      {/* Metrics Banner */}
       <div
-        className="metric-grid"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -147,173 +203,126 @@ export function DirectoryPanel({
           marginBottom: '1.5rem',
         }}
       >
-        <div className="metric-card admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.25rem', textAlign: 'left' }}>
-          <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Total Listed
-          </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0f172a', marginTop: '0.25rem' }}>
-            {totalListed}
-          </div>
+        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.75rem', padding: '1.25rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Total Institutions</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginTop: '0.25rem' }}>{totalListed}</div>
         </div>
-        <div className="metric-card admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.25rem', textAlign: 'left' }}>
-          <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Active
-          </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 700, color: '#15803d', marginTop: '0.25rem' }}>
-            {activeCount}
-          </div>
+        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.75rem', padding: '1.25rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase' }}>Active Listed</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#15803d', marginTop: '0.25rem' }}>{activeCount}</div>
         </div>
-        <div className="metric-card admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.25rem', textAlign: 'left' }}>
-          <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Suspended
-          </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 700, color: '#b91c1c', marginTop: '0.25rem' }}>
-            {suspendedCount}
-          </div>
+        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.75rem', padding: '1.25rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#dc2626', textTransform: 'uppercase' }}>Suspended / Inactive</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#b91c1c', marginTop: '0.25rem' }}>{suspendedCount}</div>
         </div>
-        <div className="metric-card admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.25rem', textAlign: 'left' }}>
-          <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Countries
-          </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 700, color: '#2563eb', marginTop: '0.25rem' }}>
-            {uniqueCountriesCount}
-          </div>
+        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.75rem', padding: '1.25rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2563eb', textTransform: 'uppercase' }}>Countries Represented</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#1d4ed8', marginTop: '0.25rem' }}>{uniqueCountriesCount}</div>
         </div>
       </div>
 
-      {/* Control Bar: Search & Country Dropdown */}
-      <div
-        className="admin-card"
-        style={{
-          background: '#ffffff',
-          border: '1px solid #e2e8f0',
-          borderRadius: '0.5rem',
-          padding: '1rem',
-          marginBottom: '1.5rem',
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '1rem',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <div style={{ minWidth: '240px', flexGrow: 1, maxWidth: '400px' }}>
-          <input
-            type="text"
-            placeholder="Search institution name, code, or country..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '0.5rem 0.75rem',
-              border: '1px solid #e2e8f0',
-              borderRadius: '0.5rem',
-              fontSize: '0.875rem',
-              outline: 'none',
-            }}
-          />
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#64748b' }}>Filter Country:</label>
-          <select
-            value={countryFilter}
-            onChange={(e) => setCountryFilter(e.target.value)}
-            style={{
-              padding: '0.5rem 0.75rem',
-              borderRadius: '0.5rem',
-              border: '1px solid #e2e8f0',
-              fontSize: '0.875rem',
-              background: '#ffffff',
-              color: '#0f172a',
-              outline: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            <option value="all">All Countries</option>
-            {countries.map((c) => (
-              <option key={c as string} value={c as string}>
-                {c as string}
-              </option>
-            ))}
-          </select>
-        </div>
+      {/* Filter and Search Bar */}
+      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.75rem', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search by name, reg number, email, or country..."
+          style={{ flex: 1, minWidth: '240px', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none' }}
+        />
+        <select
+          value={countryFilter}
+          onChange={(e) => setCountryFilter(e.target.value)}
+          style={{ padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: '#ffffff' }}
+        >
+          <option value="all">All Countries ({countries.length})</option>
+          {countries.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
       </div>
 
       {/* Directory Table */}
-      <div className="admin-card" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.5rem', overflow: 'hidden' }}>
-        <div style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
-          <table className="admin-table" style={{ width: '100%', minWidth: '650px', borderCollapse: 'collapse', fontSize: '0.875rem', textAlign: 'left' }}>
-          <thead style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
-            <tr>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Institution</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Country</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Registration No.</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Listed Since</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Status</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', fontSize: '0.72rem', textTransform: 'uppercase' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredInstitutions.length === 0 ? (
-              <tr>
-                <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
-                  No institutions found matching the search criteria.
-                </td>
+      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.75rem', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+            <thead>
+              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', textTransform: 'uppercase', fontSize: '0.72rem', color: '#64748b', fontWeight: 700 }}>
+                <th style={{ padding: '0.85rem 1rem', textAlign: 'left' }}>Institution Name</th>
+                <th style={{ padding: '0.85rem 1rem', textAlign: 'left' }}>Country</th>
+                <th style={{ padding: '0.85rem 1rem', textAlign: 'left' }}>Registration No.</th>
+                <th style={{ padding: '0.85rem 1rem', textAlign: 'left' }}>Type</th>
+                <th style={{ padding: '0.85rem 1rem', textAlign: 'left' }}>Status</th>
+                <th style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>Actions</th>
               </tr>
-            ) : (
-              filteredInstitutions.map((inst) => (
-                <tr
-                  key={inst.id}
-                  style={{
-                    borderBottom: '1px solid #f1f5f9',
-                    transition: 'background 100ms',
-                    backgroundColor: hoverRowId === inst.id ? '#f8fafc' : 'transparent',
-                  }}
-                  onMouseEnter={() => setHoverRowId(inst.id)}
-                  onMouseLeave={() => setHoverRowId(null)}
-                >
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#0f172a', textAlign: 'left' }}>
-                    {inst.name}
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 400 }}>{inst.email}</div>
-                  </td>
-                  <td style={{ padding: '0.75rem 1rem', color: '#334155', textAlign: 'left' }}>{inst.country}</td>
-                  <td style={{ padding: '0.75rem 1rem', color: '#334155', fontFamily: 'monospace', fontWeight: 600, textAlign: 'left' }}>
-                    {inst.registrationNumber}
-                  </td>
-                  <td style={{ padding: '0.75rem 1rem', color: '#64748b', textAlign: 'left' }}>
-                    {inst.createdAt ? new Date(inst.createdAt).toLocaleDateString() : ''}
-                  </td>
-                  <td style={{ padding: '0.75rem 1rem', textAlign: 'left' }}>{getStatusBadge(inst.isActive)}</td>
-                  <td style={{ padding: '0.75rem 1rem', textAlign: 'left' }}>
-                    <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
-                      <button
-                        className="admin-button"
-                        style={{
-                          padding: '0.3rem 0.7rem',
-                          fontSize: '0.75rem',
-                          borderRadius: '0.375rem',
-                          border: '1px solid #e2e8f0',
-                          background: '#ffffff',
-                          color: '#0f172a',
-                          cursor: 'pointer',
-                          fontWeight: 500,
-                        }}
-                        onClick={() => handleOpenDetailModal(inst, false)}
-                      >
-                        View Details
-                      </button>
-                    </div>
+            </thead>
+            <tbody>
+              {filteredInstitutions.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ padding: '3rem 1rem', textAlign: 'center', color: '#94a3b8' }}>
+                    No institutions match the filter criteria.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                filteredInstitutions.map((inst) => (
+                  <tr key={inst.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '0.85rem 1rem', fontWeight: 700, color: '#0f172a' }}>
+                      {inst.name}
+                      {inst.website && (
+                        <a href={inst.website.startsWith('http') ? inst.website : `https://${inst.website}`} target="_blank" rel="noreferrer" style={{ display: 'block', fontSize: '0.75rem', color: '#2563eb', fontWeight: 500 }}>
+                          {inst.website.replace(/^https?:\/\//, '')}
+                        </a>
+                      )}
+                    </td>
+                    <td style={{ padding: '0.85rem 1rem', color: '#334155' }}>📍 {inst.country || 'N/A'}</td>
+                    <td style={{ padding: '0.85rem 1rem', color: '#334155', fontFamily: 'monospace', fontWeight: 600 }}>{inst.registrationNumber || 'N/A'}</td>
+                    <td style={{ padding: '0.85rem 1rem', color: '#5d6a7c', textTransform: 'capitalize' }}>{(inst.institutionType || 'corporate').replace('_', ' ')}</td>
+                    <td style={{ padding: '0.85rem 1rem' }}>{getStatusBadge(inst.isActive)}</td>
+                    <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
+                      <div style={{ display: 'inline-flex', gap: '0.35rem', alignItems: 'center' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenModal(inst, true)}
+                          style={{
+                            padding: '0.35rem 0.75rem',
+                            fontSize: '0.785rem',
+                            borderRadius: '0.375rem',
+                            border: '1px solid #2563eb',
+                            background: '#2563eb',
+                            color: '#ffffff',
+                            cursor: 'pointer',
+                            fontWeight: 600,
+                          }}
+                        >
+                          ✏️ Edit Profile
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenModal(inst, false)}
+                          style={{
+                            padding: '0.35rem 0.65rem',
+                            fontSize: '0.785rem',
+                            borderRadius: '0.375rem',
+                            border: '1px solid #cbd5e1',
+                            background: '#ffffff',
+                            color: '#475569',
+                            cursor: 'pointer',
+                            fontWeight: 500,
+                          }}
+                        >
+                          View
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* Detail / Edit Modal */}
+      {/* View / Edit Modal */}
       {selectedInst && (
         <div
           style={{
@@ -322,7 +331,7 @@ export function DirectoryPanel({
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(15, 23, 42, 0.5)',
+            backgroundColor: 'rgba(15, 23, 42, 0.6)',
             backdropFilter: 'blur(4px)',
             display: 'flex',
             alignItems: 'center',
@@ -333,79 +342,264 @@ export function DirectoryPanel({
           onClick={handleCloseModal}
         >
           <div
-            className="admin-card admin-detail"
             style={{
-              maxWidth: '540px',
+              maxWidth: '680px',
               width: '100%',
-              borderRadius: '0.75rem',
-              padding: '2rem',
+              maxHeight: '90vh',
+              borderRadius: '1rem',
               boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
               background: '#ffffff',
-              position: 'relative',
-              textAlign: 'left',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              border: '1px solid #cbd5e1',
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
+            {/* Modal Header */}
+            <div style={{ padding: '1.25rem 1.75rem', background: '#0f172a', color: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  {isEditMode ? 'Edit Institution Listing' : 'Institution Details'}
-                </div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', margin: '0.25rem 0 0 0' }}>
-                  {selectedInst.name}
-                </h2>
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.1em', color: '#60a5fa', textTransform: 'uppercase', display: 'block' }}>
+                  {isEditMode ? 'ADMIN EDIT MODE' : 'INSTITUTION RECORD'}
+                </span>
+                <h3 style={{ margin: '0.2rem 0 0', fontSize: '1.25rem', fontWeight: 800, color: '#ffffff' }}>
+                  {isEditMode ? `Edit ${selectedInst.name}` : selectedInst.name}
+                </h3>
               </div>
-              <div>{getStatusBadge(selectedInst.isActive)}</div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem', fontSize: '0.875rem' }}>
-              <div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Registration No</div>
-                <div style={{ fontFamily: 'monospace', fontWeight: 600, color: '#1e293b', marginTop: '0.1rem' }}>
-                  {selectedInst.registrationNumber}
-                </div>
-              </div>
-              <div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Country</div>
-                <div style={{ color: '#1e293b', marginTop: '0.1rem' }}>{selectedInst.country}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Listed Since</div>
-                <div style={{ color: '#1e293b', marginTop: '0.1rem' }}>
-                  {selectedInst.createdAt ? new Date(selectedInst.createdAt).toLocaleDateString() : ''}
-                </div>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Contact Email</div>
-              <div style={{ fontSize: '0.875rem', color: '#0f172a', marginBottom: '0.75rem' }}>{selectedInst.email}</div>
-              
-              <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Address</div>
-              <div style={{ fontSize: '0.875rem', color: '#334155' }}>
-                {selectedInst.address || 'No address logged.'}
-              </div>
-            </div>
-
-            {/* Modal Actions */}
-            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', borderTop: '1px solid #e2e8f0', paddingTop: '1.25rem' }}>
               <button
-                className="admin-button"
-                style={{
-                  padding: '0.5rem 1rem',
-                  fontSize: '0.875rem',
-                  borderRadius: '0.375rem',
-                  border: '1px solid #e2e8f0',
-                  background: '#ffffff',
-                  color: '#475569',
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                }}
+                type="button"
                 onClick={handleCloseModal}
+                style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '0.4rem 0.7rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 700 }}
               >
-                Close
+                ✕
               </button>
             </div>
+
+            {/* Modal Body */}
+            {isEditMode ? (
+              <form onSubmit={handleSaveEdit} style={{ padding: '1.5rem', flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Official Institution Name <span style={{ color: '#ef4444' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editForm.name}
+                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Registration Number
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.registrationNumber}
+                      onChange={(e) => setEditForm({ ...editForm, registrationNumber: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Institution Type
+                    </label>
+                    <select
+                      value={editForm.institutionType}
+                      onChange={(e) => setEditForm({ ...editForm, institutionType: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: '#ffffff', boxSizing: 'border-box' }}
+                    >
+                      <option value="corporate">Corporate Training Provider</option>
+                      <option value="higher_education">Higher Education / University</option>
+                      <option value="vocational">Vocational / Technical Institute</option>
+                      <option value="non_profit">Non-Profit / NGO</option>
+                      <option value="government">Government / Public Sector</option>
+                      <option value="individual">Individual Educator / Consultant</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Country <span style={{ color: '#ef4444' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editForm.country}
+                      onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Official Email <span style={{ color: '#ef4444' }}>*</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={editForm.email}
+                      onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={editForm.phone}
+                      onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Website URL
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.website}
+                      onChange={(e) => setEditForm({ ...editForm, website: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Year Established
+                    </label>
+                    <input
+                      type="number"
+                      value={editForm.yearEstablished}
+                      onChange={(e) => setEditForm({ ...editForm, yearEstablished: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Directory Status
+                    </label>
+                    <select
+                      value={editForm.isActive ? 'active' : 'suspended'}
+                      onChange={(e) => setEditForm({ ...editForm, isActive: e.target.value === 'active' })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: '#ffffff', boxSizing: 'border-box' }}
+                    >
+                      <option value="active">Active (Publicly Listed)</option>
+                      <option value="suspended">Suspended (Hidden)</option>
+                    </select>
+                  </div>
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Physical Headquarters Address
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.address}
+                      onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      About / Institution Overview (Public Profile)
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={editForm.description}
+                      onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box', fontFamily: 'inherit', resize: 'vertical' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0', marginTop: '0.5rem' }}>
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    disabled={saving}
+                    style={{ padding: '0.6rem 1.25rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', cursor: 'pointer', fontWeight: 600 }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    style={{ padding: '0.6rem 1.5rem', fontSize: '0.875rem', borderRadius: '6px', border: 'none', background: '#2563eb', color: '#fff', cursor: saving ? 'not-allowed' : 'pointer', fontWeight: 700 }}
+                  >
+                    {saving ? 'Saving Changes...' : 'Save Profile Changes'}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div style={{ padding: '1.5rem', flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.875rem' }}>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Registration Number</div>
+                    <div style={{ fontFamily: 'monospace', fontWeight: 700, color: '#0f172a', marginTop: '0.2rem' }}>{selectedInst.registrationNumber || 'N/A'}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Institution Type</div>
+                    <div style={{ color: '#0f172a', marginTop: '0.2rem', textTransform: 'capitalize' }}>{(selectedInst.institutionType || 'corporate').replace('_', ' ')}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Country</div>
+                    <div style={{ color: '#0f172a', marginTop: '0.2rem' }}>📍 {selectedInst.country || 'N/A'}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Year Established</div>
+                    <div style={{ color: '#0f172a', marginTop: '0.2rem' }}>{selectedInst.yearEstablished || 'N/A'}</div>
+                  </div>
+                </div>
+
+                <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem' }}>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Contact Email</div>
+                    <div style={{ color: '#2563eb', fontWeight: 600 }}>{selectedInst.email || 'N/A'}</div>
+                  </div>
+                  {selectedInst.phone && (
+                    <div>
+                      <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Phone</div>
+                      <div style={{ color: '#0f172a' }}>{selectedInst.phone}</div>
+                    </div>
+                  )}
+                  {selectedInst.website && (
+                    <div>
+                      <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Website</div>
+                      <a href={selectedInst.website.startsWith('http') ? selectedInst.website : `https://${selectedInst.website}`} target="_blank" rel="noreferrer" style={{ color: '#2563eb', fontWeight: 600 }}>{selectedInst.website}</a>
+                    </div>
+                  )}
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Physical Address</div>
+                    <div style={{ color: '#334155' }}>{selectedInst.address || 'No address logged.'}</div>
+                  </div>
+                </div>
+
+                {selectedInst.description && (
+                  <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.3rem' }}>About / Overview</div>
+                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#334155', lineHeight: 1.6 }}>{selectedInst.description}</p>
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0' }}>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditMode(true)}
+                    style={{ padding: '0.6rem 1.25rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #2563eb', background: '#2563eb', color: '#fff', cursor: 'pointer', fontWeight: 700 }}
+                  >
+                    ✏️ Edit Profile
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    style={{ padding: '0.6rem 1rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', cursor: 'pointer', fontWeight: 500 }}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

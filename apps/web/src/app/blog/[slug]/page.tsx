@@ -5,7 +5,7 @@ import Link from 'next/link';
 async function getPost(slug: string) {
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
   try {
-    const res = await fetch(`${API_BASE}/blog/${slug}`, { next: { revalidate: 0 } });
+    const res = await fetch(`${API_BASE}/blog/${slug}`, { cache: 'no-store' });
     if (!res.ok) {
       if (res.status === 404) return null;
       throw new Error('Failed to fetch post');

@@ -19,9 +19,61 @@ export function TrainingPanel({
 }) {
   const [modules, setModules] = useState<any[]>([]);
   const [view, setView] = useState<'list' | 'editor'>('list');
-  const [current, setCurrent] = useState<any>({});
+  const [current, setCurrent] = useState<Partial<any>>({});
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const CATEGORY_IMAGES: Record<string, string> = {
+    'Safety': '/uploads/road-safety.jpg',
+    'Road Safety': '/uploads/road-safety.jpg',
+    'Professional Development': '/uploads/instructor-training.jpg',
+    'Instructor Training': '/uploads/instructor-training.jpg',
+    'Compliance': '/uploads/compliance-training.jpg',
+    'Compliance & Regulations': '/uploads/compliance-training.jpg',
+    'Vehicle Inspection': '/uploads/vehicle-inspection.jpg',
+    'First Aid': '/uploads/first-aid.jpg',
+    'Advanced Driving': '/uploads/advanced-driving.jpg',
+  };
+
+  const getValidImageUrl = (url?: string | null, category?: string, title?: string) => {
+    let targetUrl = url;
+    if (!targetUrl) {
+      if (category && CATEGORY_IMAGES[category]) {
+        targetUrl = CATEGORY_IMAGES[category];
+      } else {
+        const lowerCategory = (category || '').toLowerCase();
+        const lowerTitle = (title || '').toLowerCase();
+        if (lowerCategory.includes('safety') || lowerTitle.includes('safety') || lowerTitle.includes('road')) targetUrl = '/uploads/road-safety.jpg';
+        else if (lowerCategory.includes('professional') || lowerCategory.includes('instructor') || lowerTitle.includes('instructor')) targetUrl = '/uploads/instructor-training.jpg';
+        else if (lowerCategory.includes('compliance') || lowerTitle.includes('compliance') || lowerTitle.includes('hazmat') || lowerTitle.includes('hazardous')) targetUrl = '/uploads/compliance-training.jpg';
+        else if (lowerCategory.includes('inspection') || lowerTitle.includes('inspection') || lowerTitle.includes('vehicle')) targetUrl = '/uploads/vehicle-inspection.jpg';
+        else if (lowerCategory.includes('first aid') || lowerTitle.includes('aid') || lowerTitle.includes('first')) targetUrl = '/uploads/first-aid.jpg';
+        else if (lowerCategory.includes('driving') || lowerTitle.includes('defensive') || lowerTitle.includes('advanced') || lowerTitle.includes('driving')) targetUrl = '/uploads/advanced-driving.jpg';
+        else targetUrl = '/uploads/road-safety.jpg';
+      }
+    }
+    
+    const getApiBase = () => {
+      if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+      if (typeof window !== 'undefined' && window.location.origin) {
+        return `${window.location.origin}/api`;
+      }
+      return 'https://ctsda.acecoterieconsulting.com/api';
+    };
+
+    const apiBase = getApiBase().replace(/\/$/, '');
+
+    if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) {
+      if (targetUrl.includes('localhost:4000')) {
+        return targetUrl.replace('http://localhost:4000', apiBase);
+      }
+      return targetUrl;
+    }
+
+    const cleanPath = targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`;
+    return `${apiBase}${cleanPath}`;
+  };
 
   useEffect(() => {
     async function fetchModules() {
@@ -118,8 +170,7 @@ export function TrainingPanel({
       });
       if (!res.ok) throw new Error('Upload failed');
       const data = await res.json();
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      setCurrent({ ...current, imageUrl: `${apiBase}${data.url}` });
+      setCurrent({ ...current, imageUrl: data.url });
     } catch (err) {
       console.error(err);
       (onError || ((t: string) => alert(t)))('Upload failed', 'Could not upload the image. Try again.');
@@ -170,6 +221,9 @@ export function TrainingPanel({
                   <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} disabled={uploading} />
                 </label>
               </div>
+              {current.imageUrl && (
+                <img src={getValidImageUrl(current.imageUrl) || ''} alt="Preview" style={{ marginTop: '0.5rem', height: '100px', objectFit: 'cover', borderRadius: '0.375rem' }} />
+              )}
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Resource URL</label>
@@ -230,7 +284,7 @@ export function TrainingPanel({
               <tr key={m.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                 <td style={{ padding: '1rem' }}>
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    {m.imageUrl && <img src={m.imageUrl} alt={m.title} style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '0.375rem' }} />}
+                    <img src={getValidImageUrl(m.imageUrl, m.category, m.title)} alt={m.title} style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '0.375rem' }} />
                     <div>
                       <div style={{ fontWeight: 600, color: '#0f172a' }}>{m.title}</div>
                       <div style={{ fontSize: '0.75rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>{m.description}</div>

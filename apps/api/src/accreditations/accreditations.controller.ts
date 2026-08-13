@@ -33,6 +33,16 @@ export class AccreditationsController {
     return this.accreditationsService.uploadCertificate(id, user.userId, file);
   }
 
+  @Post(':id/certificate/upload')
+  @UseGuards(AuthGuard)
+  async uploadCertificateAlias(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Request() req: any
+  ) {
+    return this.uploadCertificate(user, id, req);
+  }
+
   @Get()
   async listActive() {
     return this.accreditationsService.listActive();
@@ -112,5 +122,34 @@ export class AccreditationsController {
     @Body() body: { reason?: string },
   ) {
     return this.accreditationsService.reactivate(id, user.userId, body.reason);
+  }
+
+  @Post(':id/delete')
+  @UseGuards(AuthGuard)
+  async delete(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+  ) {
+    return this.accreditationsService.delete(id, user.userId);
+  }
+
+  @Post(':id/update-expiry')
+  @UseGuards(AuthGuard)
+  async updateExpiry(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Body() body: { expiresAt: string },
+  ) {
+    return this.accreditationsService.updateExpiry(id, user.userId, body.expiresAt);
+  }
+
+  @Post(':id/update')
+  @UseGuards(AuthGuard)
+  async updateAccreditation(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Body() body: any,
+  ) {
+    return this.accreditationsService.updateAccreditation(id, user.userId, body);
   }
 }

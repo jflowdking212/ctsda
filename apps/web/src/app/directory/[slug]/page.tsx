@@ -3,61 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { PremiumHeader } from '../../../components/premium-header';
-import { PremiumFooter } from '../../../components/premium-footer';
-import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, Share2, CheckCircle2, ShieldCheck, Calendar, Building, 
-  MapPin, Mail, Globe, Phone, Award, GraduationCap, Search, ExternalLink 
-} from 'lucide-react';
-
-// Sub-components
-function SectionCard({ title, icon, children, delay = 0 }: { title: string; icon: React.ReactNode; children: React.ReactNode; delay?: number }) {
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
-      className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden"
-    >
-      <div className="px-7 py-5 border-b border-slate-100 flex items-center gap-3">
-        <div className="text-blue-600">{icon}</div>
-        <h2 className="text-lg font-bold text-slate-900 m-0">{title}</h2>
-      </div>
-      <div className="px-7 py-6">{children}</div>
-    </motion.div>
-  );
-}
-
-function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex justify-between items-center py-3 border-b border-slate-50 last:border-0">
-      <span className="text-slate-500 text-sm font-medium">{label}</span>
-      <span className="font-bold text-slate-900 text-sm text-right">{value}</span>
-    </div>
-  );
-}
-
-function ContactRow({ icon, label, value, href }: { icon: React.ReactNode; label: string; value: string; href?: string }) {
-  return (
-    <div className="flex items-start gap-4 py-3.5 border-b border-slate-50 last:border-0">
-      <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <p className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-1">{label}</p>
-        {href ? (
-          <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer"
-            className="text-blue-600 text-sm font-semibold hover:text-blue-800 transition-colors break-all">
-            {value}
-          </a>
-        ) : (
-          <p className="text-sm font-medium text-slate-700 m-0 leading-snug">{value}</p>
-        )}
-      </div>
-    </div>
-  );
-}
+import { PublicPage } from '../../../components/public-shell';
 
 export default function InstitutionPage() {
   const { slug } = useParams();
@@ -70,7 +16,7 @@ export default function InstitutionPage() {
     (async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-        const res = await fetch(`${apiUrl}/institutions/public-accredited/${slug}`);
+        const res = await fetch(`${apiUrl}/institutions/public-accredited/${slug}`, { cache: 'no-store' });
         setInstitution(res.ok ? await res.json() : null);
       } catch { setInstitution(null); }
       finally { setLoading(false); }
@@ -84,238 +30,274 @@ export default function InstitutionPage() {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
-      <PremiumHeader />
-      <div className="flex-1 flex flex-col items-center justify-center py-32">
-        <div className="w-16 h-16 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin mb-6"></div>
-        <p className="text-lg font-medium text-slate-500 animate-pulse">Loading profile...</p>
-      </div>
-      <PremiumFooter />
-    </div>
+    <PublicPage>
+      <main style={{ backgroundColor: '#f8fafc', minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center', color: '#5d6a7c' }}>
+          <div style={{ fontSize: '1rem', fontWeight: 500 }}>Loading institution profile…</div>
+        </div>
+      </main>
+    </PublicPage>
   );
 
   if (!institution) return (
-    <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
-      <PremiumHeader />
-      <div className="flex-1 flex flex-col items-center justify-center py-32 px-6 text-center">
-        <div className="w-24 h-24 bg-slate-100 rounded-3xl flex items-center justify-center mb-8 text-slate-400">
-          <Search size={40} />
+    <PublicPage>
+      <main style={{ backgroundColor: '#f8fafc', minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem 1.5rem', textAlign: 'center' }}>
+        <div>
+          <div style={{ width: '64px', height: '64px', background: '#eff6ff', borderRadius: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+            <svg style={{ width: '32px', height: '32px', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#10233f', marginBottom: '0.5rem' }}>Institution Not Found</h1>
+          <p style={{ color: '#5d6a7c', marginBottom: '1.5rem' }}>The institution you are looking for does not exist or is no longer accredited.</p>
+          <Link href="/directory" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: '#2563eb', color: '#fff', padding: '0.75rem 1.5rem', borderRadius: '0.6rem', fontWeight: 700, textDecoration: 'none' }}>
+            ← Back to Directory
+          </Link>
         </div>
-        <h1 className="text-3xl font-black text-slate-900 mb-4">Institution Not Found</h1>
-        <p className="text-slate-500 text-lg mb-8 max-w-md leading-relaxed">
-          The institution you are looking for does not exist or is no longer accredited by CTSDA.
-        </p>
-        <Link href="/directory" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-200 hover:-translate-y-0.5">
-          <ArrowLeft size={18} /> Back to Directory
-        </Link>
-      </div>
-      <PremiumFooter />
-    </div>
+      </main>
+    </PublicPage>
   );
 
   const latestAcc = institution.accreditations?.[0];
   const validUntil = latestAcc?.expiresAt
-    ? new Date(latestAcc.expiresAt).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' })
+    ? new Date(latestAcc.expiresAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     : 'N/A';
   const approvedApp = institution.applications?.[0];
   const programs = approvedApp?.offeredCertificates || [];
   const trainingAreas = approvedApp?.trainingAreas?.map((ta: any) => ta.trainingArea?.name).filter(Boolean) || [];
+  const fallbackDesc = `${institution.name} is an officially accredited ${institution.institutionType || 'training'} provider based in ${institution.country || 'the United States'}, recognized for high standards in education, skill verification, and workforce development by the Council For Training Skills & Development America (CTSDA).`;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
-      <PremiumHeader />
+    <PublicPage>
+      <main style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}>
 
-      {/* Hero Cover */}
-      <div className="h-64 bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay"></div>
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-        
-        <div className="container mx-auto px-6 relative z-10 pt-8">
-          <Link href="/directory" className="inline-flex items-center gap-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur-md px-4 py-2 rounded-full text-sm font-semibold transition-all">
-            <ArrowLeft size={16} /> All Institutions
-          </Link>
-        </div>
-      </div>
+        {/* Hero Banner */}
+        <section style={{
+          background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)',
+          color: '#ffffff',
+          padding: '3.5rem 1.5rem 5rem',
+        }}>
+          <div style={{ maxWidth: '1140px', margin: '0 auto' }}>
+            <Link href="/directory" style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+              color: '#bfdbfe', fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none',
+              marginBottom: '1.5rem',
+            }}>
+              <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              All Institutions
+            </Link>
+            <p style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#93c5fd', marginBottom: '0.5rem' }}>Accredited Institution</p>
+            <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', fontWeight: 800, color: '#fff', margin: 0, lineHeight: 1.15 }}>{institution.name}</h1>
+          </div>
+        </section>
 
-      {/* Main Profile Header */}
-      <div className="container mx-auto px-6 -mt-24 relative z-20 w-full mb-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-200 relative"
-        >
-          <div className="p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start">
-            
-            {/* Logo */}
-            <div className="w-32 h-32 shrink-0 rounded-2xl bg-white border-4 border-white shadow-lg flex items-center justify-center overflow-hidden -mt-24 md:-mt-28 z-10 relative">
-              {institution.logoUrl ? (
-                <img src={institution.logoUrl} alt={institution.name} className="w-full h-full object-contain p-3" />
-              ) : (
-                <div className="w-full h-full bg-blue-50 flex items-center justify-center text-4xl font-black text-blue-600">
-                  {institution.name.substring(0, 2).toUpperCase()}
+        {/* Institution Card */}
+        <section style={{ padding: '0 1.5rem' }}>
+          <div style={{ maxWidth: '1140px', margin: '-2.5rem auto 0', position: 'relative', zIndex: 1 }}>
+            <div style={{ background: '#fff', borderRadius: '1.25rem', border: '1px solid #e2e8f0', boxShadow: '0 8px 32px rgba(16,35,63,0.10)', overflow: 'hidden' }}>
+
+              {/* Header row */}
+              <div style={{ padding: '2rem 2rem 1.5rem', display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'flex-start', borderBottom: '1px solid #f1f5f9' }}>
+                {/* Logo */}
+                <div style={{ width: '80px', height: '80px', borderRadius: '0.875rem', background: '#f8fafc', border: '2px solid #e2e8f0', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {institution.logoUrl ? (
+                    <img src={institution.logoUrl} alt={institution.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  ) : (
+                    <span style={{ fontSize: '2rem', fontWeight: 800, color: '#2563eb' }}>{institution.name?.charAt(0)}</span>
+                  )}
                 </div>
-              )}
+
+                {/* Name & meta */}
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#10233f', margin: 0 }}>{institution.name}</h2>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#dcfce7', color: '#16a34a', borderRadius: '999px', padding: '0.2rem 0.7rem', fontSize: '0.75rem', fontWeight: 700 }}>
+                      <svg style={{ width: '12px', height: '12px' }} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                      ACCREDITED
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', fontSize: '0.875rem', color: '#5d6a7c', fontWeight: 500 }}>
+                    {institution.country && <span>📍 {institution.country}</span>}
+                    {institution.institutionType && <span>🏛 {institution.institutionType}</span>}
+                    {institution.yearEstablished && <span>📅 Est. {institution.yearEstablished}</span>}
+                  </div>
+                  {trainingAreas.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.75rem' }}>
+                      {trainingAreas.map((a: string, i: number) => (
+                        <span key={i} style={{ background: '#eff6ff', color: '#1d4ed8', borderRadius: '999px', padding: '0.15rem 0.65rem', fontSize: '0.78rem', fontWeight: 600 }}>{a}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Share button */}
+                <button
+                  onClick={handleShare}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', border: '1.5px solid #e2e8f0', borderRadius: '0.6rem', padding: '0.6rem 1rem', fontSize: '0.875rem', fontWeight: 600, color: '#5d6a7c', background: '#fff', cursor: 'pointer', flexShrink: 0 }}
+                >
+                  <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  {copied ? 'Link Copied!' : 'Share'}
+                </button>
+              </div>
+
+              {/* Accreditation banner */}
+              <div style={{ margin: '1.5rem 2rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '0.875rem', padding: '1rem 1.25rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1rem', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '40px', height: '40px', background: '#16a34a', borderRadius: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg style={{ width: '22px', height: '22px', color: '#fff' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, color: '#14532d', fontSize: '0.9rem' }}>Officially Accredited by CTSDA</div>
+                    <div style={{ fontSize: '0.82rem', color: '#166534' }}>
+                      This institution meets all requirements of the Council For Training Skills & Development America. Valid until <strong>{validUntil}</strong>.
+                    </div>
+                  </div>
+                </div>
+                <span style={{ background: '#16a34a', color: '#fff', borderRadius: '999px', padding: '0.25rem 0.75rem', fontSize: '0.78rem', fontWeight: 700, flexShrink: 0 }}>● Active</span>
+              </div>
             </div>
+          </div>
+        </section>
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-3 mb-3">
-                <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">{institution.name}</h1>
-                <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-3 py-1 text-xs font-bold tracking-wide">
-                  <CheckCircle2 size={14} /> ACCREDITED
-                </span>
+        {/* Body Content */}
+        <section style={{ padding: '2rem 1.5rem 5rem' }}>
+          <div style={{ maxWidth: '1140px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: '1.5rem', alignItems: 'start' }}>
+
+              {/* Left column */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+                {/* About */}
+                <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '1rem', padding: '1.75rem', boxShadow: '0 2px 8px rgba(16,35,63,0.04)' }}>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#10233f', marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <svg style={{ width: '18px', height: '18px', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                    About the Institution
+                  </h3>
+                  <p style={{ color: '#5d6a7c', lineHeight: 1.7, margin: 0 }}>
+                    {institution.description?.trim() || fallbackDesc}
+                  </p>
+                </div>
+
+                {/* Programs */}
+                <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '1rem', padding: '1.75rem', boxShadow: '0 2px 8px rgba(16,35,63,0.04)' }}>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#10233f', marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <svg style={{ width: '18px', height: '18px', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5z" /></svg>
+                    Programs & Certificates Offered
+                  </h3>
+                  {programs.length > 0 ? (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
+                      {programs.map((p: any, i: number) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 0.85rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '0.6rem', fontSize: '0.875rem', color: '#10233f', fontWeight: 500 }}>
+                          <svg style={{ width: '14px', height: '14px', color: '#16a34a', flexShrink: 0 }} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                          {p.name}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p style={{ color: '#94a3b8', fontStyle: 'italic', margin: 0 }}>No programs listed publicly.</p>
+                  )}
+                </div>
+
+                {/* Training Areas */}
+                {trainingAreas.length > 0 && (
+                  <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '1rem', padding: '1.75rem', boxShadow: '0 2px 8px rgba(16,35,63,0.04)' }}>
+                    <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#10233f', marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <svg style={{ width: '18px', height: '18px', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                      Areas of Training
+                    </h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      {trainingAreas.map((a: string, i: number) => (
+                        <span key={i} style={{ background: '#eff6ff', color: '#1d4ed8', borderRadius: '999px', padding: '0.3rem 0.85rem', fontSize: '0.82rem', fontWeight: 600 }}>{a}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div className="flex flex-wrap gap-4 text-slate-500 text-sm font-medium mb-5">
-                {institution.country && (
-                  <span className="flex items-center gap-1.5"><MapPin size={16} /> {institution.country}</span>
-                )}
-                {institution.institutionType && (
-                  <span className="flex items-center gap-1.5 capitalize"><Building size={16} /> {institution.institutionType}</span>
-                )}
-                {institution.yearEstablished && (
-                  <span className="flex items-center gap-1.5"><Calendar size={16} /> Est. {institution.yearEstablished}</span>
-                )}
-              </div>
+              {/* Right sidebar */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-              {trainingAreas.length > 0 && (
-                <div className="flex flex-wrap gap-2.5">
-                  {trainingAreas.map((a: string, i: number) => (
-                    <span key={i} className="inline-flex items-center bg-blue-50 text-blue-700 border border-blue-100 rounded-lg px-3 py-1.5 text-xs font-semibold">{a}</span>
+                {/* Quick Info */}
+                <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '1rem', padding: '1.75rem', boxShadow: '0 2px 8px rgba(16,35,63,0.04)' }}>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#10233f', marginBottom: '0.75rem' }}>Quick Info</h3>
+                  {[
+                    { label: 'Founded', value: institution.yearEstablished || '—' },
+                    { label: 'Type', value: institution.institutionType || '—' },
+                    { label: 'Reg. Number', value: institution.registrationNumber || '—' },
+                    { label: 'Country', value: institution.country || '—' },
+                    ...(programs.length > 0 ? [{ label: 'Programs', value: programs.length }] : []),
+                  ].map((row, i, arr) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.65rem 0', borderBottom: i < arr.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                      <span style={{ fontSize: '0.82rem', color: '#5d6a7c', fontWeight: 500 }}>{row.label}</span>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#10233f', textAlign: 'right' }}>{row.value}</span>
+                    </div>
                   ))}
                 </div>
-              )}
-            </div>
 
-            {/* Actions */}
-            <div className="flex gap-3 md:mt-2">
-              <button onClick={handleShare} className="inline-flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors">
-                <Share2 size={16} /> {copied ? 'Copied!' : 'Share'}
-              </button>
-            </div>
-          </div>
-
-          {/* Accreditation Banner */}
-          <div className="mx-6 md:mx-10 mb-8 p-5 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-center gap-5 relative z-10">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white shrink-0 shadow-md">
-              <ShieldCheck size={24} />
-            </div>
-            <div className="flex-1 text-center sm:text-left">
-              <h4 className="font-bold text-emerald-800 mb-1">Officially Accredited by CTSDA</h4>
-              <p className="text-sm text-emerald-700 m-0">This institution meets all requirements of the Council For Training Skills & Development America. Valid until <strong className="font-bold">{validUntil}</strong>.</p>
-            </div>
-            <div className="text-center sm:text-right shrink-0">
-              <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest mb-1.5">Status</p>
-              <div className="inline-flex items-center gap-1.5 bg-emerald-600 text-white rounded-full px-3 py-1 text-xs font-bold shadow-sm">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></div> Active
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Body Content */}
-      <main className="container mx-auto px-6 pb-24 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Left Column */}
-        <div className="lg:col-span-2 flex flex-col gap-8">
-          
-          <SectionCard title="About the Institution" icon={<GraduationCap size={20} />} delay={0.1}>
-            <p className={`text-[15px] leading-relaxed ${institution.description ? 'text-slate-600' : 'text-slate-400 italic'}`}>
-              {institution.description || 'No description has been provided for this institution yet.'}
-            </p>
-          </SectionCard>
-
-          <SectionCard title="Programs & Certificates Offered" icon={<Award size={20} />} delay={0.2}>
-            {programs.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {programs.map((p: any, i: number) => (
-                  <div key={i} className="flex items-start sm:items-center gap-3 p-3.5 bg-slate-50 border border-slate-100 rounded-xl hover:bg-blue-50 hover:border-blue-100 transition-colors">
-                    <div className="w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
-                      <CheckCircle2 size={14} />
-                    </div>
-                    <span className="text-sm font-semibold text-slate-700 leading-tight">{p.name}</span>
+                {/* Contact Information */}
+                <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '1rem', padding: '1.75rem', boxShadow: '0 2px 8px rgba(16,35,63,0.04)' }}>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#10233f', marginBottom: '0.75rem' }}>Contact Information</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                    {institution.email && (
+                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                        <span style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#5d6a7c', minWidth: '55px', paddingTop: '2px' }}>EMAIL</span>
+                        <a href={`mailto:${institution.email}`} style={{ fontSize: '0.875rem', color: '#2563eb', fontWeight: 500, wordBreak: 'break-all' }}>{institution.email}</a>
+                      </div>
+                    )}
+                    {institution.website && (
+                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                        <span style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#5d6a7c', minWidth: '55px', paddingTop: '2px' }}>WEBSITE</span>
+                        <a href={institution.website.startsWith('http') ? institution.website : `https://${institution.website}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.875rem', color: '#2563eb', fontWeight: 500, wordBreak: 'break-all' }}>{institution.website.replace(/^https?:\/\//, '')}</a>
+                      </div>
+                    )}
+                    {institution.phone && (
+                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                        <span style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#5d6a7c', minWidth: '55px', paddingTop: '2px' }}>PHONE</span>
+                        <span style={{ fontSize: '0.875rem', color: '#10233f', fontWeight: 500 }}>{institution.phone}</span>
+                      </div>
+                    )}
+                    {institution.address && (
+                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                        <span style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#5d6a7c', minWidth: '55px', paddingTop: '2px' }}>ADDRESS</span>
+                        <span style={{ fontSize: '0.875rem', color: '#10233f', fontWeight: 500 }}>{institution.address}{institution.country ? `, ${institution.country}` : ''}</span>
+                      </div>
+                    )}
                   </div>
-                ))}
+                </div>
+
+                {/* Certificate Verification CTA */}
+                <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', borderRadius: '1rem', padding: '1.75rem', color: '#fff', textAlign: 'center' }}>
+                  <div style={{ width: '44px', height: '44px', background: 'rgba(255,255,255,0.15)', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.85rem' }}>
+                    <svg style={{ width: '24px', height: '24px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </div>
+                  <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#93c5fd', marginBottom: '0.4rem' }}>Certificate Verification</div>
+                  <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', margin: '0 0 0.5rem' }}>Verify a Certificate</h4>
+                  <p style={{ fontSize: '0.82rem', color: '#bfdbfe', lineHeight: 1.6, margin: '0 0 1.25rem' }}>
+                    Authenticate certificates issued by this institution through CTSDA's official verification portal.
+                  </p>
+                  <Link href="/verify-certificate" style={{ display: 'block', background: '#fff', color: '#1e3a8a', borderRadius: '0.5rem', padding: '0.65rem', fontWeight: 700, fontSize: '0.875rem', textDecoration: 'none' }}>
+                    Verify Now →
+                  </Link>
+                </div>
               </div>
-            ) : (
-              <p className="text-slate-400 italic text-sm">No specific programs listed yet.</p>
-            )}
-          </SectionCard>
-
-          {trainingAreas.length > 0 && (
-            <SectionCard title="Areas of Training" icon={<GraduationCap size={20} />} delay={0.3}>
-              <div className="flex flex-wrap gap-2.5">
-                {trainingAreas.map((a: string, i: number) => (
-                  <span key={i} className="inline-flex items-center bg-blue-50 text-blue-700 border border-blue-100 rounded-xl px-4 py-2 text-sm font-semibold">{a}</span>
-                ))}
-              </div>
-            </SectionCard>
-          )}
-
-        </div>
-
-        {/* Right Sidebar */}
-        <div className="flex flex-col gap-8">
-          
-          <SectionCard title="Quick Info" icon={<Building size={20} />} delay={0.1}>
-            <InfoRow label="Founded" value={institution.yearEstablished || '—'} />
-            <InfoRow label="Type" value={<span className="capitalize">{institution.institutionType || '—'}</span>} />
-            <InfoRow label="Reg. Number" value={institution.registrationNumber || '—'} />
-            <InfoRow label="Country" value={institution.country || '—'} />
-            {programs.length > 0 && <InfoRow label="Programs" value={programs.length} />}
-          </SectionCard>
-
-          <SectionCard title="Contact Information" icon={<Mail size={20} />} delay={0.2}>
-            {institution.email && <ContactRow icon={<Mail size={18} />} label="Email" value={institution.email} href={`mailto:${institution.email}`} />}
-            {institution.website && <ContactRow icon={<Globe size={18} />} label="Website" value={institution.website} href={institution.website.startsWith('http') ? institution.website : `https://${institution.website}`} />}
-            {institution.phone && <ContactRow icon={<Phone size={18} />} label="Phone" value={institution.phone} href={`tel:${institution.phone}`} />}
-            {institution.address && <ContactRow icon={<MapPin size={18} />} label="Address" value={`${institution.address}${institution.country ? `, ${institution.country}` : ''}`} />}
-          </SectionCard>
-
-          {institution.socialLinks?.length > 0 && (
-            <SectionCard title="Social Media" icon={<Globe size={20} />} delay={0.3}>
-              <div className="flex flex-wrap gap-2">
-                {institution.socialLinks.map((s: any) => (
-                  <a key={s.id} href={s.url} target="_blank" rel="noopener noreferrer" 
-                    className="inline-flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold capitalize transition-colors">
-                    {s.platform} <ExternalLink size={14} className="text-slate-400" />
-                  </a>
-                ))}
-              </div>
-            </SectionCard>
-          )}
-
-          {/* Verification CTA */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="rounded-[1.5rem] bg-gradient-to-br from-blue-900 to-indigo-900 p-8 text-white relative overflow-hidden shadow-xl shadow-blue-900/20"
-          >
-            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none"></div>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3"></div>
-            
-            <div className="relative z-10">
-              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-5 backdrop-blur-sm border border-white/20">
-                <ShieldCheck size={24} className="text-blue-300" />
-              </div>
-              <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest mb-2">Certificate Verification</p>
-              <h3 className="text-xl font-bold mb-3">Verify a Certificate</h3>
-              <p className="text-blue-100/70 text-sm mb-6 leading-relaxed">
-                Authenticate certificates issued by this institution through CTSDA's official verification portal.
-              </p>
-              <Link href="/verify-certificate" className="block w-full text-center bg-white hover:bg-blue-50 text-blue-700 py-3.5 rounded-xl text-sm font-bold transition-colors shadow-lg">
-                Verify Now
-              </Link>
             </div>
-          </motion.div>
+          </div>
+        </section>
 
-        </div>
+        <style>{`
+          @media (max-width: 768px) {
+            .profile-grid { grid-template-columns: 1fr !important; }
+          }
+        `}</style>
       </main>
-
-      <PremiumFooter />
-    </div>
+    </PublicPage>
   );
 }

@@ -6,7 +6,7 @@ import { AccreditedLogosCarousel } from '../components/accredited-logos-carousel
 async function getSettings() {
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
   try {
-    const res = await fetch(`${API_BASE}/settings/public`, { next: { revalidate: 30 } });
+    const res = await fetch(`${API_BASE}/settings/public`, { cache: 'no-store' });
     if (!res.ok) return {};
     return res.json();
   } catch {

@@ -135,6 +135,48 @@ export class AccreditationsService {
     });
   }
 
+  async delete(id: string, actorId: string) {
+    await this.assertAccreditationAdmin(actorId);
+    const accreditation = await this.findById(id);
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.certificateStatusHistory.deleteMany({ where: { accreditationId: id } });
+      await tx.certificate.deleteMany({ where: { accreditationId: id } });
+      await tx.accreditation.delete({ where: { id } });
+
+      const remainingActive = await tx.accreditation.count({
+        where: { institutionId: accreditation.institutionId, status: 'active' },
+      });
+      if (remainingActive === 0) {
+        await tx.institution.update({
+          where: { id: accreditation.institutionId },
+          data: { isActive: false },
+        });
+      }
+
+      return { success: true };
+    });
+  }
+
+  async updateExpiry(id: string, actorId: string, expiresAt: string | Date) {
+    await this.assertAccreditationAdmin(actorId);
+    const newDate = new Date(expiresAt);
+
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await tx.accreditation.update({
+        where: { id },
+        data: { expiresAt: newDate },
+      });
+
+      await tx.certificate.updateMany({
+        where: { accreditationId: id },
+        data: { expiryDate: newDate },
+      });
+
+      return updated;
+    });
+  }
+
   private async assertAccreditationAdmin(actorId: string) {
     const actor = await this.prisma.user.findUnique({ where: { id: actorId } });
     if (!['super_admin', 'support_officer'].includes(actor?.role || '')) {
@@ -433,6 +475,96 @@ export class AccreditationsService {
         user,
         accountSetupSent: !!tokenToUse,
       };
+    });
+  }
+
+  async updateAccreditation(
+    id: string,
+    actorId: string,
+    data: {
+      accreditationCode?: string;
+      status?: string;
+      issuedAt?: string;
+      expiresAt?: string;
+      certificateNumber?: string;
+      institution?: {
+        name?: string;
+        registrationNumber?: string;
+        institutionType?: string;
+        country?: string;
+        address?: string;
+        phone?: string;
+        email?: string;
+        website?: string;
+        yearEstablished?: number | string;
+        description?: string;
+        logoUrl?: string;
+        isActive?: boolean;
+      };
+    },
+  ) {
+    await this.assertAccreditationAdmin(actorId);
+
+    const accreditation = await this.prisma.accreditation.findUnique({
+      where: { id },
+      include: { institution: true, certificates: true },
+    });
+
+    if (!accreditation) {
+      throw new NotFoundException('Accreditation record not found');
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const updatedAcc = await tx.accreditation.update({
+        where: { id },
+        data: {
+          ...(data.accreditationCode && { accreditationCode: data.accreditationCode }),
+          ...(data.status && { status: data.status as any }),
+          ...(data.issuedAt && { issuedAt: new Date(data.issuedAt) }),
+          ...(data.expiresAt && { expiresAt: new Date(data.expiresAt) }),
+        },
+      });
+
+      if (accreditation.certificates.length > 0) {
+        const cert = accreditation.certificates[0];
+        await tx.certificate.update({
+          where: { id: cert.id },
+          data: {
+            ...(data.certificateNumber && { certificateNumber: data.certificateNumber }),
+            ...(data.expiresAt && { expiryDate: new Date(data.expiresAt) }),
+            ...(data.issuedAt && { issueDate: new Date(data.issuedAt) }),
+            ...(data.status && { status: data.status === 'active' ? 'active' : 'suspended' }),
+          },
+        });
+      }
+
+      if (data.institution) {
+        const inst = data.institution;
+        await tx.institution.update({
+          where: { id: accreditation.institutionId },
+          data: {
+            ...(inst.name && { name: inst.name }),
+            ...(inst.registrationNumber !== undefined && { registrationNumber: inst.registrationNumber }),
+            ...(inst.institutionType && { institutionType: inst.institutionType }),
+            ...(inst.country && { country: inst.country }),
+            ...(inst.address && { address: inst.address }),
+            ...(inst.phone && { phone: inst.phone }),
+            ...(inst.email && { email: inst.email }),
+            ...(inst.website !== undefined && { website: inst.website || null }),
+            ...(inst.yearEstablished !== undefined && {
+              yearEstablished: inst.yearEstablished ? Number(inst.yearEstablished) : null,
+            }),
+            ...(inst.description !== undefined && { description: inst.description || null }),
+            ...(inst.logoUrl !== undefined && { logoUrl: inst.logoUrl || null }),
+            ...(inst.isActive !== undefined && { isActive: inst.isActive }),
+          },
+        });
+      }
+
+      return tx.accreditation.findUnique({
+        where: { id },
+        include: { institution: true, certificates: true },
+      });
     });
   }
 }

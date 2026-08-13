@@ -40,6 +40,11 @@ export class InstitutionsService {
     const institutions = await this.prisma.institution.findMany({
       where: {
         isActive: true,
+        applications: {
+          some: {
+            status: 'approved',
+          },
+        },
         accreditations: {
           some: {
             status: 'active',
@@ -81,6 +86,11 @@ export class InstitutionsService {
           ...(isUuid ? [{ id: slug }] : [])
         ],
         isActive: true,
+        applications: {
+          some: {
+            status: 'approved',
+          },
+        },
         accreditations: {
           some: {
             status: 'active',

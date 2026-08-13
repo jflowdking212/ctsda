@@ -43,6 +43,7 @@ export default function ApplyPage() {
     address: '',
     phone: '',
     email: '',
+    description: '',
   });
   
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -391,9 +392,14 @@ export default function ApplyPage() {
                 <CountrySelect value={institutionForm.country} onChange={val => setInstitutionForm({...institutionForm, country: val})} disabled={loading} placeholder="Select country..." />
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', gridColumn: 'span 2' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Physical Headquarters Address <span style={{ color: '#ef4444' }}>*</span></label>
                 <input required value={institutionForm.address} onChange={e => setInstitutionForm({...institutionForm, address: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%' }} placeholder="Street address, City, State/Province" />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', gridColumn: 'span 2' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>About / Short Institution Overview (Appears on public directory profile) <span style={{ color: '#ef4444' }}>*</span></label>
+                <textarea required rows={3} value={institutionForm.description} onChange={e => setInstitutionForm({...institutionForm, description: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%', fontFamily: 'inherit', resize: 'vertical' }} placeholder="Provide a brief summary of your institution's core focus, mission, training background, and educational services..." />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', gridColumn: 'span 2' }}>

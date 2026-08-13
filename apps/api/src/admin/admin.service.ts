@@ -235,11 +235,43 @@ export class AdminService {
     });
   }
 
-  async updateInstitution(actorId: string, id: string, data: { name?: string; website?: string; logoUrl?: string; description?: string; isActive?: boolean }) {
+  async updateInstitution(
+    actorId: string,
+    id: string,
+    data: {
+      name?: string;
+      registrationNumber?: string;
+      institutionType?: string;
+      country?: string;
+      address?: string;
+      phone?: string;
+      email?: string;
+      website?: string;
+      yearEstablished?: number | string;
+      logoUrl?: string;
+      description?: string;
+      isActive?: boolean;
+    },
+  ) {
     await this.requireRole(actorId, INSTITUTION_MANAGERS);
     return this.prisma.institution.update({
       where: { id },
-      data,
+      data: {
+        ...(data.name && { name: data.name }),
+        ...(data.registrationNumber !== undefined && { registrationNumber: data.registrationNumber }),
+        ...(data.institutionType && { institutionType: data.institutionType }),
+        ...(data.country && { country: data.country }),
+        ...(data.address && { address: data.address }),
+        ...(data.phone && { phone: data.phone }),
+        ...(data.email && { email: data.email }),
+        ...(data.website !== undefined && { website: data.website || null }),
+        ...(data.yearEstablished !== undefined && {
+          yearEstablished: data.yearEstablished ? Number(data.yearEstablished) : null,
+        }),
+        ...(data.description !== undefined && { description: data.description || null }),
+        ...(data.logoUrl !== undefined && { logoUrl: data.logoUrl || null }),
+        ...(data.isActive !== undefined && { isActive: data.isActive }),
+      },
     });
   }
 

@@ -94,10 +94,47 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
     setUploadingLogo(false);
   }
 
+  const [uploadingCert, setUploadingCert] = useState<Accreditation | null>(null);
   const [editingAccreditation, setEditingAccreditation] = useState<Accreditation | null>(null);
   const [newExpiryDate, setNewExpiryDate] = useState('');
+  const [editAccreditationForm, setEditAccreditationForm] = useState({
+    accreditationCode: '',
+    certificateNumber: '',
+    issuedAt: '',
+    expiresAt: '',
+    status: 'active',
+    institutionName: '',
+    registrationNumber: '',
+    institutionType: 'corporate',
+    country: 'United States',
+    address: '',
+    phone: '',
+    email: '',
+    website: '',
+    yearEstablished: '',
+    description: '',
+  });
 
-  const [uploadingCert, setUploadingCert] = useState<Accreditation | null>(null);
+  function handleOpenEditAccreditationModal(acc: Accreditation) {
+    setEditingAccreditation(acc);
+    setEditAccreditationForm({
+      accreditationCode: acc.accreditationCode || '',
+      certificateNumber: acc.certificates?.[0]?.certificateNumber || '',
+      issuedAt: acc.issuedAt ? new Date(acc.issuedAt).toISOString().split('T')[0] : '',
+      expiresAt: acc.expiresAt ? new Date(acc.expiresAt).toISOString().split('T')[0] : '',
+      status: acc.status || 'active',
+      institutionName: acc.institution?.name || '',
+      registrationNumber: (acc.institution as any)?.registrationNumber || '',
+      institutionType: (acc.institution as any)?.institutionType || 'corporate',
+      country: acc.institution?.country || 'United States',
+      address: (acc.institution as any)?.address || '',
+      phone: (acc.institution as any)?.phone || '',
+      email: acc.institution?.email || '',
+      website: (acc.institution as any)?.website || '',
+      yearEstablished: (acc.institution as any)?.yearEstablished ? String((acc.institution as any).yearEstablished) : '',
+      description: (acc.institution as any)?.description || '',
+    });
+  }
   const [certPdfFile, setCertPdfFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -211,6 +248,56 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
       setAccreditations(prev => prev.map(a => a.id === editingAccreditation.id ? { ...a, expiresAt: newExpiryDate } : a));
       setMessage(`Expiration date updated for ${editingAccreditation.institution.name}!`);
       setEditingAccreditation(null);
+    }
+  }
+
+  async function handleSaveAccreditationEdit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingAccreditation) return;
+    setError('');
+    setMessage('');
+    setSubmittingManual(true);
+    try {
+      const payload = {
+        accreditationCode: editAccreditationForm.accreditationCode,
+        certificateNumber: editAccreditationForm.certificateNumber,
+        issuedAt: editAccreditationForm.issuedAt,
+        expiresAt: editAccreditationForm.expiresAt,
+        status: editAccreditationForm.status,
+        institution: {
+          name: editAccreditationForm.institutionName,
+          registrationNumber: editAccreditationForm.registrationNumber,
+          institutionType: editAccreditationForm.institutionType,
+          country: editAccreditationForm.country,
+          address: editAccreditationForm.address,
+          phone: editAccreditationForm.phone,
+          email: editAccreditationForm.email,
+          website: editAccreditationForm.website,
+          yearEstablished: editAccreditationForm.yearEstablished,
+          description: editAccreditationForm.description,
+          isActive: editAccreditationForm.status === 'active',
+        },
+      };
+
+      const res = await api(`/accreditations/${editingAccreditation.id}/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        setError(errData.message || 'Failed to update accreditation.');
+        return;
+      }
+
+      setMessage(`Updated accreditation details for "${editAccreditationForm.institutionName}" successfully!`);
+      setEditingAccreditation(null);
+      await loadAccreditations();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error updating accreditation');
+    } finally {
+      setSubmittingManual(false);
     }
   }
 
@@ -391,7 +478,7 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
             color: '#0f172a',
             lineHeight: 1.25,
           }}>
-            All Accredited Institutions &amp; Certificates
+            All Accredited Institutions & Certificates
           </h2>
           <p style={{
             margin: '0.35rem 0 0',
@@ -885,23 +972,20 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
                           <div style={{ display: 'inline-flex', gap: '0.375rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                             <button
                               type="button"
-                              onClick={() => {
-                                setEditingAccreditation(acc);
-                                setNewExpiryDate(acc.expiresAt ? new Date(acc.expiresAt).toISOString().split('T')[0] : '');
-                              }}
+                              onClick={() => handleOpenEditAccreditationModal(acc)}
                               style={{
                                 padding: '0.375rem 0.625rem',
                                 fontSize: '0.785rem',
-                                fontWeight: 500,
+                                fontWeight: 600,
                                 borderRadius: '6px',
-                                border: '1px solid #cbd5e1',
-                                backgroundColor: '#ffffff',
-                                color: '#334155',
+                                border: '1px solid #2563eb',
+                                backgroundColor: '#2563eb',
+                                color: '#ffffff',
                                 cursor: 'pointer',
                                 transition: 'all 0.15s ease',
                               }}
                             >
-                              Extend / Edit
+                              ✏️ Edit Details
                             </button>
                             <button
                               type="button"
@@ -1045,7 +1129,7 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
               <div style={{ backgroundColor: '#f8fafc', padding: '1.25rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                   <span style={{ backgroundColor: '#eff6ff', color: '#2563eb', padding: '0.35rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 700 }}>1</span>
-                  <h4 style={{ margin: 0, fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>Applicant &amp; Account Activation Details</h4>
+                  <h4 style={{ margin: 0, fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>Applicant & Account Activation Details</h4>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div>
@@ -1087,7 +1171,7 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
                       style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
                     />
                     <span style={{ fontSize: '0.75rem', color: '#2563eb', marginTop: '0.2rem', display: 'block', fontWeight: 500 }}>
-                      An account setup &amp; password activation email will be automatically sent here.
+                      An account setup & password activation email will be automatically sent here.
                     </span>
                   </div>
                   <div>
@@ -1109,7 +1193,7 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
               <div style={{ backgroundColor: '#ffffff', padding: '1.25rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                   <span style={{ backgroundColor: '#eff6ff', color: '#2563eb', padding: '0.35rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 700 }}>2</span>
-                  <h4 style={{ margin: 0, fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>Institution Profile &amp; Branding</h4>
+                  <h4 style={{ margin: 0, fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>Institution Profile & Branding</h4>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -1224,6 +1308,19 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
                   </div>
                 </div>
 
+                <div style={{ marginTop: '0.85rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                    About / Institution Description (Appears on Public Profile)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={manualForm.description}
+                    onChange={(e) => setManualForm({ ...manualForm, description: e.target.value })}
+                    placeholder="Provide a brief summary of the institution's background, training mission, core competencies, and program offerings for the public directory..."
+                    style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box', fontFamily: 'inherit', resize: 'vertical' }}
+                  />
+                </div>
+
                 {/* LOGO UPLOADER BOX */}
                 <div style={{ marginTop: '1rem', paddingTop: '0.85rem', borderTop: '1px dashed #cbd5e1' }}>
                   <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.4rem' }}>
@@ -1282,7 +1379,7 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
               <div style={{ backgroundColor: '#f8fafc', padding: '1.25rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                   <span style={{ backgroundColor: '#eff6ff', color: '#2563eb', padding: '0.35rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 700 }}>3</span>
-                  <h4 style={{ margin: 0, fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>Scope of Accreditation &amp; Operations</h4>
+                  <h4 style={{ margin: 0, fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>Scope of Accreditation & Operations</h4>
                 </div>
 
                 {/* Training Areas Checkboxes */}
@@ -1388,7 +1485,7 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
               <div style={{ backgroundColor: '#ffffff', padding: '1.25rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                   <span style={{ backgroundColor: '#eff6ff', color: '#2563eb', padding: '0.35rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 700 }}>4</span>
-                  <h4 style={{ margin: 0, fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>Accreditation Code &amp; Validity</h4>
+                  <h4 style={{ margin: 0, fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>Accreditation Code & Validity</h4>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -1458,7 +1555,7 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
                       style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box', fontWeight: 700 }}
                     />
                     <small style={{ color: '#64748b', fontSize: '0.75rem', display: 'block', marginTop: '0.25rem' }}>
-                      Recorded on initial invoice receipt &amp; used for automated annual renewal billing at expiration.
+                      Recorded on initial invoice receipt & used for automated annual renewal billing at expiration.
                     </small>
                   </div>
                   <div>
@@ -1538,7 +1635,7 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
         </div>
       )}
 
-      {/* MODAL 2: EXTEND / EDIT EXPIRY MODAL */}
+      {/* MODAL 2: EDIT ACCREDITATION & PROFILE MODAL */}
       {editingAccreditation && (
         <div style={{
           position: 'fixed',
@@ -1546,8 +1643,8 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(15, 23, 42, 0.55)',
-          backdropFilter: 'blur(3px)',
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -1556,117 +1653,298 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
         }}>
           <div style={{
             backgroundColor: '#ffffff',
-            borderRadius: '12px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            borderRadius: '16px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
             width: '100%',
-            maxWidth: '440px',
+            maxWidth: '820px',
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
             overflow: 'hidden',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #cbd5e1',
           }}>
             {/* Modal Header */}
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              padding: '1.25rem 1.5rem',
+              padding: '1.25rem 1.75rem',
               borderBottom: '1px solid #e2e8f0',
-              backgroundColor: '#f8fafc',
+              backgroundColor: '#0f172a',
+              color: '#ffffff',
             }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 700, color: '#0f172a' }}>
-                  Extend / Edit Expiry
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.1em', color: '#60a5fa', textTransform: 'uppercase', display: 'block' }}>
+                  ADMINISTRATION TOOL
+                </span>
+                <h3 style={{ margin: '0.2rem 0 0', fontSize: '1.25rem', fontWeight: 800, color: '#ffffff' }}>
+                  Edit Accreditation & Institution Profile
                 </h3>
-                <p style={{ margin: '0.2rem 0 0', fontSize: '0.8125rem', color: '#64748b' }}>
-                  Updating validity for <strong>{editingAccreditation.institution?.name}</strong>
+                <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: '#94a3b8' }}>
+                  Update details for <strong>{editingAccreditation.institution?.name}</strong> ({editingAccreditation.accreditationCode})
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setEditingAccreditation(null)}
                 style={{
-                  background: 'none',
+                  background: 'rgba(255,255,255,0.1)',
                   border: 'none',
-                  color: '#64748b',
+                  color: '#ffffff',
                   cursor: 'pointer',
-                  padding: '0.375rem',
-                  borderRadius: '6px',
+                  padding: '0.5rem',
+                  borderRadius: '8px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
               </button>
             </div>
 
-            {/* Modal Content */}
-            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#334155', marginBottom: '0.375rem' }}>
-                  New Expiration Date *
-                </label>
-                <input
-                  type="date"
-                  required
-                  value={newExpiryDate}
-                  onChange={(e) => setNewExpiryDate(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.625rem 0.875rem',
-                    fontSize: '0.875rem',
-                    borderRadius: '6px',
-                    border: '1px solid #cbd5e1',
-                    boxSizing: 'border-box',
-                  }}
-                />
+            {/* Scrollable Edit Form Body */}
+            <form onSubmit={handleSaveAccreditationEdit} style={{ flex: 1, overflowY: 'auto', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+              
+              {/* SECTION 1: ACCREDITATION & CERTIFICATE CODES */}
+              <div style={{ backgroundColor: '#eff6ff', padding: '1.25rem', borderRadius: '10px', border: '1px solid #bfdbfe' }}>
+                <h4 style={{ margin: '0 0 1rem', fontSize: '0.975rem', fontWeight: 700, color: '#1e40af' }}>1. Accreditation & Certificate Credentials</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#1e3a8a', marginBottom: '0.35rem' }}>
+                      Accreditation Code
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editAccreditationForm.accreditationCode}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, accreditationCode: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #93c5fd', boxSizing: 'border-box', backgroundColor: '#fff', fontWeight: 600, fontFamily: 'monospace' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#1e3a8a', marginBottom: '0.35rem' }}>
+                      Certificate Number
+                    </label>
+                    <input
+                      type="text"
+                      value={editAccreditationForm.certificateNumber}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, certificateNumber: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #93c5fd', boxSizing: 'border-box', backgroundColor: '#fff', fontWeight: 600, fontFamily: 'monospace' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#1e3a8a', marginBottom: '0.35rem' }}>
+                      Accreditation Status
+                    </label>
+                    <select
+                      value={editAccreditationForm.status}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, status: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #93c5fd', backgroundColor: '#ffffff', boxSizing: 'border-box', fontWeight: 700 }}
+                    >
+                      <option value="active">Active (Granted & Valid)</option>
+                      <option value="suspended">Suspended (Under Investigation)</option>
+                      <option value="expired">Expired</option>
+                      <option value="revoked">Revoked</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '0.85rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#1e3a8a', marginBottom: '0.35rem' }}>
+                      Issued Date
+                    </label>
+                    <input
+                      type="date"
+                      value={editAccreditationForm.issuedAt}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, issuedAt: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #93c5fd', boxSizing: 'border-box', backgroundColor: '#fff' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#1e3a8a', marginBottom: '0.35rem' }}>
+                      Expiration Date
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      value={editAccreditationForm.expiresAt}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, expiresAt: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #93c5fd', boxSizing: 'border-box', backgroundColor: '#fff', fontWeight: 700 }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2: INSTITUTION PROFILE & CONTACT DETAILS */}
+              <div style={{ backgroundColor: '#ffffff', padding: '1.25rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ margin: '0 0 1rem', fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>2. Institution Profile & Contact Information</h4>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Institution / Company Name <span style={{ color: '#ef4444' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editAccreditationForm.institutionName}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, institutionName: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Registration Number
+                    </label>
+                    <input
+                      type="text"
+                      value={editAccreditationForm.registrationNumber}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, registrationNumber: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Institution Type
+                    </label>
+                    <select
+                      value={editAccreditationForm.institutionType}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, institutionType: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: '#ffffff', boxSizing: 'border-box' }}
+                    >
+                      <option value="corporate">Corporate Training Provider</option>
+                      <option value="higher_education">Higher Education / University</option>
+                      <option value="vocational">Vocational / Technical Institute</option>
+                      <option value="non_profit">Non-Profit / NGO</option>
+                      <option value="government">Government / Public Sector</option>
+                      <option value="individual">Individual Educator / Consultant</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Country <span style={{ color: '#ef4444' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editAccreditationForm.country}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, country: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Official Email <span style={{ color: '#ef4444' }}>*</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={editAccreditationForm.email}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, email: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={editAccreditationForm.phone}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, phone: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Website URL
+                    </label>
+                    <input
+                      type="text"
+                      value={editAccreditationForm.website}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, website: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Year Established
+                    </label>
+                    <input
+                      type="number"
+                      value={editAccreditationForm.yearEstablished}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, yearEstablished: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Physical Address
+                    </label>
+                    <input
+                      type="text"
+                      value={editAccreditationForm.address}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, address: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      About / Institution Overview (Public Profile)
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={editAccreditationForm.description}
+                      onChange={(e) => setEditAccreditationForm({ ...editAccreditationForm, description: e.target.value })}
+                      placeholder="Brief overview of training scope, accreditation history, and program capabilities..."
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box', fontFamily: 'inherit', resize: 'vertical' }}
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Modal Footer */}
-              <div style={{
-                display: 'flex',
-                gap: '0.75rem',
-                justifyContent: 'flex-end',
-                marginTop: '0.5rem',
-                paddingTop: '1rem',
-                borderTop: '1px solid #f1f5f9',
-              }}>
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', paddingTop: '0.5rem', borderTop: '1px solid #e2e8f0' }}>
                 <button
                   type="button"
                   onClick={() => setEditingAccreditation(null)}
+                  disabled={submittingManual}
                   style={{
-                    padding: '0.58rem 1.125rem',
+                    padding: '0.65rem 1.25rem',
                     fontSize: '0.875rem',
-                    fontWeight: 500,
+                    fontWeight: 600,
                     borderRadius: '6px',
                     border: '1px solid #cbd5e1',
                     backgroundColor: '#ffffff',
-                    color: '#334155',
+                    color: '#475569',
                     cursor: 'pointer',
                   }}
                 >
                   Cancel
                 </button>
                 <button
-                  type="button"
-                  onClick={handleUpdateExpiry}
+                  type="submit"
+                  disabled={submittingManual}
                   style={{
-                    padding: '0.58rem 1.25rem',
+                    padding: '0.65rem 1.5rem',
                     fontSize: '0.875rem',
-                    fontWeight: 600,
+                    fontWeight: 700,
                     borderRadius: '6px',
                     border: 'none',
                     backgroundColor: '#2563eb',
                     color: '#ffffff',
-                    cursor: 'pointer',
+                    cursor: submittingManual ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  Save Expiry Date
+                  {submittingManual ? 'Saving Changes...' : 'Save All Changes'}
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}

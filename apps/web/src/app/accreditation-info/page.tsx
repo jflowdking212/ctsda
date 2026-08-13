@@ -7,7 +7,7 @@ export default function AccreditationInfoPage() {
   const [accreditationFee, setAccreditationFee] = useState<string>('500');
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/settings/public`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/settings/public`, { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if (data && data.accreditationFee) {

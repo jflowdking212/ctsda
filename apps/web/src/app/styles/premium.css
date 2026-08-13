@@ -76,8 +76,6 @@ html {
 body {
   font-family: var(--font-primary);
   line-height: 1.6;
-  color: var(--color-ink);
-  background: var(--color-paper);
   min-width: 320px;
   overflow-x: hidden;
   font-feature-settings: "ss01" on, "ss02" on;
@@ -97,9 +95,6 @@ img, svg {
 
 button, input, textarea, select {
   font: inherit;
-  border: none;
-  background: none;
-  cursor: pointer;
 }
 
 /* Premium Container System */
