@@ -1,0 +1,5 @@
+RewriteEngine On
+DirectoryIndex disabled
+
+# Proxy EVERYTHING to Next.js on port 4005. Next.js will handle /api/ proxying to NestJS.
+RewriteRule ^(.*)$ http://127.0.0.1:4005/$1 [P,L]
