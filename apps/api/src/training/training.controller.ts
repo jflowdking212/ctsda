@@ -29,14 +29,14 @@ export class TrainingController {
     return this.trainingService.create(body);
   }
 
-  @Put('admin/training/:id')
+  @Post('admin/training/:id/update')
   @UseGuards(AuthGuard, RbacGuard)
   @Roles('super_admin', 'content_manager')
   async update(@Param('id') id: string, @Body() body: any) {
     return this.trainingService.update(id, body);
   }
 
-  @Delete('admin/training/:id')
+  @Post('admin/training/:id/delete')
   @UseGuards(AuthGuard, RbacGuard)
   @Roles('super_admin', 'content_manager')
   async remove(@Param('id') id: string) {

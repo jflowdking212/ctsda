@@ -69,8 +69,8 @@ export function TrainingPanel({
         const saved = await res.json();
         setModules([saved, ...modules]);
       } else {
-        const res = await api(`/admin/training/${current.id}`, {
-          method: 'PUT',
+        const res = await api(`/admin/training/${current.id}/update`, {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
@@ -94,7 +94,7 @@ export function TrainingPanel({
   async function deleteModule(id: string) {
     if (!confirm('Delete this training module?')) return;
     try {
-      const res = await api(`/admin/training/${id}`, { method: 'DELETE' });
+      const res = await api(`/admin/training/${id}/delete`, { method: 'POST' });
       if (!res.ok) throw new Error('Failed to delete');
       setModules(modules.filter(m => m.id !== id));
       (onSuccess || (() => {}))('Deleted', 'Training module removed.');
