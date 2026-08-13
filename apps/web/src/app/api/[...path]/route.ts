@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE = 'http://127.0.0.1:4000';
 
-async function handleProxy(req: NextRequest, context: { params: Promise<{ path: string[] }> | { path: string[] } }) {
+async function handleProxy(req: NextRequest, context: any) {
   // In Next.js 15, params is a Promise. We await it to be safe.
   const resolvedParams = await context.params;
   const path = resolvedParams.path.join('/');
