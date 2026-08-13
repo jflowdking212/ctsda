@@ -32,6 +32,18 @@ export default function DirectoryPage() {
     return matchesSearch && matchesCountry;
   });
 
+  function getLogoUrl(url?: string | null) {
+    if (!url) return null;
+    if (url.startsWith('data:')) return url;
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000').replace(/\/$/, '');
+    if (url.startsWith('http://localhost:4000')) {
+      return url.replace('http://localhost:4000', apiUrl);
+    }
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    const clean = url.replace(/^\/?(uploads\/)?/, '');
+    return `${apiUrl}/uploads/${clean}`;
+  }
+
   return (
     <PublicPage>
       <main style={{ backgroundColor: '#f8fafc', minHeight: '100vh', overflowX: 'hidden' }}>
@@ -163,38 +175,50 @@ export default function DirectoryPage() {
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1.25rem' }}>
-                {filtered.map((inst: any) => (
-                  <div key={inst.id} style={{
-                    background: '#fff',
-                    borderRadius: '1rem',
-                    border: '1px solid #e2e8f0',
-                    overflow: 'hidden',
-                    boxShadow: '0 2px 8px rgba(16,35,63,0.06)',
-                    transition: 'box-shadow 0.2s, transform 0.2s',
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(16,35,63,0.12)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(16,35,63,0.06)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
-                  >
-                    {/* Card cover */}
-                    <div style={{ height: '90px', background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', position: 'relative' }}>
-                      <div style={{ position: 'absolute', top: '0.6rem', right: '0.75rem', background: 'rgba(255,255,255,0.15)', borderRadius: '999px', padding: '0.2rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                        <svg style={{ width: '12px', height: '12px', color: '#4ade80' }} fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" /></svg>
-                        <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Accredited</span>
+                {filtered.map((inst: any) => {
+                  const formattedLogo = getLogoUrl(inst.logoUrl);
+                  return (
+                    <div key={inst.id} style={{
+                      background: '#fff',
+                      borderRadius: '1rem',
+                      border: '1px solid #e2e8f0',
+                      overflow: 'hidden',
+                      boxShadow: '0 2px 8px rgba(16,35,63,0.06)',
+                      transition: 'box-shadow 0.2s, transform 0.2s',
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(16,35,63,0.12)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(16,35,63,0.06)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
+                    >
+                      {/* Card cover */}
+                      <div style={{ height: '90px', background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', position: 'relative' }}>
+                        <div style={{ position: 'absolute', top: '0.6rem', right: '0.75rem', background: 'rgba(255,255,255,0.15)', borderRadius: '999px', padding: '0.2rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <svg style={{ width: '12px', height: '12px', color: '#4ade80' }} fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" /></svg>
+                          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Accredited</span>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Logo */}
-                    <div style={{ padding: '0 1.25rem', marginTop: '-32px', position: 'relative', zIndex: 1 }}>
-                      <div style={{ width: '64px', height: '64px', borderRadius: '0.75rem', background: '#fff', border: '2px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {inst.logoUrl ? (
-                          <img src={inst.logoUrl} alt={inst.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                        ) : (
-                          <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#2563eb' }}>{inst.name?.charAt(0) || '?'}</span>
-                        )}
+                      {/* Logo */}
+                      <div style={{ padding: '0 1.25rem', marginTop: '-32px', position: 'relative', zIndex: 1 }}>
+                        <div style={{ width: '64px', height: '64px', borderRadius: '0.75rem', background: '#fff', border: '2px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {formattedLogo ? (
+                            <img
+                              src={formattedLogo}
+                              alt={inst.name}
+                              onError={(e) => {
+                                (e.currentTarget as HTMLElement).style.display = 'none';
+                                const fallback = e.currentTarget.parentElement?.querySelector('.card-logo-fallback');
+                                if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                              }}
+                              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                            />
+                          ) : null}
+                          <span className="card-logo-fallback" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#2563eb', display: formattedLogo ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+                            {inst.name?.charAt(0) || '?'}
+                          </span>
+                        </div>
                       </div>
-                    </div>
 
                     {/* Card body */}
                     <div style={{ padding: '0.75rem 1.25rem 1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -229,7 +253,8 @@ export default function DirectoryPage() {
                       </div>
                     </div>
                   </div>
-                ))}
+                );
+              })}
               </div>
             )}
           </div>

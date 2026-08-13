@@ -36,15 +36,24 @@ export class InstitutionsService {
     return preRegistration;
   }
 
+  private formatLogoUrl(logo: string | null | undefined): string | null {
+    if (!logo) return null;
+    if (logo.startsWith('data:')) return logo;
+    const cleanKey = logo.replace(/^\/?(uploads\/)?/, '');
+    const publicUrl = (process.env.API_PUBLIC_URL || 'http://localhost:4000').replace(/\/$/, '');
+    if (logo.startsWith('http://') || logo.startsWith('https://')) {
+      if (logo.includes('localhost:4000') && !publicUrl.includes('localhost')) {
+        return logo.replace('http://localhost:4000', publicUrl);
+      }
+      return logo;
+    }
+    return `${publicUrl}/uploads/${cleanKey}`;
+  }
+
   async findPublicAccredited() {
     const institutions = await this.prisma.institution.findMany({
       where: {
         isActive: true,
-        applications: {
-          some: {
-            status: 'approved',
-          },
-        },
         accreditations: {
           some: {
             status: 'active',
@@ -62,18 +71,10 @@ export class InstitutionsService {
       take: 50,
     });
 
-    const publicUrl = process.env.API_PUBLIC_URL || 'http://localhost:4000';
-
-    return institutions.map((inst) => {
-      let logo = inst.logoUrl;
-      if (logo && !logo.startsWith('http') && !logo.startsWith('data:')) {
-        logo = `${publicUrl}/uploads/${logo}`;
-      }
-      return {
-        ...inst,
-        logoUrl: logo,
-      };
-    });
+    return institutions.map((inst) => ({
+      ...inst,
+      logoUrl: this.formatLogoUrl(inst.logoUrl),
+    }));
   }
 
   async findPublicAccreditedBySlug(slug: string) {
@@ -86,32 +87,14 @@ export class InstitutionsService {
           ...(isUuid ? [{ id: slug }] : [])
         ],
         isActive: true,
-        applications: {
-          some: {
-            status: 'approved',
-          },
-        },
-        accreditations: {
-          some: {
-            status: 'active',
-            expiresAt: { gt: new Date() },
-          },
-        },
       },
       include: {
         accreditations: {
-          where: {
-            status: 'active',
-            expiresAt: { gt: new Date() },
-          },
           orderBy: { expiresAt: 'desc' },
           take: 1,
         },
         socialLinks: true,
         applications: {
-          where: {
-            status: 'approved',
-          },
           orderBy: { submittedAt: 'desc' },
           take: 1,
           include: {
@@ -126,15 +109,9 @@ export class InstitutionsService {
       return null;
     }
 
-    const publicUrl = process.env.API_PUBLIC_URL || 'http://localhost:4000';
-    let logo = institution.logoUrl;
-    if (logo && !logo.startsWith('http') && !logo.startsWith('data:')) {
-      logo = `${publicUrl}/uploads/${logo}`;
-    }
-
     return {
       ...institution,
-      logoUrl: logo,
+      logoUrl: this.formatLogoUrl(institution.logoUrl),
     };
   }
 

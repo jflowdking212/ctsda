@@ -61,6 +61,10 @@ export default function InstitutionPage() {
   );
 
   const latestAcc = institution.accreditations?.[0];
+  const isExpired = latestAcc?.expiresAt ? new Date(latestAcc.expiresAt) <= new Date() : false;
+  const isSuspended = latestAcc?.status === 'suspended' || latestAcc?.status === 'revoked';
+  const isActive = latestAcc?.status === 'active' && !isExpired;
+
   const validUntil = latestAcc?.expiresAt
     ? new Date(latestAcc.expiresAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     : 'N/A';
@@ -68,6 +72,20 @@ export default function InstitutionPage() {
   const programs = approvedApp?.offeredCertificates || [];
   const trainingAreas = approvedApp?.trainingAreas?.map((ta: any) => ta.trainingArea?.name).filter(Boolean) || [];
   const fallbackDesc = `${institution.name} is an officially accredited ${institution.institutionType || 'training'} provider based in ${institution.country || 'the United States'}, recognized for high standards in education, skill verification, and workforce development by the Council For Training Skills & Development America (CTSDA).`;
+
+  function getLogoUrl(url?: string | null) {
+    if (!url) return null;
+    if (url.startsWith('data:')) return url;
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000').replace(/\/$/, '');
+    if (url.startsWith('http://localhost:4000')) {
+      return url.replace('http://localhost:4000', apiUrl);
+    }
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    const clean = url.replace(/^\/?(uploads\/)?/, '');
+    return `${apiUrl}/uploads/${clean}`;
+  }
+
+  const formattedLogo = getLogoUrl(institution.logoUrl);
 
   return (
     <PublicPage>
@@ -86,7 +104,9 @@ export default function InstitutionPage() {
               </svg>
               All Institutions
             </Link>
-            <p style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#93c5fd', marginBottom: '0.4rem' }}>Accredited Institution</p>
+            <p style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#93c5fd', marginBottom: '0.4rem' }}>
+              {isActive ? 'Accredited Institution' : isExpired ? 'Expired Accreditation' : 'Suspended Institution'}
+            </p>
             <h1 style={{ fontSize: 'clamp(1.5rem, 4vw, 2.75rem)', fontWeight: 800, color: '#fff', margin: 0, lineHeight: 1.2, wordBreak: 'break-word' }}>
               {institution.name}
             </h1>
@@ -102,11 +122,21 @@ export default function InstitutionPage() {
               <div className="profile-card-header">
                 {/* Logo */}
                 <div className="profile-logo-box">
-                  {institution.logoUrl ? (
-                    <img src={institution.logoUrl} alt={institution.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                  ) : (
-                    <span style={{ fontSize: '2rem', fontWeight: 800, color: '#2563eb' }}>{institution.name?.charAt(0)}</span>
-                  )}
+                  {formattedLogo ? (
+                    <img
+                      src={formattedLogo}
+                      alt={institution.name}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLElement).style.display = 'none';
+                        const fallback = e.currentTarget.parentElement?.querySelector('.profile-logo-fallback');
+                        if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                      }}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
+                  ) : null}
+                  <span className="profile-logo-fallback" style={{ fontSize: '2rem', fontWeight: 800, color: '#2563eb', display: formattedLogo ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+                    {institution.name?.charAt(0)}
+                  </span>
                 </div>
 
                 {/* Name & meta */}
@@ -115,10 +145,20 @@ export default function InstitutionPage() {
                     <h2 style={{ fontSize: 'clamp(1.25rem, 3.5vw, 1.75rem)', fontWeight: 800, color: '#10233f', margin: 0, wordBreak: 'break-word' }}>
                       {institution.name}
                     </h2>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#dcfce7', color: '#16a34a', borderRadius: '999px', padding: '0.2rem 0.7rem', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>
-                      <svg style={{ width: '12px', height: '12px' }} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-                      ACCREDITED
-                    </span>
+                    {isActive ? (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#dcfce7', color: '#16a34a', borderRadius: '999px', padding: '0.2rem 0.7rem', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>
+                        <svg style={{ width: '12px', height: '12px' }} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                        ACCREDITED
+                      </span>
+                    ) : isExpired ? (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#fef3c7', color: '#b45309', borderRadius: '999px', padding: '0.2rem 0.7rem', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>
+                        EXPIRED
+                      </span>
+                    ) : (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#fee2e2', color: '#dc2626', borderRadius: '999px', padding: '0.2rem 0.7rem', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>
+                        SUSPENDED
+                      </span>
+                    )}
                   </div>
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem 1rem', fontSize: '0.85rem', color: '#5d6a7c', fontWeight: 500, marginBottom: '0.75rem' }}>
@@ -151,22 +191,58 @@ export default function InstitutionPage() {
               </div>
 
               {/* Accreditation status banner */}
-              <div className="profile-banner-container">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
-                  <div style={{ width: '40px', height: '40px', background: '#16a34a', borderRadius: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <svg style={{ width: '22px', height: '22px', color: '#fff' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, color: '#14532d', fontSize: '0.9rem' }}>Officially Accredited by CTSDA</div>
-                    <div style={{ fontSize: '0.82rem', color: '#166534', lineHeight: 1.5, wordBreak: 'break-word' }}>
-                      This institution meets all requirements of the Council For Training Skills & Development America. Valid until <strong>{validUntil}</strong>.
+              {isActive ? (
+                <div className="profile-banner-container" style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
+                    <div style={{ width: '40px', height: '40px', background: '#16a34a', borderRadius: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg style={{ width: '22px', height: '22px', color: '#fff' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, color: '#14532d', fontSize: '0.9rem' }}>Officially Accredited by CTSDA</div>
+                      <div style={{ fontSize: '0.82rem', color: '#166534', lineHeight: 1.5, wordBreak: 'break-word' }}>
+                        This institution meets all requirements of the Council For Training Skills & Development America. Valid until <strong>{validUntil}</strong>.
+                      </div>
                     </div>
                   </div>
+                  <span style={{ background: '#16a34a', color: '#fff', borderRadius: '999px', padding: '0.25rem 0.75rem', fontSize: '0.78rem', fontWeight: 700, flexShrink: 0 }}>● Active</span>
                 </div>
-                <span style={{ background: '#16a34a', color: '#fff', borderRadius: '999px', padding: '0.25rem 0.75rem', fontSize: '0.78rem', fontWeight: 700, flexShrink: 0 }}>● Active</span>
-              </div>
+              ) : isExpired ? (
+                <div className="profile-banner-container" style={{ background: '#fffbeb', border: '1px solid #fde68a' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
+                    <div style={{ width: '40px', height: '40px', background: '#d97706', borderRadius: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg style={{ width: '22px', height: '22px', color: '#fff' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, color: '#92400e', fontSize: '0.9rem' }}>Accreditation Expired</div>
+                      <div style={{ fontSize: '0.82rem', color: '#b45309', lineHeight: 1.5, wordBreak: 'break-word' }}>
+                        This institution's CTSDA accreditation expired on <strong>{validUntil}</strong>. Please contact CTSDA or the institution for renewal status.
+                      </div>
+                    </div>
+                  </div>
+                  <span style={{ background: '#d97706', color: '#fff', borderRadius: '999px', padding: '0.25rem 0.75rem', fontSize: '0.78rem', fontWeight: 700, flexShrink: 0 }}>● Expired</span>
+                </div>
+              ) : (
+                <div className="profile-banner-container" style={{ background: '#fef2f2', border: '1px solid #fca5a5' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
+                    <div style={{ width: '40px', height: '40px', background: '#dc2626', borderRadius: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg style={{ width: '22px', height: '22px', color: '#fff' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                      </svg>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, color: '#991b1b', fontSize: '0.9rem' }}>Accreditation Suspended / Inactive</div>
+                      <div style={{ fontSize: '0.82rem', color: '#b91c1c', lineHeight: 1.5, wordBreak: 'break-word' }}>
+                        This institution is currently not active in the CTSDA accredited directory.
+                      </div>
+                    </div>
+                  </div>
+                  <span style={{ background: '#dc2626', color: '#fff', borderRadius: '999px', padding: '0.25rem 0.75rem', fontSize: '0.78rem', fontWeight: 700, flexShrink: 0 }}>● Inactive</span>
+                </div>
+              )}
             </div>
           </div>
         </section>
