@@ -39,7 +39,7 @@ export default function DirectoryPage() {
       <PremiumHeader />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 pt-24 pb-32">
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 pt-24 pb-48">
         {/* Background Elements */}
         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay"></div>
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
@@ -81,7 +81,7 @@ export default function DirectoryPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="max-w-3xl mx-auto flex flex-col md:flex-row gap-4"
+            className="max-w-4xl mx-auto flex flex-col md:flex-row gap-4 w-full"
           >
             <div className="relative flex-1 group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
@@ -92,7 +92,7 @@ export default function DirectoryPage() {
                 placeholder="Search by institution name or keyword..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white/15 backdrop-blur-md transition-all text-lg"
+                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white/15 backdrop-blur-md transition-all text-base"
               />
             </div>
             
@@ -103,7 +103,7 @@ export default function DirectoryPage() {
               <select
                 value={selectedCountry}
                 onChange={e => setSelectedCountry(e.target.value)}
-                className="w-full pl-12 pr-10 py-4 rounded-2xl bg-white/10 border border-white/20 text-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white/15 backdrop-blur-md transition-all text-lg cursor-pointer"
+                className="w-full pl-12 pr-10 py-4 rounded-2xl bg-white/10 border border-white/20 text-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white/15 backdrop-blur-md transition-all text-base cursor-pointer"
               >
                 {countries.map(country => (
                   <option key={country} value={country} className="text-slate-900">{country}</option>
@@ -118,7 +118,7 @@ export default function DirectoryPage() {
       </section>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 -mt-16 relative z-20 pb-24 flex-1">
+      <main className="container mx-auto px-6 -mt-24 relative z-20 pb-24 flex-1">
         
         {/* Stats Row */}
         {!loading && (
@@ -195,15 +195,15 @@ export default function DirectoryPage() {
                   transition={{ duration: 0.2, delay: idx * 0.05 }}
                 >
                   <Link href={`/directory/${inst.slug || inst.id}`} className="group block h-full">
-                    <div className="h-full bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                    <div className="h-full bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col relative">
                       {/* Card Header Banner */}
-                      <div className="h-20 bg-gradient-to-r from-blue-600 to-indigo-600 relative overflow-hidden">
+                      <div className="h-24 bg-gradient-to-r from-blue-600 to-indigo-600 relative overflow-hidden shrink-0">
                         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay"></div>
                       </div>
                       
-                      <div className="px-6 pb-6 flex-1 flex flex-col">
+                      <div className="relative px-6 pb-6 pt-14 flex-1 flex flex-col">
                         {/* Logo Box */}
-                        <div className="w-20 h-20 bg-white rounded-2xl border-4 border-white shadow-md -mt-10 mb-4 flex items-center justify-center overflow-hidden z-10 shrink-0">
+                        <div className="absolute top-0 left-6 -translate-y-1/2 w-20 h-20 bg-white rounded-2xl border-4 border-white shadow-md flex items-center justify-center overflow-hidden z-10 shrink-0">
                           {inst.logoUrl ? (
                             <img src={inst.logoUrl} alt={inst.name} className="w-full h-full object-contain p-2" />
                           ) : (

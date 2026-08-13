@@ -143,12 +143,12 @@ export default function InstitutionPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-200 overflow-hidden"
+          className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-200 relative"
         >
           <div className="p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start">
             
             {/* Logo */}
-            <div className="w-32 h-32 shrink-0 rounded-2xl bg-white border-4 border-white shadow-lg flex items-center justify-center overflow-hidden -mt-20 md:-mt-24 z-10">
+            <div className="w-32 h-32 shrink-0 rounded-2xl bg-white border-4 border-white shadow-lg flex items-center justify-center overflow-hidden -mt-24 md:-mt-28 z-10 relative">
               {institution.logoUrl ? (
                 <img src={institution.logoUrl} alt={institution.name} className="w-full h-full object-contain p-3" />
               ) : (
@@ -180,9 +180,9 @@ export default function InstitutionPage() {
               </div>
 
               {trainingAreas.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2.5">
                   {trainingAreas.map((a: string, i: number) => (
-                    <span key={i} className="bg-blue-50 text-blue-700 border border-blue-100 rounded-lg px-3 py-1 text-xs font-semibold">{a}</span>
+                    <span key={i} className="inline-flex items-center bg-blue-50 text-blue-700 border border-blue-100 rounded-lg px-3 py-1.5 text-xs font-semibold">{a}</span>
                   ))}
                 </div>
               )}
@@ -197,7 +197,7 @@ export default function InstitutionPage() {
           </div>
 
           {/* Accreditation Banner */}
-          <div className="mx-6 md:mx-10 mb-8 p-5 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-center gap-5">
+          <div className="mx-6 md:mx-10 mb-8 p-5 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-center gap-5 relative z-10">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white shrink-0 shadow-md">
               <ShieldCheck size={24} />
             </div>
@@ -231,11 +231,11 @@ export default function InstitutionPage() {
             {programs.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {programs.map((p: any, i: number) => (
-                  <div key={i} className="flex items-center gap-3 p-3.5 bg-slate-50 border border-slate-100 rounded-xl hover:bg-blue-50 hover:border-blue-100 transition-colors">
-                    <div className="w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                  <div key={i} className="flex items-start sm:items-center gap-3 p-3.5 bg-slate-50 border border-slate-100 rounded-xl hover:bg-blue-50 hover:border-blue-100 transition-colors">
+                    <div className="w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
                       <CheckCircle2 size={14} />
                     </div>
-                    <span className="text-sm font-semibold text-slate-700 leading-snug">{p.name}</span>
+                    <span className="text-sm font-semibold text-slate-700 leading-tight">{p.name}</span>
                   </div>
                 ))}
               </div>
@@ -246,9 +246,9 @@ export default function InstitutionPage() {
 
           {trainingAreas.length > 0 && (
             <SectionCard title="Areas of Training" icon={<GraduationCap size={20} />} delay={0.3}>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2.5">
                 {trainingAreas.map((a: string, i: number) => (
-                  <span key={i} className="bg-blue-50 text-blue-700 border border-blue-100 rounded-xl px-4 py-2 text-sm font-semibold">{a}</span>
+                  <span key={i} className="inline-flex items-center bg-blue-50 text-blue-700 border border-blue-100 rounded-xl px-4 py-2 text-sm font-semibold">{a}</span>
                 ))}
               </div>
             </SectionCard>
