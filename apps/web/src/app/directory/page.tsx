@@ -34,30 +34,27 @@ export default function DirectoryPage() {
 
   return (
     <PublicPage>
-      <main style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+      <main style={{ backgroundColor: '#f8fafc', minHeight: '100vh', overflowX: 'hidden' }}>
 
         {/* Hero Banner */}
-        <section style={{
-          background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)',
-          color: '#ffffff',
-          padding: '4.75rem 1.5rem 4rem',
-        }}>
+        <section className="directory-hero-section">
           <div style={{ maxWidth: '1140px', margin: '0 auto' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.15)', borderRadius: '999px', padding: '0.3rem 0.9rem', marginBottom: '1rem' }}>
               <span style={{ width: '8px', height: '8px', background: '#4ade80', borderRadius: '50%', display: 'inline-block' }}></span>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#fff' }}>Official Accredited Directory</span>
             </div>
             <h1 style={{
-              fontSize: 'clamp(2.4rem, 5vw, 3.5rem)',
+              fontSize: 'clamp(2rem, 5vw, 3.5rem)',
               fontWeight: 800,
               color: '#ffffff',
               marginBottom: '0.75rem',
               lineHeight: 1.15,
+              wordBreak: 'break-word',
             }}>
               Find Accredited Institutions
             </h1>
             <p style={{
-              fontSize: '1.15rem',
+              fontSize: 'clamp(0.95rem, 2.5vw, 1.15rem)',
               color: '#e2e8f0',
               maxWidth: '620px',
               lineHeight: 1.6,
@@ -70,9 +67,9 @@ export default function DirectoryPage() {
         </section>
 
         {/* Search & Filter Bar */}
-        <section style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '1.5rem' }}>
-          <div style={{ maxWidth: '1140px', margin: '0 auto', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-            <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
+        <section style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '1.25rem 1rem' }}>
+          <div style={{ maxWidth: '1140px', margin: '0 auto', display: 'flex', gap: '0.85rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ flex: '1 1 240px', minWidth: 0, position: 'relative' }}>
               <svg style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', width: '18px', height: '18px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -104,7 +101,8 @@ export default function DirectoryPage() {
                 background: '#f8fafc',
                 color: '#172033',
                 outline: 'none',
-                minWidth: '160px',
+                flex: '0 1 180px',
+                minWidth: '140px',
                 cursor: 'pointer',
               }}
             >
@@ -123,21 +121,21 @@ export default function DirectoryPage() {
 
         {/* Stats Row */}
         <section style={{ background: '#fff', borderBottom: '1px solid #e2e8f0' }}>
-          <div style={{ maxWidth: '1140px', margin: '0 auto', padding: '0 1.5rem', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
+          <div style={{ maxWidth: '1140px', margin: '0 auto', padding: '0 1rem' }} className="directory-stats-grid">
             {[
               { label: 'Accredited Institutions', value: institutions.length },
               { label: 'Countries Represented', value: countries.length - 1 },
               { label: 'Network Status', value: 'Active' },
             ].map((s, i) => (
-              <div key={i} style={{ padding: '1.25rem 1rem', borderRight: i < 2 ? '1px solid #e2e8f0' : 'none', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div key={i} className="directory-stat-item" style={{ borderRight: i < 2 ? '1px solid #e2e8f0' : 'none' }}>
                 <div style={{ width: '40px', height: '40px', borderRadius: '0.5rem', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <svg style={{ width: '20px', height: '20px', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#10233f', lineHeight: 1 }}>{s.value}</div>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#5d6a7c', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '0.15rem' }}>{s.label}</div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#10233f', lineHeight: 1 }}>{s.value}</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#5d6a7c', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '0.15rem', wordBreak: 'break-word' }}>{s.label}</div>
                 </div>
               </div>
             ))}
@@ -145,10 +143,10 @@ export default function DirectoryPage() {
         </section>
 
         {/* Institution Grid */}
-        <section style={{ padding: '3rem 1.5rem 5rem' }}>
+        <section style={{ padding: '2rem 1rem 4rem' }}>
           <div style={{ maxWidth: '1140px', margin: '0 auto' }}>
-            <div style={{ marginBottom: '1.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#10233f', margin: 0 }}>
+            <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#10233f', margin: 0 }}>
                 {searchTerm || selectedCountry !== 'All' ? 'Search Results' : 'All Accredited Institutions'}
               </h2>
               <span style={{ fontSize: '0.875rem', color: '#5d6a7c' }}>Showing <strong>{filtered.length}</strong> institution{filtered.length !== 1 ? 's' : ''}</span>
@@ -164,7 +162,7 @@ export default function DirectoryPage() {
                 <p style={{ marginTop: '0.5rem', fontSize: '0.95rem' }}>Try adjusting your search or filter criteria.</p>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1.25rem' }}>
                 {filtered.map((inst: any) => (
                   <div key={inst.id} style={{
                     background: '#fff',
@@ -180,7 +178,7 @@ export default function DirectoryPage() {
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(16,35,63,0.06)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
                   >
                     {/* Card cover */}
-                    <div style={{ height: '100px', background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', position: 'relative' }}>
+                    <div style={{ height: '90px', background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', position: 'relative' }}>
                       <div style={{ position: 'absolute', top: '0.6rem', right: '0.75rem', background: 'rgba(255,255,255,0.15)', borderRadius: '999px', padding: '0.2rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                         <svg style={{ width: '12px', height: '12px', color: '#4ade80' }} fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" /></svg>
                         <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Accredited</span>
@@ -191,7 +189,7 @@ export default function DirectoryPage() {
                     <div style={{ padding: '0 1.25rem', marginTop: '-32px', position: 'relative', zIndex: 1 }}>
                       <div style={{ width: '64px', height: '64px', borderRadius: '0.75rem', background: '#fff', border: '2px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {inst.logoUrl ? (
-                          <img src={inst.logoUrl} alt={inst.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img src={inst.logoUrl} alt={inst.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                         ) : (
                           <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#2563eb' }}>{inst.name?.charAt(0) || '?'}</span>
                         )}
@@ -200,7 +198,7 @@ export default function DirectoryPage() {
 
                     {/* Card body */}
                     <div style={{ padding: '0.75rem 1.25rem 1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                      <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#10233f', margin: '0 0 0.4rem' }}>{inst.name}</h3>
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#10233f', margin: '0 0 0.4rem', wordBreak: 'break-word' }}>{inst.name}</h3>
                       {inst.country && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#5d6a7c', fontSize: '0.82rem', marginBottom: '0.75rem' }}>
                           <svg style={{ width: '13px', height: '13px', flexShrink: 0 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,6 +234,44 @@ export default function DirectoryPage() {
             )}
           </div>
         </section>
+
+        <style jsx global>{`
+          .directory-hero-section {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: #ffffff;
+            padding: 3rem 1rem 3.5rem;
+          }
+          .directory-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+          }
+          .directory-stat-item {
+            padding: 1.25rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+          }
+
+          @media (min-width: 768px) {
+            .directory-hero-section {
+              padding: 4.75rem 1.5rem 4rem;
+            }
+          }
+
+          @media (max-width: 640px) {
+            .directory-stats-grid {
+              grid-template-columns: 1fr;
+            }
+            .directory-stat-item {
+              border-right: none !important;
+              border-bottom: 1px solid #e2e8f0;
+              padding: 1rem 0.5rem;
+            }
+            .directory-stat-item:last-child {
+              border-bottom: none;
+            }
+          }
+        `}</style>
       </main>
     </PublicPage>
   );
