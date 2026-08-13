@@ -315,23 +315,49 @@ export class AccreditationsService {
     const certificateNumber = data.certificateNumber || `CERT-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
 
     return this.prisma.$transaction(async (tx) => {
-      const institution = await tx.institution.create({
-        data: {
-          name: instName,
-          slug,
-          registrationNumber: data.registrationNumber || `RC-${Math.floor(100000 + Math.random() * 900000)}`,
-          institutionType: data.institutionType || 'corporate',
-          country: data.country || 'United States',
-          address: data.address || 'N/A',
-          phone: data.institutionPhone || data.phone || 'N/A',
-          email: data.institutionEmail || targetEmail,
-          website: data.website || undefined,
-          yearEstablished: data.yearEstablished ? Number(data.yearEstablished) : undefined,
-          description: data.description || undefined,
-          logoUrl: uploadedLogoKey || undefined,
-          createdBy: actorId,
-        },
+      // Check if an institution with this registrationNumber or email already exists
+      const searchConditions: any[] = [{ email: data.institutionEmail || targetEmail }];
+      if (data.registrationNumber && data.registrationNumber.trim()) {
+        searchConditions.push({ registrationNumber: data.registrationNumber.trim() });
+      }
+
+      let institution = await tx.institution.findFirst({
+        where: { OR: searchConditions },
       });
+
+      if (institution) {
+        institution = await tx.institution.update({
+          where: { id: institution.id },
+          data: {
+            name: instName,
+            country: data.country || institution.country,
+            address: data.address || institution.address,
+            phone: data.institutionPhone || data.phone || institution.phone,
+            website: data.website || institution.website,
+            yearEstablished: data.yearEstablished ? Number(data.yearEstablished) : institution.yearEstablished,
+            description: data.description || institution.description,
+            logoUrl: uploadedLogoKey || institution.logoUrl,
+          },
+        });
+      } else {
+        institution = await tx.institution.create({
+          data: {
+            name: instName,
+            slug,
+            registrationNumber: data.registrationNumber?.trim() || `RC-${Math.floor(100000 + Math.random() * 900000)}`,
+            institutionType: data.institutionType || 'corporate',
+            country: data.country || 'United States',
+            address: data.address || 'N/A',
+            phone: data.institutionPhone || data.phone || 'N/A',
+            email: data.institutionEmail || targetEmail,
+            website: data.website || undefined,
+            yearEstablished: data.yearEstablished ? Number(data.yearEstablished) : undefined,
+            description: data.description || undefined,
+            logoUrl: uploadedLogoKey || undefined,
+            createdBy: actorId,
+          },
+        });
+      }
 
       // Filter and resolve training area IDs if passed
       let validTrainingAreaIds: string[] = [];
