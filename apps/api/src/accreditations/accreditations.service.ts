@@ -363,6 +363,7 @@ export class AccreditationsService {
             yearEstablished: data.yearEstablished ? Number(data.yearEstablished) : institution.yearEstablished,
             description: data.description || institution.description,
             logoUrl: uploadedLogoKey || institution.logoUrl,
+            isActive: true,
           },
         });
       } else {
@@ -381,6 +382,7 @@ export class AccreditationsService {
             description: data.description || undefined,
             logoUrl: uploadedLogoKey || undefined,
             createdBy: actorId,
+            isActive: true,
           },
         });
       }
