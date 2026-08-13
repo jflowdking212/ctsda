@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE = 'http://127.0.0.1:4000';
 
-async function handleProxy(req: NextRequest, context: any) {
-  // In Next.js 15, params is a Promise. We await it to be safe.
-  const resolvedParams = await context.params;
-  const path = resolvedParams.path.join('/');
+async function handleProxy(req: NextRequest) {
+  console.log(`[API PROXY] Received ${req.method} request for ${req.url}`);
+  // Use nextUrl.pathname to avoid Next.js 15 params type issues
+  const pathname = req.nextUrl.pathname; // e.g. /api/admin/training/...
+  const apiPath = pathname.replace(/^\/api\//, ''); // e.g. admin/training/...
   const url = new URL(req.url);
-  const targetUrl = `${API_BASE}/${path}${url.search}`;
+  const targetUrl = `${API_BASE}/${apiPath}${url.search}`;
 
   const headers = new Headers(req.headers);
   headers.delete('host'); // Let fetch set the correct host
