@@ -51,8 +51,23 @@ async function bootstrap() {
   });
 
   // CORS
+  const configuredFrontend = configService.get('FRONTEND_URL');
+  const allowedOrigins = [
+    'https://ctsda.acecoterieconsulting.com',
+    'https://ctsdamerica.com',
+    'https://www.ctsdamerica.com',
+    'http://localhost:3000',
+    ...(configuredFrontend ? [configuredFrontend] : []),
+  ];
+
   await app.register(fastifyCors, {
-    origin: [configService.get('FRONTEND_URL', 'http://localhost:3000')],
+    origin: (origin, cb) => {
+      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+        cb(null, true);
+        return;
+      }
+      cb(null, true);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Requested-With', 'X-Session-Id'],

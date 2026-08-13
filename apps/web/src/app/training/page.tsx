@@ -56,8 +56,7 @@ const CATEGORY_IMAGES: Record<string, string> = {
 
 function getValidImageUrl(url?: string | null, category?: string, title?: string): string {
   // Server-safe: NEXT_PUBLIC_API_URL is available both server and client.
-  // Never reference `window` here — this is a Server Component.
-  const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'https://ctsdamerica.com/api').replace(/\/$/, '');
+  const apiBase = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
 
   let targetUrl = url;
 

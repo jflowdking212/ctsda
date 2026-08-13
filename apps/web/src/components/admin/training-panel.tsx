@@ -55,11 +55,11 @@ export function TrainingPanel({
     }
     
     const getApiBase = () => {
-      if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
       if (typeof window !== 'undefined' && window.location.origin) {
         return `${window.location.origin}/api`;
       }
-      return 'https://ctsdamerica.com/api';
+      if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+      return '/api';
     };
 
     const apiBase = getApiBase().replace(/\/$/, '');
