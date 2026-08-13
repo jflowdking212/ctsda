@@ -13,7 +13,7 @@ const sections = [
     icon: '📋',
     content: `The Council For Training Skills and Development America (CTSDA) provides international accreditation, institutional evaluation, certificate verification, and educational governance services.
 
-By accessing our website (ctsdamerica.com / ctsda.acecoterieconsulting.com), creating an account, submitting an accreditation application, making a fee payment, or using our public verification tools, you agree to comply with these Terms of Service.
+By accessing our website (ctsdamerica.com / ctsdamerica.com), creating an account, submitting an accreditation application, making a fee payment, or using our public verification tools, you agree to comply with these Terms of Service.
 
 You may use CTSDA services solely for lawful, authorized purposes. You represent and warrant that all information submitted by you or on behalf of your institution is accurate, current, complete, and legally authorized.`
   },
@@ -104,7 +104,7 @@ You may use CTSDA services solely for lawful, authorized purposes. You represent
 Council For Training Skills and Development America (CTSDA)
 Address: The Green, STE A, Dover, Kent, Delaware, United States
 Email: management@ctsdamerica.com
-Official Portal: https://ctsda.acecoterieconsulting.com`
+Official Portal: https://ctsdamerica.com`
   }
 ];
 

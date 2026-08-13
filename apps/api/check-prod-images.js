@@ -1,7 +1,7 @@
 // Update training imageUrls in production DB via the Admin API
 // We need an admin token first, then patch each training
 
-const API = 'https://ctsda.acecoterieconsulting.com/api';
+const API = 'https://ctsdamerica.com/api';
 
 const IMAGE_LINKS = {
   'Safety': `${API}/uploads/road-safety.jpg`,
@@ -25,7 +25,7 @@ async function main() {
   }
 
   // Also verify the manually added image still works
-  const manualImg = 'https://ctsda.acecoterieconsulting.com/api/uploads/1786609496351-jude.jpeg';
+  const manualImg = 'https://ctsdamerica.com/api/uploads/1786609496351-jude.jpeg';
   try {
     const res = await fetch(manualImg, { method: 'HEAD' });
     console.log(`\nManual image: ${res.status} ${res.ok ? '✓ ACCESSIBLE' : '✗ NOT FOUND'}`);

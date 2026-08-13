@@ -1,6 +1,6 @@
 async function main() {
   try {
-    const res = await fetch('https://ctsda.acecoterieconsulting.com/api/training').catch(() => null) || 
+    const res = await fetch('https://ctsdamerica.com/api/training').catch(() => null) || 
                 await fetch('http://localhost:4000/training').catch(() => null);
     if (res && res.ok) {
       const data = await res.json();

@@ -250,7 +250,7 @@ export class ReviewsService {
             }
 
             const envUrl = process.env.FRONTEND_URL || '';
-            const baseUrl = (!envUrl || envUrl.includes('localhost')) ? 'https://ctsda.acecoterieconsulting.com' : envUrl;
+            const baseUrl = (!envUrl || envUrl.includes('localhost')) ? 'https://ctsdamerica.com' : envUrl;
             const paymentLink = `${baseUrl}/payment/${invoice.id}`;
             const targetEmail = app.applicantEmail || app.applicant?.email || app.institution?.email || app.institution?.contacts?.find((c: any) => c.isPrimary)?.email || app.institution?.contacts?.[0]?.email;
             if (targetEmail) {
@@ -292,7 +292,7 @@ export class ReviewsService {
             });
 
             const verificationToken = this.generateVerificationToken();
-            const verificationBaseUrl = process.env.FRONTEND_URL || 'https://ctsda.acecoterieconsulting.com';
+            const verificationBaseUrl = process.env.FRONTEND_URL || 'https://ctsdamerica.com';
             const qrCodeUrl = verificationBaseUrl + '/verify?token=' + verificationToken;
             const certificate = await tx.certificate.create({
               data: {

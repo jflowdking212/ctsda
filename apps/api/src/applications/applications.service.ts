@@ -145,7 +145,7 @@ export class ApplicationsService {
         html: `
           <h2>New Application Pending Review</h2>
           <p>An application for <strong>${instName}</strong> has been submitted by an applicant and is pending administrative review.</p>
-          <p><a href="${process.env.FRONTEND_URL || 'https://ctsda.acecoterieconsulting.com'}/admin/queue?appId=${applicationId}" style="display:inline-block;padding:10px 18px;background:#0d9488;color:#ffffff;text-decoration:none;border-radius:6px;">Review Application</a></p>
+          <p><a href="${process.env.FRONTEND_URL || 'https://ctsdamerica.com'}/admin/queue?appId=${applicationId}" style="display:inline-block;padding:10px 18px;background:#0d9488;color:#ffffff;text-decoration:none;border-radius:6px;">Review Application</a></p>
         `,
         userId: userId,
       });

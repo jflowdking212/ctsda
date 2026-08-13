@@ -59,7 +59,7 @@ export function TrainingPanel({
       if (typeof window !== 'undefined' && window.location.origin) {
         return `${window.location.origin}/api`;
       }
-      return 'https://ctsda.acecoterieconsulting.com/api';
+      return 'https://ctsdamerica.com/api';
     };
 
     const apiBase = getApiBase().replace(/\/$/, '');

@@ -28,7 +28,7 @@ export class StudentsService {
       : new Date(data.expiryDate);
 
     const envUrl = process.env.FRONTEND_URL || '';
-    const frontendUrl = (!envUrl || envUrl.includes('localhost')) ? 'https://ctsda.acecoterieconsulting.com' : envUrl;
+    const frontendUrl = (!envUrl || envUrl.includes('localhost')) ? 'https://ctsdamerica.com' : envUrl;
     const qrCodeUrl = `${frontendUrl}/verify?token=${verificationToken}`;
 
     const cert = await this.prisma.studentCertificate.create({

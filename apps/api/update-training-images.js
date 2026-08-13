@@ -1,7 +1,7 @@
 // Update training records in production DB via admin API
 // Links the 3 trainings that still have null imageUrl to their category-matched images
 
-const API = 'https://ctsda.acecoterieconsulting.com/api';
+const API = 'https://ctsdamerica.com/api';
 
 // Training IDs from the live DB (from previous inspection)
 const UPDATES = [

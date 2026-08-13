@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const FormData = require('form-data');
 
-const API = 'https://ctsda.acecoterieconsulting.com/api';
+const API = 'https://ctsdamerica.com/api';
 const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
 
 const IMAGES = [

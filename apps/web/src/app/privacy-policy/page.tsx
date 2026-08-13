@@ -11,7 +11,7 @@ const sections = [
     id: 'overview',
     title: '1. Overview & Scope',
     icon: '📋',
-    content: `The Council For Training Skills and Development America (CTSDA) is committed to protecting the privacy, confidentiality, and security of all personal and institutional data entrusted to us. This Privacy Policy & Legal Framework applies to all interactions with CTSDA, including our website (ctsdamerica.com / ctsda.acecoterieconsulting.com), applicant portal, public accreditation directory, certificate verification services, training programs, and communication channels.
+    content: `The Council For Training Skills and Development America (CTSDA) is committed to protecting the privacy, confidentiality, and security of all personal and institutional data entrusted to us. This Privacy Policy & Legal Framework applies to all interactions with CTSDA, including our website (ctsdamerica.com / ctsdamerica.com), applicant portal, public accreditation directory, certificate verification services, training programs, and communication channels.
 
 By accessing our services, submitting accreditation applications, or utilizing our public verification system, you acknowledge and agree to the practices outlined in this policy.`
   },
@@ -102,7 +102,7 @@ To exercise any of these rights, contact us at management@ctsdamerica.com.`
 Council For Training Skills and Development America (CTSDA)
 Address: The Green, STE A, Dover, Kent, Delaware, United States
 Email: management@ctsdamerica.com
-Official Verification Portal: https://ctsda.acecoterieconsulting.com/verify`
+Official Verification Portal: https://ctsdamerica.com/verify`
   }
 ];
 
