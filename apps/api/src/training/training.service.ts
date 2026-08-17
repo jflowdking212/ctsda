@@ -2,13 +2,21 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../common/prisma.service';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { ConfigService } from '@nestjs/config';
+import { randomUUID } from 'crypto';
+import IORedis from 'ioredis';
 
 @Injectable()
 export class TrainingService {
+  private redis: IORedis;
+
   constructor(
     private prisma: PrismaService,
+    private configService: ConfigService,
     @InjectQueue('email') private emailQueue: Queue,
-  ) {}
+  ) {
+    this.redis = new IORedis(this.configService.get<string>('REDIS_URL', 'redis://localhost:6379'));
+  }
 
   async findAllPublic() {
     return this.prisma.training.findMany({
@@ -59,7 +67,99 @@ export class TrainingService {
     return this.prisma.training.delete({ where: { id } });
   }
 
-  async register(userId: string | null, trainingId: string, email: string | null = null, name: string | null = null) {
+  async generateCaptcha() {
+    const isAddition = Math.random() > 0.35;
+    let num1: number;
+    let num2: number;
+    let question: string;
+    let answer: number;
+
+    if (isAddition) {
+      num1 = Math.floor(Math.random() * 12) + 2; // 2 to 13
+      num2 = Math.floor(Math.random() * 9) + 1;  // 1 to 9
+      question = `What is ${num1} + ${num2} = ?`;
+      answer = num1 + num2;
+    } else {
+      num1 = Math.floor(Math.random() * 12) + 8; // 8 to 19
+      num2 = Math.floor(Math.random() * 6) + 1;  // 1 to 6
+      question = `What is ${num1} - ${num2} = ?`;
+      answer = num1 - num2;
+    }
+
+    const captchaId = randomUUID();
+    // Expire challenge in 5 minutes (300 seconds)
+    await this.redis.set(`captcha:training:${captchaId}`, String(answer), 'EX', 300);
+
+    return {
+      captchaId,
+      question,
+    };
+  }
+
+  async register(
+    userId: string | null,
+    trainingId: string,
+    email: string | null = null,
+    name: string | null = null,
+    captchaId?: string,
+    captchaAnswer?: string,
+    honeypot?: string,
+    clientTime?: number,
+    clientIp?: string,
+  ) {
+    // 1. Honeypot check (Automated spam bots fill hidden inputs)
+    if (honeypot && honeypot.trim().length > 0) {
+      throw new BadRequestException('Spam submission detected');
+    }
+
+    // 2. Submission time check (Automated scripts submit instantly in < 1 second)
+    if (clientTime && Date.now() - clientTime < 1200) {
+      throw new BadRequestException('Form submitted too fast. Please take a moment to review and try again.');
+    }
+
+    // 3. Name & Email validation
+    const userName = (name || '').trim();
+    const userEmail = (email || '').trim().toLowerCase();
+    if (!userName || userName.length < 2) {
+      throw new BadRequestException('Please enter your full name.');
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!userEmail || !emailRegex.test(userEmail)) {
+      throw new BadRequestException('Please provide a valid email address.');
+    }
+
+    // 4. IP Rate Limiting (max 6 registration requests per 10 minutes per IP)
+    if (clientIp) {
+      const cleanIp = String(clientIp).split(',')[0].trim();
+      const ipKey = `ratelimit:training_reg:${cleanIp}`;
+      const count = await this.redis.incr(ipKey);
+      if (count === 1) {
+        await this.redis.expire(ipKey, 600); // 10 minutes
+      }
+      if (count > 6) {
+        throw new BadRequestException('Too many registration requests from this network. Please wait a few minutes before trying again.');
+      }
+    }
+
+    // 5. Captcha Verification (Required for all guest / unauthenticated requests)
+    if (!userId) {
+      if (!captchaId || !captchaAnswer || !captchaAnswer.trim()) {
+        throw new BadRequestException('Security verification is required. Please solve the math challenge.');
+      }
+
+      const expectedAnswer = await this.redis.get(`captcha:training:${captchaId}`);
+      if (!expectedAnswer) {
+        throw new BadRequestException('Security verification expired or invalid. Please refresh the question.');
+      }
+
+      // Immediately delete token to prevent replay attacks
+      await this.redis.del(`captcha:training:${captchaId}`);
+
+      if (captchaAnswer.trim() !== expectedAnswer.trim()) {
+        throw new BadRequestException('Incorrect security verification answer. Please try again.');
+      }
+    }
+
     const training = await this.prisma.training.findUnique({
       where: { id: trainingId }
     });
@@ -69,9 +169,6 @@ export class TrainingService {
     }
 
     const adminEmail = 'ctsdausa@gmail.com';
-    const userName = name || 'A user';
-    const userEmail = email || 'Unknown email';
-
     const subject = `New Training Enrollment Request: ${training.title}`;
     const html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #334155;">
