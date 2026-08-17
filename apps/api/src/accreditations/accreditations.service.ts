@@ -29,8 +29,13 @@ export class AccreditationsService {
   }
 
   async listActive() {
+    const now = new Date();
     return this.prisma.accreditation.findMany({
-      where: { status: 'active' },
+      where: {
+        status: 'active',
+        expiresAt: { gt: now },
+        institution: { isActive: true },
+      },
       include: { institution: true, certificates: true },
       orderBy: { issuedAt: 'desc' },
     });
@@ -84,6 +89,23 @@ export class AccreditationsService {
         data: { status: 'suspended', suspendedAt: new Date() },
       });
 
+      // Update institution isActive to false if no other active unexpired accreditations exist
+      const otherActive = await tx.accreditation.count({
+        where: {
+          institutionId: accreditation.institutionId,
+          id: { not: id },
+          status: 'active',
+          expiresAt: { gt: new Date() },
+        },
+      });
+
+      if (otherActive === 0) {
+        await tx.institution.update({
+          where: { id: accreditation.institutionId },
+          data: { isActive: false },
+        });
+      }
+
       await tx.certificate.updateMany({
         where: { accreditationId: id },
         data: { status: 'suspended' },
@@ -114,6 +136,11 @@ export class AccreditationsService {
       const updated = await tx.accreditation.update({
         where: { id },
         data: { status: 'active', suspendedAt: null },
+      });
+
+      await tx.institution.update({
+        where: { id: accreditation.institutionId },
+        data: { isActive: true },
       });
 
       await tx.certificate.updateMany({
@@ -152,6 +179,21 @@ export class AccreditationsService {
       await tx.certificateStatusHistory.deleteMany({ where: { accreditationId: id } });
       await tx.certificate.deleteMany({ where: { accreditationId: id } });
       await tx.accreditation.delete({ where: { id } });
+
+      const otherActive = await tx.accreditation.count({
+        where: {
+          institutionId: accreditation.institutionId,
+          status: 'active',
+          expiresAt: { gt: new Date() },
+        },
+      });
+
+      if (otherActive === 0) {
+        await tx.institution.update({
+          where: { id: accreditation.institutionId },
+          data: { isActive: false },
+        });
+      }
 
       if (accreditation.applicationId) {
         await tx.invoice.deleteMany({ where: { applicationId: accreditation.applicationId } });
@@ -612,6 +654,14 @@ export class AccreditationsService {
             ...(inst.logoUrl !== undefined && { logoUrl: inst.logoUrl || null }),
             ...(inst.isActive !== undefined && { isActive: inst.isActive }),
           },
+        });
+      }
+
+      if (data.status) {
+        const isStatusActive = data.status === 'active';
+        await tx.institution.update({
+          where: { id: accreditation.institutionId },
+          data: { isActive: isStatusActive },
         });
       }
 

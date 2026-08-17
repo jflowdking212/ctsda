@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { ConfirmDialog } from '../confirm-dialog';
 
 const MOCK_POSTS = [
   { id: '1', title: 'New Accreditation Standards for 2024', slug: 'new-standards-2024', excerpt: 'We are updating our evaluation criteria...', isPublished: true, createdAt: '2024-07-15T10:00:00Z' },
@@ -13,6 +14,44 @@ export function BlogPanel({ api }: { api: (path: string, init?: RequestInit) => 
   const [view, setView] = useState<'list' | 'editor'>('list');
   const [current, setCurrent] = useState<any>({});
   const [saving, setSaving] = useState(false);
+
+  // Custom Confirm Dialog state
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    confirmLabel: string;
+    variant: 'danger' | 'warning' | 'primary' | 'success';
+    onConfirm: () => void;
+  }>({
+    open: false,
+    title: '',
+    message: '',
+    confirmLabel: 'Confirm',
+    variant: 'danger',
+    onConfirm: () => {},
+  });
+
+  function showConfirm(opts: {
+    title: string;
+    message: string;
+    confirmLabel?: string;
+    variant?: 'danger' | 'warning' | 'primary' | 'success';
+    onConfirm: () => void;
+  }) {
+    setConfirmDialog({
+      open: true,
+      confirmLabel: opts.confirmLabel || 'Confirm',
+      variant: opts.variant || 'danger',
+      title: opts.title,
+      message: opts.message,
+      onConfirm: opts.onConfirm,
+    });
+  }
+
+  function closeConfirm() {
+    setConfirmDialog(d => ({ ...d, open: false }));
+  }
 
   useEffect(() => {
     async function fetchPosts() {
@@ -46,8 +85,17 @@ export function BlogPanel({ api }: { api: (path: string, init?: RequestInit) => 
   }
 
   async function deletePost(id: string) {
-    if (!confirm('Delete this post?')) return;
-    setPosts(posts.filter(p => p.id !== id));
+    const post = posts.find(p => p.id === id);
+    showConfirm({
+      title: 'Delete Blog Post?',
+      message: `Are you sure you want to delete "${post?.title || 'this post'}"? This action cannot be undone.`,
+      confirmLabel: 'Yes, Delete Post',
+      variant: 'danger',
+      onConfirm: () => {
+        closeConfirm();
+        setPosts(posts.filter(p => p.id !== id));
+      },
+    });
   }
 
   if (view === 'editor') {
@@ -126,6 +174,17 @@ export function BlogPanel({ api }: { api: (path: string, init?: RequestInit) => 
           </tbody>
         </table>
       </div>
+
+      {/* Custom Confirm Dialog Modal */}
+      <ConfirmDialog
+        open={confirmDialog.open}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmLabel={confirmDialog.confirmLabel}
+        variant={confirmDialog.variant}
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={closeConfirm}
+      />
     </div>
   );
 }

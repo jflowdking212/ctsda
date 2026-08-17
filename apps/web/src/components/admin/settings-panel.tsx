@@ -446,8 +446,11 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
                     type="number" 
                     min="0"
                     step="0.01"
-                    value={settings.accreditationFee || 500} 
-                    onChange={e => setSettings({...settings, accreditationFee: parseFloat(e.target.value) || 0})} 
+                    value={settings.accreditationFee !== undefined && settings.accreditationFee !== null ? settings.accreditationFee : 500} 
+                    onChange={e => {
+                      const val = parseFloat(e.target.value);
+                      setSettings({...settings, accreditationFee: isNaN(val) ? 0 : val});
+                    }} 
                     style={{ padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', width: '100%' }}
                   />
                 </div>

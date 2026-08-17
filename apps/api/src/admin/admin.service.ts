@@ -254,24 +254,40 @@ export class AdminService {
     },
   ) {
     await this.requireRole(actorId, INSTITUTION_MANAGERS);
-    return this.prisma.institution.update({
-      where: { id },
-      data: {
-        ...(data.name && { name: data.name }),
-        ...(data.registrationNumber !== undefined && { registrationNumber: data.registrationNumber }),
-        ...(data.institutionType && { institutionType: data.institutionType }),
-        ...(data.country && { country: data.country }),
-        ...(data.address && { address: data.address }),
-        ...(data.phone && { phone: data.phone }),
-        ...(data.email && { email: data.email }),
-        ...(data.website !== undefined && { website: data.website || null }),
-        ...(data.yearEstablished !== undefined && {
-          yearEstablished: data.yearEstablished ? Number(data.yearEstablished) : null,
-        }),
-        ...(data.description !== undefined && { description: data.description || null }),
-        ...(data.logoUrl !== undefined && { logoUrl: data.logoUrl || null }),
-        ...(data.isActive !== undefined && { isActive: data.isActive }),
-      },
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await tx.institution.update({
+        where: { id },
+        data: {
+          ...(data.name && { name: data.name }),
+          ...(data.registrationNumber !== undefined && { registrationNumber: data.registrationNumber }),
+          ...(data.institutionType && { institutionType: data.institutionType }),
+          ...(data.country && { country: data.country }),
+          ...(data.address && { address: data.address }),
+          ...(data.phone && { phone: data.phone }),
+          ...(data.email && { email: data.email }),
+          ...(data.website !== undefined && { website: data.website || null }),
+          ...(data.yearEstablished !== undefined && {
+            yearEstablished: data.yearEstablished ? Number(data.yearEstablished) : null,
+          }),
+          ...(data.description !== undefined && { description: data.description || null }),
+          ...(data.logoUrl !== undefined && { logoUrl: data.logoUrl || null }),
+          ...(data.isActive !== undefined && { isActive: data.isActive }),
+        },
+      });
+
+      if (data.isActive !== undefined) {
+        const accStatus = data.isActive ? 'active' : 'suspended';
+        await tx.accreditation.updateMany({
+          where: { institutionId: id },
+          data: { status: accStatus },
+        });
+        await tx.certificate.updateMany({
+          where: { accreditation: { institutionId: id } },
+          data: { status: accStatus },
+        });
+      }
+
+      return updated;
     });
   }
 

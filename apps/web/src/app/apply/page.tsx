@@ -372,7 +372,7 @@ export default function ApplyPage() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>Company Registration No/LLC/LTD/CIN etc <span style={{ color: '#ef4444' }}>*</span></label>
-                <input required value={institutionForm.registrationNumber} onChange={e => setInstitutionForm({...institutionForm, registrationNumber: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%' }} placeholder="e.g. RC-104958 / LLC-94812" />
+                <input required value={institutionForm.registrationNumber} onChange={e => setInstitutionForm({...institutionForm, registrationNumber: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%' }} placeholder="Registration No/LLC/LTD/CIN etc" />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>

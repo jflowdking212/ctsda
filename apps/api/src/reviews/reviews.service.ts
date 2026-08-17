@@ -220,7 +220,8 @@ export class ReviewsService {
           const settings = await tx.siteSetting.findMany();
           const getSetting = (key: string) => settings.find(s => s.key === key)?.value;
           const workflow = getSetting('accreditationWorkflow') || 'review_first';
-          const accreditationFee = Number(getSetting('accreditationFee')) || 500;
+          const rawFee = getSetting('accreditationFee');
+          const accreditationFee = (rawFee !== undefined && rawFee !== null && rawFee !== '') ? Number(rawFee) : 500;
 
           if ((workflow === 'review_first' || workflow === 'hybrid') && accreditationFee > 0) {
             // Post-approval invoicing

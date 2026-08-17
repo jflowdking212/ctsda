@@ -51,13 +51,14 @@ export class InstitutionsService {
   }
 
   async findPublicAccredited() {
+    const now = new Date();
     const institutions = await this.prisma.institution.findMany({
       where: {
         isActive: true,
         accreditations: {
           some: {
             status: 'active',
-            expiresAt: { gt: new Date() },
+            expiresAt: { gt: now },
           },
         },
       },
@@ -67,8 +68,17 @@ export class InstitutionsService {
         name: true,
         logoUrl: true,
         country: true,
+        registrationNumber: true,
+        institutionType: true,
+        yearEstablished: true,
+        description: true,
+        email: true,
+        phone: true,
+        website: true,
+        address: true,
       },
-      take: 50,
+      orderBy: { name: 'asc' },
+      take: 100,
     });
 
     return institutions.map((inst) => ({
@@ -78,6 +88,7 @@ export class InstitutionsService {
   }
 
   async findPublicAccreditedBySlug(slug: string) {
+    const now = new Date();
     const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(slug);
 
     const institution = await this.prisma.institution.findFirst({
@@ -87,9 +98,19 @@ export class InstitutionsService {
           ...(isUuid ? [{ id: slug }] : [])
         ],
         isActive: true,
+        accreditations: {
+          some: {
+            status: 'active',
+            expiresAt: { gt: now },
+          },
+        },
       },
       include: {
         accreditations: {
+          where: {
+            status: 'active',
+            expiresAt: { gt: now },
+          },
           orderBy: { expiresAt: 'desc' },
           take: 1,
         },

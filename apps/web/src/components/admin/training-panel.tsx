@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { ConfirmDialog } from '../confirm-dialog';
 
 const MOCK_MODULES = [
   { id: '1', title: 'Introduction to Quality Assurance', description: 'Basics of QA for institutions.', type: 'video', isPublished: true, createdAt: '2024-07-15T10:00:00Z' },
@@ -23,6 +24,44 @@ export function TrainingPanel({
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Custom Confirm Dialog state
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    confirmLabel: string;
+    variant: 'danger' | 'warning' | 'primary' | 'success';
+    onConfirm: () => void;
+  }>({
+    open: false,
+    title: '',
+    message: '',
+    confirmLabel: 'Confirm',
+    variant: 'danger',
+    onConfirm: () => {},
+  });
+
+  function showConfirm(opts: {
+    title: string;
+    message: string;
+    confirmLabel?: string;
+    variant?: 'danger' | 'warning' | 'primary' | 'success';
+    onConfirm: () => void;
+  }) {
+    setConfirmDialog({
+      open: true,
+      confirmLabel: opts.confirmLabel || 'Confirm',
+      variant: opts.variant || 'danger',
+      title: opts.title,
+      message: opts.message,
+      onConfirm: opts.onConfirm,
+    });
+  }
+
+  function closeConfirm() {
+    setConfirmDialog(d => ({ ...d, open: false }));
+  }
 
   const CATEGORY_IMAGES: Record<string, string> = {
     'Safety': '/uploads/road-safety.jpg',
@@ -144,15 +183,24 @@ export function TrainingPanel({
   }
 
   async function deleteModule(id: string) {
-    if (!confirm('Delete this training module?')) return;
-    try {
-      const res = await api(`/admin/training/${id}/delete`, { method: 'POST' });
-      if (!res.ok) throw new Error('Failed to delete');
-      setModules(modules.filter(m => m.id !== id));
-      (onSuccess || (() => {}))('Deleted', 'Training module removed.');
-    } catch (err) {
-      (onError || ((t: string) => alert(t)))('Delete failed', 'Could not remove this module.');
-    }
+    const mod = modules.find(m => m.id === id);
+    showConfirm({
+      title: 'Delete Training Module?',
+      message: `Are you sure you want to delete "${mod?.title || 'this module'}"? This action cannot be undone.`,
+      confirmLabel: 'Yes, Delete Module',
+      variant: 'danger',
+      onConfirm: async () => {
+        closeConfirm();
+        try {
+          const res = await api(`/admin/training/${id}/delete`, { method: 'POST' });
+          if (!res.ok) throw new Error('Failed to delete');
+          setModules(modules.filter(m => m.id !== id));
+          (onSuccess || (() => {}))('Deleted', 'Training module removed.');
+        } catch (err) {
+          (onError || ((t: string) => alert(t)))('Delete failed', 'Could not remove this module.');
+        }
+      },
+    });
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -311,6 +359,17 @@ export function TrainingPanel({
           </tbody>
         </table>
       </div>
+
+      {/* Custom Confirm Dialog Modal */}
+      <ConfirmDialog
+        open={confirmDialog.open}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmLabel={confirmDialog.confirmLabel}
+        variant={confirmDialog.variant}
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={closeConfirm}
+      />
     </div>
   );
 }

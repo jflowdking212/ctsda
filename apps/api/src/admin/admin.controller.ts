@@ -131,13 +131,13 @@ export class AdminController {
   }
 
   @Post('accreditations/:id/suspend')
-  async suspendAccreditation(@CurrentUser() user: any, @Param('id') id: string, @Body() body: { reason?: string }) {
-    return this.adminService.suspendAccreditation(user.userId, id, body.reason);
+  async suspendAccreditation(@CurrentUser() user: any, @Param('id') id: string, @Body() body?: { reason?: string }) {
+    return this.adminService.suspendAccreditation(user.userId, id, body?.reason);
   }
 
   @Post('accreditations/:id/reactivate')
-  async reactivateAccreditation(@CurrentUser() user: any, @Param('id') id: string, @Body() body: { reason?: string }) {
-    return this.adminService.reactivateAccreditation(user.userId, id, body.reason);
+  async reactivateAccreditation(@CurrentUser() user: any, @Param('id') id: string, @Body() body?: { reason?: string }) {
+    return this.adminService.reactivateAccreditation(user.userId, id, body?.reason);
   }
 
   @Get('users')

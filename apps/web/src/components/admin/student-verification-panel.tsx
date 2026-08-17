@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ConfirmDialog } from '../confirm-dialog';
 
 export type StudentCertificate = {
   id: string;
@@ -37,6 +38,44 @@ export default function StudentVerificationPanel({ api }: PanelProps) {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'suspended'>('all');
+
+  // Custom Confirm Dialog State
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    confirmLabel: string;
+    variant: 'danger' | 'warning' | 'primary' | 'success';
+    onConfirm: () => void;
+  }>({
+    open: false,
+    title: '',
+    message: '',
+    confirmLabel: 'Confirm',
+    variant: 'danger',
+    onConfirm: () => {},
+  });
+
+  function showConfirm(opts: {
+    title: string;
+    message: string;
+    confirmLabel?: string;
+    variant?: 'danger' | 'warning' | 'primary' | 'success';
+    onConfirm: () => void;
+  }) {
+    setConfirmDialog({
+      open: true,
+      confirmLabel: opts.confirmLabel || 'Confirm',
+      variant: opts.variant || 'danger',
+      title: opts.title,
+      message: opts.message,
+      onConfirm: opts.onConfirm,
+    });
+  }
+
+  function closeConfirm() {
+    setConfirmDialog(d => ({ ...d, open: false }));
+  }
 
   // Modal States
   const [showModal, setShowModal] = useState(false);
@@ -152,16 +191,26 @@ export default function StudentVerificationPanel({ api }: PanelProps) {
   }
 
   async function handleDelete(cert: StudentCertificate) {
-    if (!confirm(`Are you sure you want to delete certificate for "${cert.studentName}"?`)) return;
-    try {
-      const res = await fetchApi(`/students/${cert.id}/delete`, { method: 'POST' });
-      if (res.ok) {
-        setMessage(`Student Certificate deleted.`);
-        await loadData();
-      }
-    } catch {
-      setError('Failed to delete certificate.');
-    }
+    showConfirm({
+      title: 'Delete Student Certificate?',
+      message: `Are you sure you want to permanently delete the student certificate for "${cert.studentName}" (${cert.certificateNumber})? This action cannot be undone.`,
+      confirmLabel: 'Yes, Delete Certificate',
+      variant: 'danger',
+      onConfirm: async () => {
+        closeConfirm();
+        try {
+          const res = await fetchApi(`/students/${cert.id}/delete`, { method: 'POST' });
+          if (res.ok) {
+            setMessage(`Student Certificate deleted.`);
+            await loadData();
+          } else {
+            setError('Failed to delete certificate.');
+          }
+        } catch {
+          setError('Failed to delete certificate.');
+        }
+      },
+    });
   }
 
   const filteredCertificates = certificates.filter(cert => {
@@ -535,6 +584,17 @@ export default function StudentVerificationPanel({ api }: PanelProps) {
           </div>
         </div>
       )}
+
+      {/* Custom Confirm Dialog Modal */}
+      <ConfirmDialog
+        open={confirmDialog.open}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmLabel={confirmDialog.confirmLabel}
+        variant={confirmDialog.variant}
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={closeConfirm}
+      />
     </div>
   );
 }

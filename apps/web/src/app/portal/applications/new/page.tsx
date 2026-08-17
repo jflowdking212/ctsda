@@ -293,7 +293,7 @@ export default function NewApplicationPage() {
               <input
                 value={instForm.registrationNumber}
                 onChange={(e) => setInstForm({ ...instForm, registrationNumber: e.target.value })}
-                placeholder="e.g. RC-1029384, LLC-482, CIN-9821"
+                placeholder="Registration No/LLC/LTD/CIN etc"
                 required
                 disabled={loading}
               />

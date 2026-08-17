@@ -109,9 +109,9 @@ export class AccreditationsController {
   async suspend(
     @CurrentUser() user: any,
     @Param('id') id: string,
-    @Body() body: { reason?: string },
+    @Body() body?: { reason?: string },
   ) {
-    return this.accreditationsService.suspend(id, user.userId, body.reason);
+    return this.accreditationsService.suspend(id, user.userId, body?.reason);
   }
 
   @Post(':id/reactivate')
@@ -119,9 +119,9 @@ export class AccreditationsController {
   async reactivate(
     @CurrentUser() user: any,
     @Param('id') id: string,
-    @Body() body: { reason?: string },
+    @Body() body?: { reason?: string },
   ) {
-    return this.accreditationsService.reactivate(id, user.userId, body.reason);
+    return this.accreditationsService.reactivate(id, user.userId, body?.reason);
   }
 
   @Post(':id/delete')

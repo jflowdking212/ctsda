@@ -2,6 +2,242 @@
 
 import React, { useState, useEffect } from 'react';
 
+// ─── Custom CTSDA Themed Confirm Modal ─────────────────────────────────────────
+interface ConfirmDialogProps {
+  open: boolean;
+  title: string;
+  message: string;
+  confirmLabel?: string;
+  variant?: 'danger' | 'warning' | 'primary' | 'success';
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+function ConfirmDialog({
+  open,
+  title,
+  message,
+  confirmLabel = 'Confirm',
+  variant = 'primary',
+  onConfirm,
+  onCancel,
+}: ConfirmDialogProps) {
+  if (!open) return null;
+
+  const config = {
+    danger: {
+      bgIcon: '#fef2f2',
+      borderIcon: '#fee2e2',
+      iconColor: '#dc2626',
+      btnBg: '#dc2626',
+      btnHover: '#b91c1c',
+      btnColor: '#ffffff',
+      svg: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      )
+    },
+    warning: {
+      bgIcon: '#fffbeb',
+      borderIcon: '#fef3c7',
+      iconColor: '#d97706',
+      btnBg: '#d97706',
+      btnHover: '#b45309',
+      btnColor: '#ffffff',
+      svg: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      )
+    },
+    success: {
+      bgIcon: '#ecfdf5',
+      borderIcon: '#d1fae5',
+      iconColor: '#059669',
+      btnBg: '#059669',
+      btnHover: '#047857',
+      btnColor: '#ffffff',
+      svg: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      )
+    },
+    primary: {
+      bgIcon: '#eff6ff',
+      borderIcon: '#dbeafe',
+      iconColor: '#1d4ed8',
+      btnBg: '#10233f',
+      btnHover: '#1e3a8a',
+      btnColor: '#ffffff',
+      svg: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+      )
+    }
+  }[variant];
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 99999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(16, 35, 63, 0.65)',
+        backdropFilter: 'blur(6px)',
+        padding: '1.25rem',
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCancel();
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '16px',
+          boxShadow: '0 25px 50px -12px rgba(16, 35, 63, 0.25), 0 0 0 1px rgba(16, 35, 63, 0.08)',
+          width: '100%',
+          maxWidth: '460px',
+          overflow: 'hidden',
+          animation: 'ctsdaModalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+      >
+        <style>{`
+          @keyframes ctsdaModalIn {
+            from { opacity: 0; transform: scale(0.96) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+          }
+        `}</style>
+
+        {/* Modal Content */}
+        <div style={{ padding: '1.75rem 1.75rem 1.25rem 1.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+            <div
+              style={{
+                width: '46px',
+                height: '46px',
+                borderRadius: '12px',
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: config.bgIcon,
+                border: `1px solid ${config.borderIcon}`,
+              }}
+            >
+              {config.svg}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h3
+                style={{
+                  fontSize: '1.125rem',
+                  fontWeight: 700,
+                  color: '#10233f',
+                  margin: '0 0 0.5rem 0',
+                  lineHeight: 1.3,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                {title}
+              </h3>
+              <p
+                style={{
+                  fontSize: '0.885rem',
+                  color: '#5d6a7c',
+                  lineHeight: 1.55,
+                  margin: 0,
+                }}
+              >
+                {message}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Actions */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            gap: '0.75rem',
+            padding: '1rem 1.75rem 1.5rem 1.75rem',
+            backgroundColor: '#f8fafc',
+            borderTop: '1px solid #edf2f7',
+          }}
+        >
+          <button
+            type="button"
+            onClick={onCancel}
+            style={{
+              padding: '0.625rem 1.25rem',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              borderRadius: '8px',
+              border: '1px solid #dde5ee',
+              backgroundColor: '#ffffff',
+              color: '#475569',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+            }}
+            onMouseOver={(e) => {
+              (e.currentTarget as HTMLElement).style.backgroundColor = '#f1f5f9';
+              (e.currentTarget as HTMLElement).style.borderColor = '#cbd5e1';
+            }}
+            onMouseOut={(e) => {
+              (e.currentTarget as HTMLElement).style.backgroundColor = '#ffffff';
+              (e.currentTarget as HTMLElement).style.borderColor = '#dde5ee';
+            }}
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={onConfirm}
+            style={{
+              padding: '0.625rem 1.35rem',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              borderRadius: '8px',
+              border: 'none',
+              backgroundColor: config.btnBg,
+              color: config.btnColor,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            }}
+            onMouseOver={(e) => {
+              (e.currentTarget as HTMLElement).style.backgroundColor = config.btnHover;
+            }}
+            onMouseOut={(e) => {
+              (e.currentTarget as HTMLElement).style.backgroundColor = config.btnBg;
+            }}
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 interface Accreditation {
   id: string;
   accreditationCode: string;
@@ -51,6 +287,43 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'suspended' | 'expired'>('all');
   const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
+
+  // Custom confirm dialog state
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    confirmLabel: string;
+    variant: 'danger' | 'warning' | 'primary' | 'success';
+    onConfirm: () => void;
+  }>({
+    open: false,
+    title: '',
+    message: '',
+    confirmLabel: 'Confirm',
+    variant: 'primary',
+    onConfirm: () => {},
+  });
+
+  function showConfirm(opts: {
+    title: string;
+    message: string;
+    confirmLabel?: string;
+    variant?: 'danger' | 'warning' | 'primary' | 'success';
+    onConfirm: () => void;
+  }) {
+    setConfirmDialog({
+      open: true,
+      confirmLabel: opts.confirmLabel || 'Confirm',
+      variant: opts.variant || 'primary',
+      title: opts.title,
+      message: opts.message,
+      onConfirm: opts.onConfirm,
+    });
+  }
+  function closeConfirm() {
+    setConfirmDialog(d => ({ ...d, open: false }));
+  }
 
   const initialManualForm = {
     firstName: '',
@@ -303,38 +576,62 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
 
   async function handleToggleStatus(acc: Accreditation) {
     const action = acc.status === 'active' ? 'suspend' : 'reactivate';
-    const nextStatus = acc.status === 'active' ? 'suspended' : 'active';
-    try {
-      const res = await api(`/accreditations/${acc.id}/${action}`, { method: 'POST' });
-      if (res.ok) {
-        setMessage(`Accreditation ${action}ed successfully.`);
-        await loadAccreditations();
-      } else {
+    const isSuspend = action === 'suspend';
+    showConfirm({
+      title: isSuspend ? 'Suspend Accreditation?' : 'Reactivate Accreditation?',
+      message: isSuspend
+        ? `This will suspend the accreditation for "${acc.institution.name}" and immediately hide them from the public directory and homepage slider.`
+        : `This will reactivate the accreditation for "${acc.institution.name}" and restore their profile on the public directory and homepage slider.`,
+      confirmLabel: isSuspend ? 'Yes, Suspend' : 'Yes, Reactivate',
+      variant: isSuspend ? 'warning' : 'success',
+      onConfirm: async () => {
+        closeConfirm();
+        const nextStatus = isSuspend ? 'suspended' : 'active';
         setAccreditations(prev => prev.map(a => a.id === acc.id ? { ...a, status: nextStatus } : a));
-        setMessage(`Accreditation ${action}ed successfully.`);
-      }
-    } catch {
-      setAccreditations(prev => prev.map(a => a.id === acc.id ? { ...a, status: nextStatus } : a));
-      setMessage(`Accreditation ${action}ed successfully.`);
-    }
+        try {
+          const res = await api(`/accreditations/${acc.id}/${action}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: isSuspend ? 'Suspended by admin' : 'Reactivated by admin' }),
+          });
+          if (res.ok) {
+            setMessage(`Accreditation ${isSuspend ? 'suspended' : 'reactivated'} successfully.`);
+            await loadAccreditations();
+          } else {
+            const body = await res.json().catch(() => ({}));
+            setError(`Failed to ${action}: ${body?.message || res.statusText || 'Unknown error'}`);
+            await loadAccreditations();
+          }
+        } catch (err: any) {
+          setError(`Failed to ${action}: ${err?.message || 'Network error'}`);
+          await loadAccreditations();
+        }
+      },
+    });
   }
 
   async function handleDelete(acc: Accreditation) {
-    if (!confirm(`Are you sure you want to delete accreditation for "${acc.institution.name}"? This action cannot be undone.`)) return;
-
-    try {
-      const res = await api(`/accreditations/${acc.id}/delete`, { method: 'POST' });
-      if (res.ok) {
-        setMessage(`Accreditation deleted.`);
-        await loadAccreditations();
-      } else {
-        setAccreditations(prev => prev.filter(a => a.id !== acc.id));
-        setMessage(`Accreditation deleted.`);
-      }
-    } catch {
-      setAccreditations(prev => prev.filter(a => a.id !== acc.id));
-      setMessage(`Accreditation deleted.`);
-    }
+    showConfirm({
+      title: 'Delete Accreditation?',
+      message: `You are about to permanently delete the accreditation record for "${acc.institution.name}". This action cannot be undone.`,
+      confirmLabel: 'Yes, Delete Record',
+      variant: 'danger',
+      onConfirm: async () => {
+        closeConfirm();
+        try {
+          const res = await api(`/accreditations/${acc.id}/delete`, { method: 'POST' });
+          if (res.ok) {
+            setMessage('Accreditation deleted successfully.');
+            await loadAccreditations();
+          } else {
+            const body = await res.json().catch(() => ({}));
+            setError(`Failed to delete: ${body?.message || res.statusText || 'Unknown error'}`);
+          }
+        } catch (err: any) {
+          setError(`Failed to delete: ${err?.message || 'Network error'}`);
+        }
+      },
+    });
   }
 
   async function handleUploadCert(e: React.FormEvent) {
@@ -1008,35 +1305,55 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
                               type="button"
                               onClick={() => handleToggleStatus(acc)}
                               style={{
-                                padding: '0.375rem 0.625rem',
+                                padding: '0.4rem 0.75rem',
                                 fontSize: '0.785rem',
-                                fontWeight: 500,
+                                fontWeight: 600,
                                 borderRadius: '6px',
-                                border: '1px solid #cbd5e1',
-                                backgroundColor: '#ffffff',
-                                color: '#334155',
+                                border: acc.status === 'active' ? '1px solid #fde68a' : '1px solid #a7f3d0',
+                                backgroundColor: acc.status === 'active' ? '#fffbeb' : '#ecfdf5',
+                                color: acc.status === 'active' ? '#b45309' : '#047857',
                                 cursor: 'pointer',
                                 transition: 'all 0.15s ease',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.3rem',
+                              }}
+                              onMouseOver={(e) => {
+                                (e.currentTarget as HTMLElement).style.backgroundColor =
+                                  acc.status === 'active' ? '#fef3c7' : '#d1fae5';
+                              }}
+                              onMouseOut={(e) => {
+                                (e.currentTarget as HTMLElement).style.backgroundColor =
+                                  acc.status === 'active' ? '#fffbeb' : '#ecfdf5';
                               }}
                             >
-                              {acc.status === 'active' ? 'Suspend' : 'Reactivate'}
+                              {acc.status === 'active' ? '⏸️ Suspend' : '▶️ Reactivate'}
                             </button>
                             <button
                               type="button"
                               onClick={() => handleDelete(acc)}
                               style={{
-                                padding: '0.375rem 0.625rem',
+                                padding: '0.4rem 0.75rem',
                                 fontSize: '0.785rem',
-                                fontWeight: 500,
+                                fontWeight: 600,
                                 borderRadius: '6px',
-                                border: '1px solid #fca5a5',
-                                backgroundColor: '#fff5f5',
-                                color: '#b91c1c',
+                                border: '1px solid #fecaca',
+                                backgroundColor: '#fef2f2',
+                                color: '#dc2626',
                                 cursor: 'pointer',
                                 transition: 'all 0.15s ease',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.3rem',
+                              }}
+                              onMouseOver={(e) => {
+                                (e.currentTarget as HTMLElement).style.backgroundColor = '#fee2e2';
+                              }}
+                              onMouseOut={(e) => {
+                                (e.currentTarget as HTMLElement).style.backgroundColor = '#fef2f2';
                               }}
                             >
-                              Delete
+                              🗑️ Delete
                             </button>
                           </div>
                         </td>
@@ -1218,7 +1535,7 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
                       type="text"
                       value={manualForm.registrationNumber}
                       onChange={(e) => setManualForm({ ...manualForm, registrationNumber: e.target.value })}
-                      placeholder="e.g. RC-849201 / LLC-94812"
+                      placeholder="Registration No/LLC/LTD/CIN etc"
                       style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
                     />
                   </div>
@@ -2085,6 +2402,17 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
           </div>
         </div>
       )}
+
+      {/* Custom Confirm Dialog Modal */}
+      <ConfirmDialog
+        open={confirmDialog.open}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmLabel={confirmDialog.confirmLabel}
+        variant={confirmDialog.variant}
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={closeConfirm}
+      />
     </div>
   );
 }
