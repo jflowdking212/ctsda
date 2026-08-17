@@ -158,6 +158,29 @@ export class TrainingService {
       throw new NotFoundException('Training not found');
     }
 
+    // Check if an enrollment with this email already exists for this training module
+    const existingUser = await this.prisma.user.findUnique({ where: { email: userEmail } });
+    if (existingUser) {
+      const existingEnrollment = await this.prisma.trainingEnrollment.findUnique({
+        where: {
+          userId_trainingId: {
+            userId: existingUser.id,
+            trainingId: training.id,
+          }
+        }
+      });
+      if (existingEnrollment) {
+        throw new BadRequestException(`An enrollment with this email (${userEmail}) already exists for this training module.`);
+      }
+    }
+
+    // Check if a registration request was already submitted with this email for this training
+    const regKey = `reg:training:${training.id}:${userEmail}`;
+    const recentSubmission = await this.redis.get(regKey);
+    if (recentSubmission) {
+      throw new BadRequestException(`A registration request for this training module already exists for ${userEmail}. Please check your inbox or wait for an admin to contact you.`);
+    }
+
     const adminEmail = 'ctsdausa@gmail.com';
     const subject = `New Training Enrollment Request: ${training.title}`;
     const html = `
@@ -195,6 +218,9 @@ export class TrainingService {
       html,
       userId: userId || 'system',
     });
+
+    // Record submission for 24 hours to prevent spam duplicates
+    await this.redis.set(regKey, '1', 'EX', 86400);
 
     return { 
       success: true, 
