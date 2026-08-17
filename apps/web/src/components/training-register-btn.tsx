@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 export function TrainingRegisterBtn({
   trainingId,
@@ -23,8 +23,6 @@ export function TrainingRegisterBtn({
   const [captchaQuestion, setCaptchaQuestion] = useState('');
   const [captchaAnswer, setCaptchaAnswer] = useState('');
   const [loadingCaptcha, setLoadingCaptcha] = useState(false);
-  const [honeypot, setHoneypot] = useState('');
-  const [formLoadedAt, setFormLoadedAt] = useState<number>(0);
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -41,7 +39,7 @@ export function TrainingRegisterBtn({
         }
       }
     } catch {
-      // Fallback if needed
+      // Fallback
     } finally {
       setLoadingCaptcha(false);
     }
@@ -50,7 +48,6 @@ export function TrainingRegisterBtn({
   function handleOpenForm() {
     setShowForm(true);
     setError('');
-    setFormLoadedAt(Date.now());
     void fetchCaptcha();
   }
 
@@ -69,7 +66,7 @@ export function TrainingRegisterBtn({
       return;
     }
     if (!captchaAnswer.trim()) {
-      setError('Please complete the security math question.');
+      setError('Please solve the math verification question.');
       return;
     }
 
@@ -85,8 +82,6 @@ export function TrainingRegisterBtn({
           email: email.trim(),
           captchaId,
           captchaAnswer: captchaAnswer.trim(),
-          honeypot: honeypot.trim(),
-          clientTime: formLoadedAt,
         }),
       });
 
@@ -145,20 +140,6 @@ export function TrainingRegisterBtn({
             padding: '0.875rem',
           }}
         >
-          {/* Honeypot field (hidden from human users, traps spam bots) */}
-          <div style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, overflow: 'hidden' }} aria-hidden="true">
-            <label htmlFor={`hp_${trainingId}`}>Leave this empty</label>
-            <input
-              id={`hp_${trainingId}`}
-              type="text"
-              name="company_url_hp"
-              tabIndex={-1}
-              autoComplete="off"
-              value={honeypot}
-              onChange={(e) => setHoneypot(e.target.value)}
-            />
-          </div>
-
           <div>
             <label style={{ display: 'block', fontSize: '0.785rem', fontWeight: 600, color: '#334155', marginBottom: '0.25rem' }}>
               Full Name <span style={{ color: '#dc2626' }}>*</span>

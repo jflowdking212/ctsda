@@ -103,21 +103,11 @@ export class TrainingService {
     name: string | null = null,
     captchaId?: string,
     captchaAnswer?: string,
-    honeypot?: string,
-    clientTime?: number,
+    _honeypot?: string,
+    _clientTime?: number,
     clientIp?: string,
   ) {
-    // 1. Honeypot check (Automated spam bots fill hidden inputs)
-    if (honeypot && honeypot.trim().length > 0) {
-      throw new BadRequestException('Spam submission detected');
-    }
-
-    // 2. Submission time check (Automated scripts submit instantly in < 1 second)
-    if (clientTime && Date.now() - clientTime < 1200) {
-      throw new BadRequestException('Form submitted too fast. Please take a moment to review and try again.');
-    }
-
-    // 3. Name & Email validation
+    // 1. Name & Email validation
     const userName = (name || '').trim();
     const userEmail = (email || '').trim().toLowerCase();
     if (!userName || userName.length < 2) {
@@ -128,7 +118,7 @@ export class TrainingService {
       throw new BadRequestException('Please provide a valid email address.');
     }
 
-    // 4. IP Rate Limiting (max 6 registration requests per 10 minutes per IP)
+    // 2. IP Rate Limiting (max 10 registration requests per 10 minutes per IP)
     if (clientIp) {
       const cleanIp = String(clientIp).split(',')[0].trim();
       const ipKey = `ratelimit:training_reg:${cleanIp}`;
@@ -136,12 +126,12 @@ export class TrainingService {
       if (count === 1) {
         await this.redis.expire(ipKey, 600); // 10 minutes
       }
-      if (count > 6) {
+      if (count > 10) {
         throw new BadRequestException('Too many registration requests from this network. Please wait a few minutes before trying again.');
       }
     }
 
-    // 5. Captcha Verification (Required for all guest / unauthenticated requests)
+    // 3. Captcha Verification (Required for all guest / unauthenticated requests)
     if (!userId) {
       if (!captchaId || !captchaAnswer || !captchaAnswer.trim()) {
         throw new BadRequestException('Security verification is required. Please solve the math challenge.');
