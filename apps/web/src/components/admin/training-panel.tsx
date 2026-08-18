@@ -203,27 +203,41 @@ export function TrainingPanel({
     });
   }
 
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    if (!e.target.files || !e.target.files[0]) return;
-    const file = e.target.files[0];
-    setUploading(true);
-    
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    try {
-      const res = await api('/admin/upload', {
-        method: 'POST',
-        body: formData
-      });
-      if (!res.ok) throw new Error('Upload failed');
-      const data = await res.json();
-      setCurrent({ ...current, imageUrl: data.url });
-    } catch (err) {
-      console.error(err);
-      (onError || ((t: string) => alert(t)))('Upload failed', 'Could not upload the image. Try again.');
-    } finally {
-      setUploading(false);
+  function handleImageFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploading(true);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1200;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressed = canvas.toDataURL('image/jpeg', 0.85);
+            setCurrent((prev: any) => ({ ...prev, imageUrl: compressed }));
+          }
+          setUploading(false);
+        };
+        img.onerror = () => setUploading(false);
+        img.src = event.target?.result as string;
+      };
+      reader.readAsDataURL(file);
     }
   }
 
@@ -240,8 +254,8 @@ export function TrainingPanel({
         <form onSubmit={saveModule} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginTop: '1.5rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Title</label>
-              <input className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} required value={current.title || ''} onChange={e => setCurrent({...current, title: e.target.value})} />
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Title *</label>
+              <input className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} required value={current.title || ''} onChange={e => setCurrent({...current, title: e.target.value})} placeholder="e.g. Defensive Driving Fundamentals" />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Category</label>
@@ -256,39 +270,107 @@ export function TrainingPanel({
             </div>
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Description</label>
-            <textarea style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', minHeight: '100px' }} required value={current.description || ''} onChange={e => setCurrent({...current, description: e.target.value})} />
+            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Description *</label>
+            <textarea style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', minHeight: '100px' }} required value={current.description || ''} onChange={e => setCurrent({...current, description: e.target.value})} placeholder="Detailed course description..." />
           </div>
+
+          {/* PICTURE / IMAGE SELECTION & UPLOAD */}
+          <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+            <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem' }}>
+              🖼️ Training Cover Picture
+            </label>
+            
+            <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+              {/* Image Preview Box */}
+              <div style={{ width: '180px', height: '110px', borderRadius: '0.5rem', border: '2px dashed #cbd5e1', background: '#ffffff', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {current.imageUrl ? (
+                  <img src={getValidImageUrl(current.imageUrl, current.category, current.title)} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8', textAlign: 'center', padding: '0.5rem' }}>No image selected (Category default will be used)</span>
+                )}
+              </div>
+
+              {/* Upload & Options */}
+              <div style={{ flex: 1, minWidth: '240px', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <label style={{ backgroundColor: '#2563eb', color: '#ffffff', padding: '0.5rem 1rem', borderRadius: '0.375rem', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                    📁 {uploading ? 'Processing...' : 'Upload Image File'}
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageFileSelect} disabled={uploading} />
+                  </label>
+                  {current.imageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setCurrent({ ...current, imageUrl: '' })}
+                      style={{ background: '#fee2e2', color: '#b91c1c', border: 'none', padding: '0.5rem 0.85rem', borderRadius: '0.375rem', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}
+                    >
+                      Reset to Default
+                    </button>
+                  )}
+                </div>
+
+                {/* Preset Suggestions */}
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, display: 'block', marginBottom: '0.3rem' }}>Or pick a standard preset:</span>
+                  <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+                    {[
+                      { label: '🚗 Road Safety', url: '/uploads/road-safety.jpg' },
+                      { label: '👨‍🏫 Instructor', url: '/uploads/instructor-training.jpg' },
+                      { label: '📋 Compliance', url: '/uploads/compliance-training.jpg' },
+                      { label: '🔍 Inspection', url: '/uploads/vehicle-inspection.jpg' },
+                      { label: '🩹 First Aid', url: '/uploads/first-aid.jpg' },
+                      { label: '🏎️ Adv. Driving', url: '/uploads/advanced-driving.jpg' },
+                    ].map(preset => (
+                      <button
+                        key={preset.url}
+                        type="button"
+                        onClick={() => setCurrent({ ...current, imageUrl: preset.url })}
+                        style={{
+                          background: current.imageUrl === preset.url ? '#eff6ff' : '#ffffff',
+                          border: current.imageUrl === preset.url ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
+                          color: current.imageUrl === preset.url ? '#1d4ed8' : '#334155',
+                          borderRadius: '0.3rem',
+                          padding: '0.25rem 0.5rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom URL Option */}
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Or enter custom image URL (https://...)"
+                    value={current.imageUrl?.startsWith('data:') ? '' : (current.imageUrl || '')}
+                    onChange={e => setCurrent({ ...current, imageUrl: e.target.value })}
+                    style={{ width: '100%', padding: '0.45rem 0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', fontSize: '0.8rem', background: '#ffffff' }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Image URL</label>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <input type="url" className="admin-input" style={{ flex: 1, padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.imageUrl || ''} onChange={e => setCurrent({...current, imageUrl: e.target.value})} placeholder="https://" />
-                <label className="admin-button" style={{ cursor: 'pointer', padding: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {uploading ? '...' : 'Upload'}
-                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} disabled={uploading} />
-                </label>
-              </div>
-              {current.imageUrl && (
-                <img src={getValidImageUrl(current.imageUrl) || ''} alt="Preview" style={{ marginTop: '0.5rem', height: '100px', objectFit: 'cover', borderRadius: '0.375rem' }} />
-              )}
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Resource URL</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Resource / PDF URL</label>
               <input type="text" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.resourceUrl || ''} onChange={e => setCurrent({...current, resourceUrl: e.target.value})} placeholder="https://" />
             </div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Video URL</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Video URL (YouTube/Vimeo)</label>
               <input type="text" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.videoUrl || ''} onChange={e => setCurrent({...current, videoUrl: e.target.value})} placeholder="https://" />
             </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Duration</label>
               <input type="text" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.durationMinutes || current.duration || ''} onChange={e => setCurrent({...current, duration: e.target.value})} placeholder="e.g. 45 mins" />
             </div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Price ($)</label>
               <input type="number" step="0.01" className="admin-input" style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} required value={current.price || 0} onChange={e => setCurrent({...current, price: e.target.value})} />

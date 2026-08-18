@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
-const navItems = [
+const baseNavItems = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
   { href: '/services', label: 'Services' },
@@ -13,8 +13,36 @@ const navItems = [
   { href: '/contact', label: 'Contact' },
 ];
 
-export function PremiumHeader() {
+export function PremiumHeader({ settings: initialSettings }: { settings?: Record<string, any> }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showDirectory, setShowDirectory] = useState<boolean>(() => {
+    if (initialSettings?.showDirectory !== undefined) {
+      return initialSettings.showDirectory !== 'false' && initialSettings.showDirectory !== false;
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadSettings() {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const res = await fetch(`${apiUrl}/settings/public`, { cache: 'no-store' }).catch(() => null);
+        if (res && res.ok) {
+          const data = await res.json().catch(() => null);
+          if (isMounted && data) {
+            setShowDirectory(data.showDirectory !== 'false' && data.showDirectory !== false);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load settings in header', err);
+      }
+    }
+    loadSettings();
+    return () => { isMounted = false; };
+  }, []);
+
+  const navItems = baseNavItems.filter(item => item.href !== '/directory' || showDirectory);
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {

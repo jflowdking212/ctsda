@@ -2,26 +2,52 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { PublicPage } from '../../components/public-shell';
 
 export default function DirectoryPage() {
+  const router = useRouter();
   const [institutions, setInstitutions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('All');
+  const [isAllowed, setIsAllowed] = useState<boolean | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     async function fetchDirectory() {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
+        // 1. Check if public directory is enabled
+        const settingsRes = await fetch(`${apiUrl}/settings/public`, { cache: 'no-store' }).catch(() => null);
+        if (settingsRes && settingsRes.ok) {
+          const settings = await settingsRes.json().catch(() => ({}));
+          const enabled = settings.showDirectory !== 'false' && settings.showDirectory !== false;
+          if (!enabled) {
+            if (isMounted) {
+              setIsAllowed(false);
+              setLoading(false);
+            }
+            router.replace('/');
+            return;
+          }
+        }
+
+        if (isMounted) setIsAllowed(true);
+
+        // 2. Fetch accredited institutions
         const res = await fetch(`${apiUrl}/institutions/public-accredited`, { cache: 'no-store' });
-        if (res.ok) setInstitutions(await res.json());
+        if (res.ok && isMounted) setInstitutions(await res.json());
       } catch (err) {
         console.error('Failed to load directory', err);
-      } finally { setLoading(false); }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
     }
     fetchDirectory();
-  }, []);
+    return () => { isMounted = false; };
+  }, [router]);
 
   const countries = ['All', ...Array.from(new Set(institutions.map(i => i.country).filter(Boolean)))].sort();
 
@@ -42,6 +68,27 @@ export default function DirectoryPage() {
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
     const clean = url.replace(/^\/?(uploads\/)?/, '');
     return `${apiUrl}/uploads/${clean}`;
+  }
+
+  if (isAllowed === false) {
+    return (
+      <PublicPage>
+        <main style={{ backgroundColor: '#f8fafc', minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem 1.5rem', textAlign: 'center' }}>
+          <div>
+            <div style={{ width: '64px', height: '64px', background: '#eff6ff', borderRadius: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+              <svg style={{ width: '32px', height: '32px', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m0 0v2m0-2h2m-2 0H10m11-3.5a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#10233f', marginBottom: '0.5rem' }}>Directory Unavailable</h1>
+            <p style={{ color: '#5d6a7c', marginBottom: '1.5rem' }}>The public directory is currently private. Redirecting to home...</p>
+            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: '#2563eb', color: '#fff', padding: '0.75rem 1.5rem', borderRadius: '0.6rem', fontWeight: 700, textDecoration: 'none' }}>
+              Return to Home
+            </Link>
+          </div>
+        </main>
+      </PublicPage>
+    );
   }
 
   return (

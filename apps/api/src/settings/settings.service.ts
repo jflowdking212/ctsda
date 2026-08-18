@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 
 const DEFAULT_PAGE_SETTINGS: Record<string, string> = {
+  showDirectory: 'true',
   homeHeroBadge: 'Official International Accreditation Body',
   homeHeroTitle: 'Council For Training Skills & Development America (CTSDA)',
   homeHeroSubtitle: 'Empowering global education and workforce training providers with rigorous quality standards, international recognition, and 100% verifiable digital credentials.',

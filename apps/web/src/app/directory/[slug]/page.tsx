@@ -10,14 +10,24 @@ export default function InstitutionPage() {
   const [institution, setInstitution] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [showDirectory, setShowDirectory] = useState<boolean>(true);
 
   useEffect(() => {
     if (!slug) return;
     (async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-        const res = await fetch(`${apiUrl}/institutions/public-accredited/${slug}`, { cache: 'no-store' });
-        setInstitution(res.ok ? await res.json() : null);
+        const [instRes, settingsRes] = await Promise.all([
+          fetch(`${apiUrl}/institutions/public-accredited/${slug}`, { cache: 'no-store' }),
+          fetch(`${apiUrl}/settings/public`, { cache: 'no-store' }).catch(() => null),
+        ]);
+        setInstitution(instRes.ok ? await instRes.json() : null);
+        if (settingsRes && settingsRes.ok) {
+          const settings = await settingsRes.json().catch(() => ({}));
+          if (settings.showDirectory === 'false' || settings.showDirectory === false) {
+            setShowDirectory(false);
+          }
+        }
       } catch { setInstitution(null); }
       finally { setLoading(false); }
     })();
@@ -94,7 +104,7 @@ export default function InstitutionPage() {
         {/* Hero Banner */}
         <section className="profile-hero-section">
           <div style={{ maxWidth: '1140px', margin: '0 auto' }}>
-            <Link href="/directory" style={{
+            <Link href={showDirectory ? "/directory" : "/"} style={{
               display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
               color: '#bfdbfe', fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none',
               marginBottom: '1rem',
@@ -102,7 +112,7 @@ export default function InstitutionPage() {
               <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              All Institutions
+              {showDirectory ? 'All Institutions' : 'Home'}
             </Link>
             <p style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#93c5fd', marginBottom: '0.4rem' }}>
               {isActive ? 'Accredited Institution' : isExpired ? 'Expired Accreditation' : 'Suspended Institution'}

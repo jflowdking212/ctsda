@@ -458,6 +458,55 @@ export function SettingsPanel({ api }: { api: (path: string, init?: RequestInit)
             </div>
           </fieldset>
 
+          {/* SECTION 6: PUBLIC DIRECTORY & FEATURE VISIBILITY */}
+          <fieldset style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.5rem', background: '#fafafa' }}>
+            <legend style={{ padding: '0 0.5rem', fontSize: '0.9rem', fontWeight: 600, color: '#2563eb' }}>🌐 Public Directory & Page Visibility</legend>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                background: '#ffffff',
+                padding: '1.25rem',
+                borderRadius: '0.5rem',
+                border: '1px solid #e2e8f0',
+                flexWrap: 'wrap',
+                gap: '1rem',
+              }}>
+                <div style={{ maxWidth: '560px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.3rem' }}>
+                    <span style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a' }}>Public Directory Page (`/directory`)</span>
+                    {settings.showDirectory !== 'false' && settings.showDirectory !== false ? (
+                      <span style={{ background: '#dcfce7', color: '#15803d', fontSize: '0.72rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '999px', textTransform: 'uppercase' }}>
+                        ● Visible to Public
+                      </span>
+                    ) : (
+                      <span style={{ background: '#fee2e2', color: '#b91c1c', fontSize: '0.72rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '999px', textTransform: 'uppercase' }}>
+                        ○ Hidden from Public
+                      </span>
+                    )}
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
+                    When enabled, the <strong>Directory</strong> link appears in the main header navigation and visitors can search all accredited institutions at <code>/directory</code>. When disabled, the menu link is hidden and direct visitors to <code>/directory</code> are redirected to the homepage, while direct institution profile links (<code>/directory/[slug]</code>) remain fully accessible.
+                  </p>
+                </div>
+
+                {/* Toggle Switch */}
+                <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', userSelect: 'none' }}>
+                  <input
+                    type="checkbox"
+                    checked={settings.showDirectory !== 'false' && settings.showDirectory !== false}
+                    onChange={e => setSettings({ ...settings, showDirectory: e.target.checked ? 'true' : 'false' })}
+                    style={{ width: '22px', height: '22px', cursor: 'pointer', accentColor: '#2563eb' }}
+                  />
+                  <span style={{ marginLeft: '0.6rem', fontSize: '0.95rem', fontWeight: 600, color: settings.showDirectory !== 'false' && settings.showDirectory !== false ? '#2563eb' : '#64748b' }}>
+                    {settings.showDirectory !== 'false' && settings.showDirectory !== false ? 'Enabled (Visible)' : 'Disabled (Hidden)'}
+                  </span>
+                </label>
+              </div>
+            </div>
+          </fieldset>
+
           <div style={{ display: 'flex', gap: '1rem', borderTop: '1px solid #e2e8f0', paddingTop: '1.5rem', justifyContent: 'flex-end' }}>
             <button 
               type="submit" 

@@ -16,6 +16,8 @@ export function DirectoryPanel({
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showDirectory, setShowDirectory] = useState<boolean>(true);
+  const [togglingVisibility, setTogglingVisibility] = useState(false);
 
   // Edit Form State
   const [editForm, setEditForm] = useState({
@@ -36,6 +38,48 @@ export function DirectoryPanel({
   React.useEffect(() => {
     setInstitutionsList(initialInstitutions || []);
   }, [initialInstitutions]);
+
+  // Load public directory visibility setting
+  React.useEffect(() => {
+    async function loadVisibility() {
+      try {
+        const res = await api('/settings');
+        if (res.ok) {
+          const s = await res.json();
+          setShowDirectory(s.showDirectory !== 'false' && s.showDirectory !== false);
+        }
+      } catch (err) {
+        console.error('Failed to load settings in directory panel', err);
+      }
+    }
+    loadVisibility();
+  }, [api]);
+
+  async function handleToggleDirectoryVisibility() {
+    setTogglingVisibility(true);
+    const newStatus = !showDirectory;
+    try {
+      const res = await api('/settings', {
+        method: 'POST',
+        body: JSON.stringify({ showDirectory: newStatus ? 'true' : 'false' }),
+      });
+      if (res.ok) {
+        setShowDirectory(newStatus);
+        setMessage({
+          type: 'success',
+          text: newStatus
+            ? '🌐 Public Directory is now VISIBLE to website visitors and added to the header navigation.'
+            : '🔒 Public Directory is now HIDDEN from the frontend. Direct institution URLs (/directory/[slug]) remain accessible.',
+        });
+      } else {
+        throw new Error('Failed to update setting');
+      }
+    } catch (err: any) {
+      setMessage({ type: 'error', text: `Failed to update directory visibility: ${err.message}` });
+    } finally {
+      setTogglingVisibility(false);
+    }
+  }
 
   // Extract unique countries
   const countries = Array.from(new Set(institutionsList.map((i) => i.country).filter(Boolean))).sort();
@@ -193,6 +237,78 @@ export function DirectoryPanel({
           {message.text}
         </div>
       )}
+
+      {/* Directory Page Visibility Banner */}
+      <div style={{
+        background: showDirectory ? '#f0fdf4' : '#fff1f2',
+        border: `1.5px solid ${showDirectory ? '#86efac' : '#fecdd3'}`,
+        borderRadius: '0.75rem',
+        padding: '1.25rem 1.5rem',
+        marginBottom: '1.5rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '1rem',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            background: showDirectory ? '#dcfce7' : '#fee2e2',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1.25rem',
+            flexShrink: 0,
+          }}>
+            {showDirectory ? '🌐' : '🔒'}
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <strong style={{ fontSize: '1rem', color: showDirectory ? '#14532d' : '#9f1239' }}>
+                Public Directory Status: {showDirectory ? 'LIVE & VISIBLE' : 'HIDDEN FROM FRONTEND'}
+              </strong>
+              <span style={{
+                background: showDirectory ? '#16a34a' : '#e11d48',
+                color: '#ffffff',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                padding: '0.15rem 0.55rem',
+                borderRadius: '999px',
+                textTransform: 'uppercase',
+              }}>
+                {showDirectory ? 'Online' : 'Hidden'}
+              </span>
+            </div>
+            <p style={{ margin: '0.2rem 0 0', fontSize: '0.825rem', color: showDirectory ? '#166534' : '#be123c', lineHeight: 1.4 }}>
+              {showDirectory
+                ? 'The Directory menu is visible on the header and visitors can search institutions at /directory.'
+                : 'The Directory menu is removed from header and /directory redirects to home. Individual profile links (/directory/[slug]) still work.'}
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleToggleDirectoryVisibility}
+          disabled={togglingVisibility}
+          style={{
+            background: showDirectory ? '#dc2626' : '#2563eb',
+            color: '#ffffff',
+            border: 'none',
+            padding: '0.65rem 1.25rem',
+            borderRadius: '0.5rem',
+            fontSize: '0.85rem',
+            fontWeight: 700,
+            cursor: togglingVisibility ? 'not-allowed' : 'pointer',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          }}
+        >
+          {togglingVisibility ? 'Updating...' : showDirectory ? '🔒 Hide Public Directory' : '🌐 Reveal Public Directory'}
+        </button>
+      </div>
 
       {/* Metrics Banner */}
       <div

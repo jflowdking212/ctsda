@@ -2,9 +2,12 @@ import { Module } from '@nestjs/common';
 import { BlogController } from './blog.controller';
 import { BlogAdminController } from './blog.admin.controller';
 import { BlogService } from './blog.service';
+import { PrismaService } from '../common/prisma.service';
 
 @Module({
   controllers: [BlogController, BlogAdminController],
-  providers: [BlogService],
+  providers: [BlogService, PrismaService],
+  exports: [BlogService],
 })
 export class BlogModule {}
+
