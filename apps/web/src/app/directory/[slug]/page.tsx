@@ -362,6 +362,25 @@ export default function InstitutionPage() {
                         <span style={{ fontSize: '0.875rem', color: '#10233f', fontWeight: 500, wordBreak: 'break-word' }}>{institution.address}{institution.country ? `, ${institution.country}` : ''}</span>
                       </div>
                     )}
+                    {(institution.facebookUrl || institution.instagramUrl || institution.linkedinUrl || institution.twitterUrl) && (
+                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', marginTop: '0.5rem', borderTop: '1px solid #f1f5f9', paddingTop: '0.85rem' }}>
+                        <span style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#5d6a7c', minWidth: '55px', paddingTop: '2px', flexShrink: 0 }}>SOCIAL</span>
+                        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                          {institution.facebookUrl && (
+                            <a href={institution.facebookUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.875rem', color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>Facebook</a>
+                          )}
+                          {institution.instagramUrl && (
+                            <a href={institution.instagramUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.875rem', color: '#db2777', fontWeight: 600, textDecoration: 'none' }}>Instagram</a>
+                          )}
+                          {institution.linkedinUrl && (
+                            <a href={institution.linkedinUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.875rem', color: '#0284c7', fontWeight: 600, textDecoration: 'none' }}>LinkedIn</a>
+                          )}
+                          {institution.twitterUrl && (
+                            <a href={institution.twitterUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.875rem', color: '#0f172a', fontWeight: 600, textDecoration: 'none' }}>X (Twitter)</a>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 

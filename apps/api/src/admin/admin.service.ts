@@ -250,6 +250,10 @@ export class AdminService {
       yearEstablished?: number | string;
       logoUrl?: string;
       description?: string;
+      facebookUrl?: string;
+      instagramUrl?: string;
+      linkedinUrl?: string;
+      twitterUrl?: string;
       isActive?: boolean;
     },
   ) {
@@ -271,6 +275,10 @@ export class AdminService {
           }),
           ...(data.description !== undefined && { description: data.description || null }),
           ...(data.logoUrl !== undefined && { logoUrl: data.logoUrl || null }),
+          ...(data.facebookUrl !== undefined && { facebookUrl: data.facebookUrl || null }),
+          ...(data.instagramUrl !== undefined && { instagramUrl: data.instagramUrl || null }),
+          ...(data.linkedinUrl !== undefined && { linkedinUrl: data.linkedinUrl || null }),
+          ...(data.twitterUrl !== undefined && { twitterUrl: data.twitterUrl || null }),
           ...(data.isActive !== undefined && { isActive: data.isActive }),
         },
       });

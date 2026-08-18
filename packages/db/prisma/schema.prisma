@@ -203,6 +203,10 @@ model Institution {
   phone              String   @db.VarChar(20)
   email              String   @db.VarChar(255)
   website            String?  @db.VarChar(500)
+  facebookUrl        String?  @db.VarChar(500)
+  instagramUrl       String?  @db.VarChar(500)
+  linkedinUrl        String?  @db.VarChar(500)
+  twitterUrl         String?  @db.VarChar(500)
   logoUrl            String?  @db.VarChar(500)
   yearEstablished    Int?
   description        String?  @db.Text

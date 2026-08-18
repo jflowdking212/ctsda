@@ -31,6 +31,10 @@ export function DirectoryPanel({
     website: '',
     yearEstablished: '',
     description: '',
+    facebookUrl: '',
+    instagramUrl: '',
+    linkedinUrl: '',
+    twitterUrl: '',
     isActive: true,
   });
 
@@ -137,6 +141,10 @@ export function DirectoryPanel({
       website: inst.website || '',
       yearEstablished: inst.yearEstablished ? String(inst.yearEstablished) : '',
       description: inst.description || '',
+      facebookUrl: inst.facebookUrl || '',
+      instagramUrl: inst.instagramUrl || '',
+      linkedinUrl: inst.linkedinUrl || '',
+      twitterUrl: inst.twitterUrl || '',
       isActive: inst.isActive ?? true,
     });
   };
@@ -164,6 +172,10 @@ export function DirectoryPanel({
         website: editForm.website,
         yearEstablished: editForm.yearEstablished ? Number(editForm.yearEstablished) : null,
         description: editForm.description,
+        facebookUrl: editForm.facebookUrl,
+        instagramUrl: editForm.instagramUrl,
+        linkedinUrl: editForm.linkedinUrl,
+        twitterUrl: editForm.twitterUrl,
         isActive: editForm.isActive,
       };
 
@@ -605,6 +617,61 @@ export function DirectoryPanel({
                       <option value="suspended">Suspended (Hidden)</option>
                     </select>
                   </div>
+                  
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <h4 style={{ fontSize: '0.875rem', fontWeight: 800, color: '#0f172a', margin: '1rem 0 0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+                      Social Media Links
+                    </h4>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Facebook URL
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://facebook.com/..."
+                      value={editForm.facebookUrl}
+                      onChange={(e) => setEditForm({ ...editForm, facebookUrl: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Instagram URL
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://instagram.com/..."
+                      value={editForm.instagramUrl}
+                      onChange={(e) => setEditForm({ ...editForm, instagramUrl: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      LinkedIn URL
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://linkedin.com/company/..."
+                      value={editForm.linkedinUrl}
+                      onChange={(e) => setEditForm({ ...editForm, linkedinUrl: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      X (Twitter) URL
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://x.com/..."
+                      value={editForm.twitterUrl}
+                      onChange={(e) => setEditForm({ ...editForm, twitterUrl: e.target.value })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
                   <div style={{ gridColumn: 'span 2' }}>
                     <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
                       Physical Headquarters Address
