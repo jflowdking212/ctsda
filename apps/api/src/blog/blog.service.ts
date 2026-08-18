@@ -32,7 +32,7 @@ export class BlogService {
   async createPost(authorId: string, data: any) {
     let validAuthorId = authorId;
     if (!validAuthorId) {
-      const admin = await this.prisma.user.findFirst({ where: { role: { in: ['super_admin', 'admin', 'content_manager'] } } });
+      const admin = await this.prisma.user.findFirst({ where: { role: { in: ['super_admin', 'content_manager'] } } });
       validAuthorId = admin?.id || '';
     }
 
