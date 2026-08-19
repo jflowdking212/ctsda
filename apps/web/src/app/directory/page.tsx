@@ -61,14 +61,20 @@ export default function DirectoryPage() {
   function getLogoUrl(url?: string | null) {
     if (!url) return null;
     if (url.startsWith('data:')) return url;
-    const _rawApi = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-    const apiUrl = (typeof window !== 'undefined' && _rawApi === 'http://localhost:4000') ? '/api' : _rawApi.replace(/\/$/, '');
-    if (url.startsWith('http://localhost:4000')) {
-      return url.replace('http://localhost:4000', apiUrl);
+    const KNOWN_HOSTS = [
+      'https://ctsda.acecoterieconsulting.com',
+      'http://ctsda.acecoterieconsulting.com',
+      'https://ctsdamerica.com',
+      'https://www.ctsdamerica.com',
+      'http://ctsdamerica.com',
+      'http://localhost:4000',
+    ];
+    for (const host of KNOWN_HOSTS) {
+      if (url.startsWith(host)) { url = url.slice(host.length); break; }
     }
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    const clean = url.replace(/^\/?(uploads\/)?/, '');
-    return `${apiUrl}/uploads/${clean}`;
+    const clean = url.replace(/^\/?api\/uploads\//, '').replace(/^\/?uploads\//, '');
+    return `/api/uploads/${clean}`;
   }
 
   if (isAllowed === false) {

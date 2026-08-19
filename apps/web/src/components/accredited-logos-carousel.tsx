@@ -53,14 +53,30 @@ export function AccreditedLogosCarousel() {
   function getLogoUrl(url?: string | null) {
     if (!url) return null;
     if (url.startsWith('data:')) return url;
-    const _rawApi = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-    const apiUrl = (typeof window !== 'undefined' && _rawApi === 'http://localhost:4000') ? '/api' : _rawApi.replace(/\/$/, '');
-    if (url.startsWith('http://localhost:4000')) {
-      return url.replace('http://localhost:4000', apiUrl);
+
+    // Strip any known CTSDA domain prefix and extract just the upload filename
+    // This ensures logos work when DB has absolute URLs from a different domain
+    const KNOWN_HOSTS = [
+      'https://ctsda.acecoterieconsulting.com',
+      'http://ctsda.acecoterieconsulting.com',
+      'https://ctsdamerica.com',
+      'https://www.ctsdamerica.com',
+      'http://ctsdamerica.com',
+      'http://localhost:4000',
+    ];
+    for (const host of KNOWN_HOSTS) {
+      if (url.startsWith(host)) {
+        url = url.slice(host.length); // strip domain → now starts with /api/uploads/... or /uploads/...
+        break;
+      }
     }
+
+    // If it's still an external URL (e.g. CDN), return as-is
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    const clean = url.replace(/^\/?(uploads\/)?/, '');
-    return `${apiUrl}/uploads/${clean}`;
+
+    // Now url is a relative path like /api/uploads/file.png or /uploads/file.png or uploads/file.png
+    const clean = url.replace(/^\/?api\/uploads\//, '').replace(/^\/?uploads\//, '');
+    return `/api/uploads/${clean}`;
   }
 
   return (
