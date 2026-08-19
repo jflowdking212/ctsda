@@ -18,6 +18,22 @@ export function BlogCard({ post }: { post: BlogPost }) {
     ? post.category.name 
     : (post.category || 'Article');
 
+  function fixImgUrl(url?: string | null): string {
+    if (!url) return '';
+    if (url.startsWith('data:')) return url;
+    const KNOWN_HOSTS = [
+      'https://ctsda.acecoterieconsulting.com', 'http://ctsda.acecoterieconsulting.com',
+      'https://ctsdamerica.com', 'https://www.ctsdamerica.com', 'http://ctsdamerica.com',
+      'http://localhost:4000',
+    ];
+    for (const host of KNOWN_HOSTS) {
+      if (url.startsWith(host)) { url = url.slice(host.length); break; }
+    }
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    const clean = url.replace(/^\/?api\/uploads\//, '').replace(/^\/?uploads\//, '');
+    return `/api/uploads/${clean}`;
+  }
+
   return (
     <article
       style={{
@@ -52,7 +68,7 @@ export function BlogCard({ post }: { post: BlogPost }) {
       >
         {post.featuredImg ? (
           <img
-            src={post.featuredImg}
+            src={fixImgUrl(post.featuredImg)}
             alt={post.title}
             style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
             onMouseOver={(e) => ((e.currentTarget as HTMLImageElement).style.transform = 'scale(1.05)')}

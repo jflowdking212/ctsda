@@ -55,6 +55,25 @@ export function BlogPanel({
     }, 4000);
   }
 
+  function fixImgUrl(url?: string | null): string {
+    if (!url) return '';
+    if (url.startsWith('data:')) return url;
+    const KNOWN_HOSTS = [
+      'https://ctsda.acecoterieconsulting.com',
+      'http://ctsda.acecoterieconsulting.com',
+      'https://ctsdamerica.com',
+      'https://www.ctsdamerica.com',
+      'http://ctsdamerica.com',
+      'http://localhost:4000',
+    ];
+    for (const host of KNOWN_HOSTS) {
+      if (url.startsWith(host)) { url = url.slice(host.length); break; }
+    }
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    const clean = url.replace(/^\/?api\/uploads\//, '').replace(/^\/?uploads\//, '');
+    return `/api/uploads/${clean}`;
+  }
+
   function showConfirm(opts: {
     title: string;
     message: string;
@@ -192,8 +211,8 @@ export function BlogPanel({
           body: JSON.stringify(payload),
         });
       } else {
-        res = await api(`/admin/blog/${current.id}`, {
-          method: 'PUT',
+        res = await api(`/admin/blog/${current.id}/update`, {
+          method: 'POST',
           body: JSON.stringify(payload),
         });
       }
@@ -224,7 +243,7 @@ export function BlogPanel({
       onConfirm: async () => {
         closeConfirm();
         try {
-          const res = await api(`/admin/blog/${id}`, { method: 'DELETE' });
+          const res = await api(`/admin/blog/${id}/delete`, { method: 'POST' });
           if (!res.ok) throw new Error('Failed to delete blog post');
           setPosts(posts.filter(p => p.id !== id));
           notify('Blog post deleted successfully.', 'success');
@@ -238,8 +257,8 @@ export function BlogPanel({
   async function togglePublish(post: any) {
     const newStatus = !post.isPublished;
     try {
-      const res = await api(`/admin/blog/${post.id}`, {
-        method: 'PUT',
+      const res = await api(`/admin/blog/${post.id}/update`, {
+        method: 'POST',
         body: JSON.stringify({ isPublished: newStatus }),
       });
       if (res.ok) {
@@ -348,7 +367,7 @@ export function BlogPanel({
               {/* Thumbnail preview */}
               <div style={{ width: '160px', height: '100px', borderRadius: '0.5rem', border: '2px dashed #cbd5e1', background: '#f8fafc', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {current.featuredImg ? (
-                  <img src={current.featuredImg} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={fixImgUrl(current.featuredImg)} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   <span style={{ fontSize: '0.75rem', color: '#94a3b8', textAlign: 'center', padding: '0.5rem' }}>No image chosen</span>
                 )}
@@ -508,7 +527,7 @@ export function BlogPanel({
                   <td style={{ padding: '1rem' }}>
                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                       {p.featuredImg ? (
-                        <img src={p.featuredImg} alt="" style={{ width: '56px', height: '40px', objectFit: 'cover', borderRadius: '0.35rem', flexShrink: 0 }} />
+                        <img src={fixImgUrl(p.featuredImg)} alt="" style={{ width: '56px', height: '40px', objectFit: 'cover', borderRadius: '0.35rem', flexShrink: 0 }} />
                       ) : (
                         <div style={{ width: '56px', height: '40px', background: '#f1f5f9', borderRadius: '0.35rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '1.2rem', flexShrink: 0 }}>📰</div>
                       )}

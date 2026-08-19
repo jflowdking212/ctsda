@@ -43,6 +43,23 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     day: 'numeric',
   });
 
+  const KNOWN_HOSTS = [
+    'https://ctsda.acecoterieconsulting.com', 'http://ctsda.acecoterieconsulting.com',
+    'https://ctsdamerica.com', 'https://www.ctsdamerica.com', 'http://ctsdamerica.com',
+    'http://localhost:4000',
+  ];
+  function fixImgUrl(url?: string | null): string {
+    if (!url) return '';
+    if (url.startsWith('data:')) return url;
+    let u = url;
+    for (const host of KNOWN_HOSTS) {
+      if (u.startsWith(host)) { u = u.slice(host.length); break; }
+    }
+    if (u.startsWith('http://') || u.startsWith('https://')) return u;
+    const clean = u.replace(/^\/?api\/uploads\//, '').replace(/^\/?uploads\//, '');
+    return `/api/uploads/${clean}`;
+  }
+
   return (
     <PublicPage>
       <main style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}>
@@ -86,7 +103,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {post.featuredImg && (
               <div style={{ height: '420px', overflow: 'hidden' }}>
                 <img
-                  src={post.featuredImg}
+                  src={fixImgUrl(post.featuredImg)}
                   alt={post.title}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
