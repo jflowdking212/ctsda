@@ -1,5 +1,6 @@
 import { PublicPage } from '../../components/public-shell';
 import { BlogCard } from '../../components/blog-card';
+import Link from 'next/link';
 
 export const metadata = {
   title: 'Blog & Insights | CTSDA',
@@ -28,13 +29,25 @@ async function getSettings() {
   }
 }
 
-export default async function BlogPage() {
+export default async function BlogPage({ searchParams }: { searchParams?: any }) {
+  const resolvedParams = searchParams ? await Promise.resolve(searchParams) : {};
+  const selectedCategory = resolvedParams.category;
+
   const [posts, settings] = await Promise.all([
     getPosts(),
     getSettings(),
   ]);
 
   const heroSubtitle = settings.blogHeroSubtitle || 'Discover articles, research papers, and policy announcements from international accreditation leaders.';
+
+  const categories = [...new Set(posts.map((p: any) => p.category?.name || (typeof p.category === 'string' ? p.category : null)).filter(Boolean))] as string[];
+
+  const filteredPosts = selectedCategory
+    ? posts.filter((p: any) => {
+        const cat = p.category?.name || (typeof p.category === 'string' ? p.category : '');
+        return cat === selectedCategory;
+      })
+    : posts;
 
   return (
     <PublicPage>
@@ -95,8 +108,56 @@ export default async function BlogPage() {
         </section>
 
         {/* Content */}
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '4rem 1.5rem 0' }}>
-          {posts.length === 0 ? (
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3.5rem 1.5rem 0' }}>
+          {/* Category Filter Pills */}
+          {categories.length > 0 && (
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '2.5rem' }}>
+              <Link
+                href="/blog"
+                style={{
+                  padding: '0.5rem 1.25rem',
+                  borderRadius: '999px',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  backgroundColor: !selectedCategory ? '#2563eb' : '#ffffff',
+                  color: !selectedCategory ? '#ffffff' : '#475569',
+                  border: '1px solid',
+                  borderColor: !selectedCategory ? '#2563eb' : '#e2e8f0',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                  transition: 'all 0.2s',
+                }}
+              >
+                All Articles
+              </Link>
+              {categories.map((cat: string) => {
+                const isActive = selectedCategory === cat;
+                return (
+                  <Link
+                    key={cat}
+                    href={`/blog?category=${encodeURIComponent(cat)}`}
+                    style={{
+                      padding: '0.5rem 1.25rem',
+                      borderRadius: '999px',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      backgroundColor: isActive ? '#2563eb' : '#ffffff',
+                      color: isActive ? '#ffffff' : '#475569',
+                      border: '1px solid',
+                      borderColor: isActive ? '#2563eb' : '#e2e8f0',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    {cat}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+
+          {filteredPosts.length === 0 ? (
             <div
               style={{
                 textAlign: 'center',
@@ -109,7 +170,7 @@ export default async function BlogPage() {
             >
               <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>📰</div>
               <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem' }}>
-                No posts published yet
+                {selectedCategory ? `No articles in "${selectedCategory}" yet` : 'No posts published yet'}
               </h2>
               <p style={{ color: '#64748b', maxWidth: '400px', margin: '0 auto' }}>
                 Check back soon for the latest news, regulatory updates, and educational insights from CTSDA.
@@ -123,7 +184,7 @@ export default async function BlogPage() {
                 gap: '2rem',
               }}
             >
-              {posts.map((post: any) => (
+              {filteredPosts.map((post: any) => (
                 <BlogCard key={post.id} post={post} />
               ))}
             </div>

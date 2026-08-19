@@ -21,12 +21,12 @@ async function getTraining() {
 }
 
 const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
-  'Road Safety': { bg: '#fee2e2', text: '#991b1b' },
-  'Instructor Training': { bg: '#dbeafe', text: '#1e40af' },
-  'Compliance': { bg: '#ede9fe', text: '#5b21b6' },
-  'Vehicle Inspection': { bg: '#fef3c7', text: '#92400e' },
-  'First Aid': { bg: '#fce7f3', text: '#9d174d' },
-  'Advanced Driving': { bg: '#d1fae5', text: '#065f46' },
+  'Business And Professional Development': { bg: '#dbeafe', text: '#1e40af' },
+  'Technology and Digital Skills': { bg: '#e0e7ff', text: '#3730a3' },
+  'Health Safety and Compliance': { bg: '#fee2e2', text: '#991b1b' },
+  'Personal Growth and Soft Skill': { bg: '#fef3c7', text: '#92400e' },
+  'Caregiving, Health and Social Care': { bg: '#fce7f3', text: '#9d174d' },
+  'Training, Skills and Development': { bg: '#d1fae5', text: '#065f46' },
 };
 
 const DEFAULT_COLOR = { bg: '#f1f5f9', text: '#475569' };
@@ -43,15 +43,12 @@ async function getSettings() {
 }
 
 const CATEGORY_IMAGES: Record<string, string> = {
-  'Safety': '/uploads/road-safety.jpg',
-  'Road Safety': '/uploads/road-safety.jpg',
-  'Professional Development': '/uploads/instructor-training.jpg',
-  'Instructor Training': '/uploads/instructor-training.jpg',
-  'Compliance': '/uploads/compliance-training.jpg',
-  'Compliance & Regulations': '/uploads/compliance-training.jpg',
-  'Vehicle Inspection': '/uploads/vehicle-inspection.jpg',
-  'First Aid': '/uploads/first-aid.jpg',
-  'Advanced Driving': '/uploads/advanced-driving.jpg',
+  'Business And Professional Development': '/uploads/instructor-training.jpg',
+  'Technology and Digital Skills': '/uploads/vehicle-inspection.jpg',
+  'Health Safety and Compliance': '/uploads/compliance-training.jpg',
+  'Personal Growth and Soft Skill': '/uploads/first-aid.jpg',
+  'Caregiving, Health and Social Care': '/uploads/first-aid.jpg',
+  'Training, Skills and Development': '/uploads/road-safety.jpg',
 };
 
 function getValidImageUrl(url?: string | null, category?: string, title?: string): string {
@@ -79,18 +76,16 @@ function getValidImageUrl(url?: string | null, category?: string, title?: string
 
   if (CATEGORY_IMAGES[category || '']) {
     fallbackPath = CATEGORY_IMAGES[category || ''];
-  } else if (lowerCategory.includes('safety') || lowerTitle.includes('safety') || lowerTitle.includes('road')) {
-    fallbackPath = '/uploads/road-safety.jpg';
-  } else if (lowerCategory.includes('professional') || lowerCategory.includes('instructor') || lowerTitle.includes('instructor')) {
-    fallbackPath = '/uploads/instructor-training.jpg';
-  } else if (lowerCategory.includes('compliance') || lowerTitle.includes('compliance') || lowerTitle.includes('hazmat') || lowerTitle.includes('hazardous')) {
-    fallbackPath = '/uploads/compliance-training.jpg';
-  } else if (lowerCategory.includes('inspection') || lowerTitle.includes('inspection') || lowerTitle.includes('vehicle')) {
+  } else if (lowerCategory.includes('tech') || lowerCategory.includes('digital') || lowerTitle.includes('digital') || lowerTitle.includes('tech')) {
     fallbackPath = '/uploads/vehicle-inspection.jpg';
-  } else if (lowerCategory.includes('first aid') || lowerTitle.includes('aid') || lowerTitle.includes('first')) {
+  } else if (lowerCategory.includes('business') || lowerCategory.includes('professional') || lowerTitle.includes('business') || lowerTitle.includes('professional')) {
+    fallbackPath = '/uploads/instructor-training.jpg';
+  } else if (lowerCategory.includes('health') || lowerCategory.includes('safety') || lowerCategory.includes('compliance') || lowerTitle.includes('safety') || lowerTitle.includes('compliance')) {
+    fallbackPath = '/uploads/compliance-training.jpg';
+  } else if (lowerCategory.includes('care') || lowerCategory.includes('social') || lowerTitle.includes('care')) {
     fallbackPath = '/uploads/first-aid.jpg';
-  } else if (lowerCategory.includes('driving') || lowerTitle.includes('defensive') || lowerTitle.includes('advanced') || lowerTitle.includes('driving')) {
-    fallbackPath = '/uploads/advanced-driving.jpg';
+  } else if (lowerCategory.includes('growth') || lowerCategory.includes('soft') || lowerTitle.includes('growth') || lowerTitle.includes('skill')) {
+    fallbackPath = '/uploads/first-aid.jpg';
   } else {
     fallbackPath = '/uploads/road-safety.jpg';
   }

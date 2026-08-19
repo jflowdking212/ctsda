@@ -63,16 +63,22 @@ export function TrainingPanel({
     setConfirmDialog(d => ({ ...d, open: false }));
   }
 
+  const TRAINING_CATEGORIES = [
+    'Business And Professional Development',
+    'Technology and Digital Skills',
+    'Health Safety and Compliance',
+    'Personal Growth and Soft Skill',
+    'Caregiving, Health and Social Care',
+    'Training, Skills and Development',
+  ];
+
   const CATEGORY_IMAGES: Record<string, string> = {
-    'Safety': '/uploads/road-safety.jpg',
-    'Road Safety': '/uploads/road-safety.jpg',
-    'Professional Development': '/uploads/instructor-training.jpg',
-    'Instructor Training': '/uploads/instructor-training.jpg',
-    'Compliance': '/uploads/compliance-training.jpg',
-    'Compliance & Regulations': '/uploads/compliance-training.jpg',
-    'Vehicle Inspection': '/uploads/vehicle-inspection.jpg',
-    'First Aid': '/uploads/first-aid.jpg',
-    'Advanced Driving': '/uploads/advanced-driving.jpg',
+    'Business And Professional Development': '/uploads/instructor-training.jpg',
+    'Technology and Digital Skills': '/uploads/vehicle-inspection.jpg',
+    'Health Safety and Compliance': '/uploads/compliance-training.jpg',
+    'Personal Growth and Soft Skill': '/uploads/first-aid.jpg',
+    'Caregiving, Health and Social Care': '/uploads/first-aid.jpg',
+    'Training, Skills and Development': '/uploads/road-safety.jpg',
   };
 
   const getValidImageUrl = (url?: string | null, category?: string, title?: string) => {
@@ -83,12 +89,11 @@ export function TrainingPanel({
       } else {
         const lowerCategory = (category || '').toLowerCase();
         const lowerTitle = (title || '').toLowerCase();
-        if (lowerCategory.includes('safety') || lowerTitle.includes('safety') || lowerTitle.includes('road')) targetUrl = '/uploads/road-safety.jpg';
-        else if (lowerCategory.includes('professional') || lowerCategory.includes('instructor') || lowerTitle.includes('instructor')) targetUrl = '/uploads/instructor-training.jpg';
-        else if (lowerCategory.includes('compliance') || lowerTitle.includes('compliance') || lowerTitle.includes('hazmat') || lowerTitle.includes('hazardous')) targetUrl = '/uploads/compliance-training.jpg';
-        else if (lowerCategory.includes('inspection') || lowerTitle.includes('inspection') || lowerTitle.includes('vehicle')) targetUrl = '/uploads/vehicle-inspection.jpg';
-        else if (lowerCategory.includes('first aid') || lowerTitle.includes('aid') || lowerTitle.includes('first')) targetUrl = '/uploads/first-aid.jpg';
-        else if (lowerCategory.includes('driving') || lowerTitle.includes('defensive') || lowerTitle.includes('advanced') || lowerTitle.includes('driving')) targetUrl = '/uploads/advanced-driving.jpg';
+        if (lowerCategory.includes('tech') || lowerCategory.includes('digital') || lowerTitle.includes('digital') || lowerTitle.includes('tech')) targetUrl = '/uploads/vehicle-inspection.jpg';
+        else if (lowerCategory.includes('business') || lowerCategory.includes('professional') || lowerTitle.includes('business') || lowerTitle.includes('professional')) targetUrl = '/uploads/instructor-training.jpg';
+        else if (lowerCategory.includes('health') || lowerCategory.includes('safety') || lowerCategory.includes('compliance') || lowerTitle.includes('safety') || lowerTitle.includes('compliance')) targetUrl = '/uploads/compliance-training.jpg';
+        else if (lowerCategory.includes('care') || lowerCategory.includes('social') || lowerTitle.includes('care')) targetUrl = '/uploads/first-aid.jpg';
+        else if (lowerCategory.includes('growth') || lowerCategory.includes('soft') || lowerTitle.includes('growth') || lowerTitle.includes('skill')) targetUrl = '/uploads/first-aid.jpg';
         else targetUrl = '/uploads/road-safety.jpg';
       }
     }
@@ -127,7 +132,7 @@ export function TrainingPanel({
     fetchModules();
   }, [api, view]);
 
-  const openNew = () => { setCurrent({ isPublished: false, category: 'Road Safety', price: 0 }); setView('editor'); };
+  const openNew = () => { setCurrent({ isPublished: false, category: 'Business And Professional Development', price: 0 }); setView('editor'); };
   const openEdit = (m: any) => { setCurrent(m); setView('editor'); };
 
   async function saveModule(e: React.FormEvent) {
@@ -278,12 +283,9 @@ export function TrainingPanel({
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>Category</label>
               <select style={{ width: '100%', padding: '0.6rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem' }} value={current.category || ''} onChange={e => setCurrent({...current, category: e.target.value})}>
-                <option value="Road Safety">Road Safety</option>
-                <option value="Instructor Training">Instructor Training</option>
-                <option value="Compliance">Compliance</option>
-                <option value="Vehicle Inspection">Vehicle Inspection</option>
-                <option value="First Aid">First Aid</option>
-                <option value="Advanced Driving">Advanced Driving</option>
+                {TRAINING_CATEGORIES.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -331,12 +333,12 @@ export function TrainingPanel({
                   <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, display: 'block', marginBottom: '0.3rem' }}>Or pick a standard preset:</span>
                   <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
                     {[
-                      { label: '🚗 Road Safety', url: '/uploads/road-safety.jpg' },
-                      { label: '👨‍🏫 Instructor', url: '/uploads/instructor-training.jpg' },
-                      { label: '📋 Compliance', url: '/uploads/compliance-training.jpg' },
-                      { label: '🔍 Inspection', url: '/uploads/vehicle-inspection.jpg' },
-                      { label: '🩹 First Aid', url: '/uploads/first-aid.jpg' },
-                      { label: '🏎️ Adv. Driving', url: '/uploads/advanced-driving.jpg' },
+                      { label: '💼 Business & Pro', url: '/uploads/instructor-training.jpg' },
+                      { label: '💻 Tech & Digital', url: '/uploads/vehicle-inspection.jpg' },
+                      { label: '🛡️ Health & Safety', url: '/uploads/compliance-training.jpg' },
+                      { label: '🌱 Personal Growth', url: '/uploads/first-aid.jpg' },
+                      { label: '🏥 Caregiving', url: '/uploads/first-aid.jpg' },
+                      { label: '🎯 Training & Skills', url: '/uploads/road-safety.jpg' },
                     ].map(preset => (
                       <button
                         key={preset.url}

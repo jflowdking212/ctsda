@@ -10,9 +10,14 @@ interface BlogPost {
   featuredImg?: string;
   publishedAt?: string;
   createdAt: string;
+  category?: { name: string; slug?: string } | string | null;
 }
 
 export function BlogCard({ post }: { post: BlogPost }) {
+  const categoryName = typeof post.category === 'object' && post.category !== null 
+    ? post.category.name 
+    : (post.category || 'Article');
+
   return (
     <article
       style={{
@@ -85,16 +90,18 @@ export function BlogCard({ post }: { post: BlogPost }) {
             position: 'absolute',
             top: '1rem',
             left: '1rem',
-            background: 'white',
-            padding: '0.25rem 0.75rem',
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(4px)',
+            padding: '0.3rem 0.85rem',
             borderRadius: '999px',
             fontSize: '0.75rem',
-            fontWeight: 600,
-            color: '#0f172a',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            fontWeight: 700,
+            color: '#1e40af',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+            border: '1px solid rgba(226, 232, 240, 0.8)',
           }}
         >
-          Article
+          {categoryName}
         </div>
       </div>
 

@@ -9,14 +9,20 @@ export class BlogService {
     return this.prisma.blogPost.findMany({
       where: { isPublished: true },
       orderBy: { publishedAt: 'desc' },
-      include: { author: { select: { firstName: true, lastName: true } } },
+      include: {
+        author: { select: { firstName: true, lastName: true } },
+        category: { select: { id: true, name: true, slug: true } },
+      },
     });
   }
 
   async getPostBySlug(slug: string) {
     const post = await this.prisma.blogPost.findUnique({
       where: { slug },
-      include: { author: { select: { firstName: true, lastName: true } } },
+      include: {
+        author: { select: { firstName: true, lastName: true } },
+        category: { select: { id: true, name: true, slug: true } },
+      },
     });
     if (!post || !post.isPublished) throw new NotFoundException('Post not found');
     return post;
@@ -25,7 +31,10 @@ export class BlogService {
   async listAllPosts() {
     return this.prisma.blogPost.findMany({
       orderBy: { createdAt: 'desc' },
-      include: { author: { select: { firstName: true, lastName: true } } },
+      include: {
+        author: { select: { firstName: true, lastName: true } },
+        category: { select: { id: true, name: true, slug: true } },
+      },
     });
   }
 
@@ -45,6 +54,17 @@ export class BlogService {
       slug = `${slug}-${Date.now().toString().slice(-4)}`;
     }
 
+    let categoryId = data.categoryId || null;
+    if (!categoryId && data.category) {
+      const catSlug = data.category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      const cat = await this.prisma.blogCategory.upsert({
+        where: { name: data.category },
+        update: {},
+        create: { name: data.category, slug: catSlug || `cat-${Date.now()}` },
+      });
+      categoryId = cat.id;
+    }
+
     const isPublished = data.isPublished === true || data.isPublished === 'true';
 
     return this.prisma.blogPost.create({
@@ -57,6 +77,11 @@ export class BlogService {
         isPublished,
         publishedAt: isPublished ? (data.publishedAt ? new Date(data.publishedAt) : new Date()) : null,
         authorId: validAuthorId,
+        categoryId,
+      },
+      include: {
+        author: { select: { firstName: true, lastName: true } },
+        category: { select: { id: true, name: true, slug: true } },
       },
     });
   }
@@ -73,6 +98,21 @@ export class BlogService {
     if (data.slug) {
       updateData.slug = data.slug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     }
+    if (data.categoryId !== undefined) {
+      updateData.categoryId = data.categoryId || null;
+    } else if (data.category !== undefined) {
+      if (data.category) {
+        const catSlug = data.category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        const cat = await this.prisma.blogCategory.upsert({
+          where: { name: data.category },
+          update: {},
+          create: { name: data.category, slug: catSlug || `cat-${Date.now()}` },
+        });
+        updateData.categoryId = cat.id;
+      } else {
+        updateData.categoryId = null;
+      }
+    }
     if (isPublished && !data.publishedAt) {
       updateData.publishedAt = new Date();
     } else if (isPublished === false) {
@@ -81,6 +121,10 @@ export class BlogService {
     return this.prisma.blogPost.update({
       where: { id },
       data: updateData,
+      include: {
+        author: { select: { firstName: true, lastName: true } },
+        category: { select: { id: true, name: true, slug: true } },
+      },
     });
   }
 

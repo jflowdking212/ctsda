@@ -3,6 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import { ConfirmDialog } from '../confirm-dialog';
 
+const BLOG_CATEGORIES = [
+  'Business And Professional Development',
+  'Technology and Digital Skills',
+  'Health Safety and Compliance',
+  'Personal Growth and Soft Skill',
+  'Caregiving, Health and Social Care',
+  'Training, Skills and Development',
+];
+
+
 export function BlogPanel({ 
   api,
   onSuccess,
@@ -92,14 +102,17 @@ export function BlogPanel({
       excerpt: '',
       content: '',
       featuredImg: '',
+      category: '',
       isPublished: true,
     });
     setView('editor');
   };
 
+
   const openEdit = (p: any) => {
     setCurrent({
       ...p,
+      category: p.category?.name || p.category || '',
       isPublished: p.isPublished === true || p.isPublished === 'true',
     });
     setView('editor');
@@ -166,8 +179,10 @@ export function BlogPanel({
       excerpt: current.excerpt,
       content: current.content,
       featuredImg: current.featuredImg || null,
+      category: current.category || null,
       isPublished: Boolean(current.isPublished),
     };
+
 
     try {
       let res: Response;
@@ -311,7 +326,22 @@ export function BlogPanel({
             />
           </div>
 
-          {/* FEATURED IMAGE UPLOAD */}
+          {/* CATEGORY */}
+          <div>
+            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>Category</label>
+            <select
+              style={{ width: '100%', padding: '0.65rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', fontSize: '0.9rem', background: '#fff', color: current.category ? '#1e293b' : '#94a3b8' }}
+              value={current.category || ''}
+              onChange={e => setCurrent({ ...current, category: e.target.value })}
+            >
+              <option value="">— Select a category —</option>
+              {BLOG_CATEGORIES.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+
+
           <div>
             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>Featured Cover Image</label>
             <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -483,7 +513,14 @@ export function BlogPanel({
                         <div style={{ width: '56px', height: '40px', background: '#f1f5f9', borderRadius: '0.35rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '1.2rem', flexShrink: 0 }}>📰</div>
                       )}
                       <div>
-                        <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>{p.title}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>{p.title}</span>
+                          {(p.category?.name || p.category) && (
+                            <span style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem', background: '#eff6ff', color: '#1d4ed8', borderRadius: '999px', fontWeight: 600, border: '1px solid #bfdbfe' }}>
+                              {p.category?.name || p.category}
+                            </span>
+                          )}
+                        </div>
                         <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '0.15rem' }}>
                           <span style={{ color: '#2563eb' }}>/blog/{p.slug}</span>
                           {p.author && <span> • by {p.author.firstName} {p.author.lastName}</span>}
