@@ -44,6 +44,10 @@ export default function ApplyPage() {
     phone: '',
     email: '',
     description: '',
+    facebookUrl: '',
+    instagramUrl: '',
+    linkedinUrl: '',
+    twitterUrl: '',
   });
   
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -400,6 +404,30 @@ export default function ApplyPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', gridColumn: 'span 2' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>About / Short Institution Overview (Appears on public directory profile) <span style={{ color: '#ef4444' }}>*</span></label>
                 <textarea required rows={3} value={institutionForm.description} onChange={e => setInstitutionForm({...institutionForm, description: e.target.value})} disabled={loading} style={{ padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', outline: 'none', width: '100%', fontFamily: 'inherit', resize: 'vertical' }} placeholder="Provide a brief summary of your institution's core focus, mission, training background, and educational services..." />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', gridColumn: 'span 2' }}>
+                <label style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem', marginTop: '0.5rem' }}>Social Media Profiles (Optional - Appears on directory)</label>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>Facebook</label>
+                <input value={institutionForm.facebookUrl} onChange={e => setInstitutionForm({...institutionForm, facebookUrl: e.target.value})} disabled={loading} style={{ padding: '0.7rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', width: '100%' }} placeholder="https://facebook.com/yourpage" type="url" />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>Instagram</label>
+                <input value={institutionForm.instagramUrl} onChange={e => setInstitutionForm({...institutionForm, instagramUrl: e.target.value})} disabled={loading} style={{ padding: '0.7rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', width: '100%' }} placeholder="https://instagram.com/yourhandle" type="url" />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>LinkedIn</label>
+                <input value={institutionForm.linkedinUrl} onChange={e => setInstitutionForm({...institutionForm, linkedinUrl: e.target.value})} disabled={loading} style={{ padding: '0.7rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', width: '100%' }} placeholder="https://linkedin.com/company/yourcompany" type="url" />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>X (Twitter)</label>
+                <input value={institutionForm.twitterUrl} onChange={e => setInstitutionForm({...institutionForm, twitterUrl: e.target.value})} disabled={loading} style={{ padding: '0.7rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.5rem', fontSize: '0.9rem', width: '100%' }} placeholder="https://x.com/yourhandle" type="url" />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', gridColumn: 'span 2' }}>

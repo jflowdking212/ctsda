@@ -130,8 +130,24 @@ export function BlogPanel({
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
-            const compressed = canvas.toDataURL('image/jpeg', 0.85);
-            setCurrent((prev: any) => ({ ...prev, featuredImg: compressed }));
+            canvas.toBlob(async (blob) => {
+              if (blob) {
+                const formData = new FormData();
+                formData.append('file', blob, file.name || 'image.jpg');
+                try {
+                  const res = await api('/admin/upload', { method: 'POST', body: formData });
+                  if (res.ok) {
+                    const data = await res.json();
+                    if (data.url) setCurrent((prev: any) => ({ ...prev, featuredImg: data.url }));
+                  } else {
+                    notify('Upload failed: Server returned an error', 'error');
+                  }
+                } catch (err) {
+                  console.error(err);
+                  notify('Upload error: Failed to upload image', 'error');
+                }
+              }
+            }, 'image/jpeg', 0.85);
           }
         };
         img.src = event.target?.result as string;

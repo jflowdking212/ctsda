@@ -255,6 +255,7 @@ export class AdminService {
       linkedinUrl?: string;
       twitterUrl?: string;
       isActive?: boolean;
+      showInDirectory?: boolean;
     },
   ) {
     await this.requireRole(actorId, INSTITUTION_MANAGERS);
@@ -280,6 +281,7 @@ export class AdminService {
           ...(data.linkedinUrl !== undefined && { linkedinUrl: data.linkedinUrl || null }),
           ...(data.twitterUrl !== undefined && { twitterUrl: data.twitterUrl || null }),
           ...(data.isActive !== undefined && { isActive: data.isActive }),
+          ...(data.showInDirectory !== undefined && { showInDirectory: data.showInDirectory }),
         },
       });
 
@@ -429,6 +431,10 @@ export class AdminService {
       email: string;
       website?: string;
       description?: string;
+      facebookUrl?: string;
+      instagramUrl?: string;
+      linkedinUrl?: string;
+      twitterUrl?: string;
       accreditationCode: string;
       certificateNumber: string;
       verificationToken?: string;
@@ -456,9 +462,13 @@ export class AdminService {
           address: data.address,
           phone: data.phone,
           email: data.email,
-          website: data.website,
-          description: data.description,
-          createdBy: actorId,
+          website: data.website || null,
+          description: data.description || null,
+          facebookUrl: data.facebookUrl || null,
+          instagramUrl: data.instagramUrl || null,
+          linkedinUrl: data.linkedinUrl || null,
+          twitterUrl: data.twitterUrl || null,
+          createdBy: actor.id,
         },
       });
 

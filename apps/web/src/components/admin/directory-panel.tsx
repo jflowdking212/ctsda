@@ -36,6 +36,7 @@ export function DirectoryPanel({
     linkedinUrl: '',
     twitterUrl: '',
     isActive: true,
+    showInDirectory: true,
   });
 
   // Keep internal list in sync if prop changes
@@ -146,6 +147,7 @@ export function DirectoryPanel({
       linkedinUrl: inst.linkedinUrl || '',
       twitterUrl: inst.twitterUrl || '',
       isActive: inst.isActive ?? true,
+      showInDirectory: inst.showInDirectory ?? true,
     });
   };
 
@@ -177,6 +179,7 @@ export function DirectoryPanel({
         linkedinUrl: editForm.linkedinUrl,
         twitterUrl: editForm.twitterUrl,
         isActive: editForm.isActive,
+        showInDirectory: editForm.showInDirectory,
       };
 
       const res = await api(`/admin/institutions/${selectedInst.id}`, {
@@ -606,15 +609,29 @@ export function DirectoryPanel({
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
-                      Directory Status
+                      Account Status
                     </label>
                     <select
                       value={editForm.isActive ? 'active' : 'suspended'}
                       onChange={(e) => setEditForm({ ...editForm, isActive: e.target.value === 'active' })}
                       style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: '#ffffff', boxSizing: 'border-box' }}
                     >
-                      <option value="active">Active (Publicly Listed)</option>
-                      <option value="suspended">Suspended (Hidden)</option>
+                      <option value="active">Active (Can Login)</option>
+                      <option value="suspended">Suspended (Locked Out)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Directory Visibility
+                    </label>
+                    <select
+                      value={editForm.showInDirectory ? 'visible' : 'hidden'}
+                      onChange={(e) => setEditForm({ ...editForm, showInDirectory: e.target.value === 'visible' })}
+                      style={{ width: '100%', padding: '0.625rem 0.875rem', fontSize: '0.875rem', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: '#ffffff', boxSizing: 'border-box' }}
+                    >
+                      <option value="visible">Visible (Listed on Public Directory)</option>
+                      <option value="hidden">Hidden (Removed from Directory)</option>
                     </select>
                   </div>
                   
