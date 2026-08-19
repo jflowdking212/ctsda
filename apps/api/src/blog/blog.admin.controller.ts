@@ -26,8 +26,24 @@ export class BlogAdminController {
     return this.blogService.updatePost(id, body);
   }
 
+  @Post(':id/update')
+  async updatePostAlt(@Param('id') id: string, @Body() body: any) {
+    return this.blogService.updatePost(id, body);
+  }
+
+  @Post(':id')
+  async updatePostPost(@Param('id') id: string, @Body() body: any) {
+    return this.blogService.updatePost(id, body);
+  }
+
   @Delete(':id')
   async deletePost(@Param('id') id: string) {
     return this.blogService.deletePost(id);
   }
+
+  @Post(':id/delete')
+  async deletePostAlt(@Param('id') id: string) {
+    return this.blogService.deletePost(id);
+  }
 }
+

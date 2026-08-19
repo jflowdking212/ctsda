@@ -24,7 +24,8 @@ export function TrainingRegisterBtn({
   const [captchaAnswer, setCaptchaAnswer] = useState('');
   const [loadingCaptcha, setLoadingCaptcha] = useState(false);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  const _RAW_API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  const API_BASE = (typeof window !== 'undefined' && _RAW_API_BASE === 'http://localhost:4000') ? '/api' : _RAW_API_BASE;
 
   async function fetchCaptcha() {
     setLoadingCaptcha(true);

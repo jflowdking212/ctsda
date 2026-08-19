@@ -5,7 +5,8 @@ import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 const PORTAL_SESSION_KEY = 'ctsda_portal_session';
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const _RAW_API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE = (typeof window !== 'undefined' && _RAW_API_BASE === 'http://localhost:4000') ? '/api' : _RAW_API_BASE;
 
 export type PortalSection = 'overview' | 'credentials' | 'billing' | 'registration' | 'training' | 'directory';
 

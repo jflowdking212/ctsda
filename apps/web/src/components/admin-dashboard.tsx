@@ -16,7 +16,8 @@ import { PagesPanel } from './admin/pages-panel';
 import { ToastProvider, useToast } from './toast';
 
 const ADMIN_SESSION_KEY = 'ctsda_admin_session';
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const _RAW_API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE = (typeof window !== 'undefined' && _RAW_API_BASE === 'http://localhost:4000') ? '/api' : _RAW_API_BASE;
 
 export type AdminNavItem = {
   href: string;
@@ -313,8 +314,13 @@ function AdminDashboardInner({ section = 'reports' }: { section?: AdminSection }
       }
     }
 
+    let finalPath = path.startsWith('/') ? path : `/${path}`;
+    if (API_BASE === '/api' && finalPath.startsWith('/api')) {
+      finalPath = finalPath.replace(/^\/api/, '');
+    }
+
     try {
-      response = await fetch(`${API_BASE}${path}`, {
+      response = await fetch(`${API_BASE}${finalPath}`, {
         cache: 'no-store',
         ...init,
         credentials: 'include',
