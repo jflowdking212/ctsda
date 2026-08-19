@@ -17,7 +17,8 @@ export function AccreditedLogosCarousel() {
     let isMounted = true;
     async function loadInstitutions() {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const _rawApi = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const apiUrl = (typeof window !== 'undefined' && _rawApi === 'http://localhost:4000') ? '/api' : _rawApi.replace(/\/$/, '');
         const response = await fetch(`${apiUrl}/institutions/public-accredited`, {
           cache: 'no-store',
         }).catch(() => null);
@@ -52,7 +53,8 @@ export function AccreditedLogosCarousel() {
   function getLogoUrl(url?: string | null) {
     if (!url) return null;
     if (url.startsWith('data:')) return url;
-    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000').replace(/\/$/, '');
+    const _rawApi = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    const apiUrl = (typeof window !== 'undefined' && _rawApi === 'http://localhost:4000') ? '/api' : _rawApi.replace(/\/$/, '');
     if (url.startsWith('http://localhost:4000')) {
       return url.replace('http://localhost:4000', apiUrl);
     }
