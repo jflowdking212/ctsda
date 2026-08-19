@@ -212,6 +212,6 @@ export class AdminController {
     const buffer = await data.toBuffer();
     fs.writeFileSync(filePath, buffer);
 
-    return { url: `/uploads/${fileName}` };
+    return { url: `/api/uploads/${fileName}` };
   }
 }
