@@ -59,6 +59,7 @@ function getValidImageUrl(url?: string | null, category?: string, title?: string
 
   // If the DB record has a real URL (from the admin upload), use it after sanitizing localhost
   if (targetUrl) {
+    if (targetUrl.startsWith('/images/')) return targetUrl;
     // Strip any known CTSDA domain prefix so images work on any domain
     const KNOWN_HOSTS = [
       'https://ctsda.acecoterieconsulting.com', 'http://ctsda.acecoterieconsulting.com',
@@ -69,8 +70,9 @@ function getValidImageUrl(url?: string | null, category?: string, title?: string
       if (targetUrl.startsWith(host)) { targetUrl = targetUrl.slice(host.length); break; }
     }
     if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) return targetUrl;
+    if (targetUrl.startsWith('/images/')) return targetUrl;
     // Relative path — strip /api/uploads/ or /uploads/ prefix and rebuild cleanly
-    const clean = targetUrl.replace(/^\/?api\/uploads\//, '').replace(/^\/?uploads\//, '');
+    const clean = targetUrl.replace(/^\/?api\/uploads\//, '').replace(/^\/?uploads\//, '').replace(/^\//, '');
     return `/api/uploads/${clean}`;
   }
 

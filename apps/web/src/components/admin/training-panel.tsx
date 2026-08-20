@@ -121,8 +121,10 @@ export function TrainingPanel({
       return targetUrl;
     }
 
-    const cleanPath = targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`;
-    return `${apiBase}${cleanPath}`;
+    if (targetUrl.startsWith('/images/')) return targetUrl;
+    
+    const clean = targetUrl.replace(/^\/?api\/uploads\//, '').replace(/^\/?uploads\//, '').replace(/^\//, '');
+    return `/api/uploads/${clean}`;
   };
 
   useEffect(() => {

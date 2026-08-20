@@ -21,16 +21,19 @@ export function BlogCard({ post }: { post: BlogPost }) {
   function fixImgUrl(url?: string | null): string {
     if (!url) return '';
     if (url.startsWith('data:')) return url;
+    if (url.startsWith('/images/')) return url;
+    let u = url;
     const KNOWN_HOSTS = [
       'https://ctsda.acecoterieconsulting.com', 'http://ctsda.acecoterieconsulting.com',
       'https://ctsdamerica.com', 'https://www.ctsdamerica.com', 'http://ctsdamerica.com',
       'http://localhost:4000',
     ];
     for (const host of KNOWN_HOSTS) {
-      if (url.startsWith(host)) { url = url.slice(host.length); break; }
+      if (u.startsWith(host)) { u = u.slice(host.length); break; }
     }
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    const clean = url.replace(/^\/?api\/uploads\//, '').replace(/^\/?uploads\//, '');
+    if (u.startsWith('http://') || u.startsWith('https://')) return u;
+    if (u.startsWith('/images/')) return u; // Double check just in case
+    const clean = u.replace(/^\/?api\/uploads\//, '').replace(/^\/?uploads\//, '').replace(/^\//, '');
     return `/api/uploads/${clean}`;
   }
 

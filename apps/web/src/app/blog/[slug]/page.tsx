@@ -51,12 +51,19 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   function fixImgUrl(url?: string | null): string {
     if (!url) return '';
     if (url.startsWith('data:')) return url;
+    if (url.startsWith('/images/')) return url;
     let u = url;
+    const KNOWN_HOSTS = [
+      'https://ctsda.acecoterieconsulting.com', 'http://ctsda.acecoterieconsulting.com',
+      'https://ctsdamerica.com', 'https://www.ctsdamerica.com', 'http://ctsdamerica.com',
+      'http://localhost:4000',
+    ];
     for (const host of KNOWN_HOSTS) {
       if (u.startsWith(host)) { u = u.slice(host.length); break; }
     }
     if (u.startsWith('http://') || u.startsWith('https://')) return u;
-    const clean = u.replace(/^\/?api\/uploads\//, '').replace(/^\/?uploads\//, '');
+    if (u.startsWith('/images/')) return u; // Double check just in case
+    const clean = u.replace(/^\/?api\/uploads\//, '').replace(/^\/?uploads\//, '').replace(/^\//, '');
     return `/api/uploads/${clean}`;
   }
 
