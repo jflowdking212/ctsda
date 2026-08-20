@@ -386,6 +386,7 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
     website: '',
     yearEstablished: '',
     description: '',
+    logoUrl: '',
   });
 
   function handleOpenEditAccreditationModal(acc: Accreditation) {
@@ -406,6 +407,7 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
       website: (acc.institution as any)?.website || '',
       yearEstablished: (acc.institution as any)?.yearEstablished ? String((acc.institution as any).yearEstablished) : '',
       description: (acc.institution as any)?.description || '',
+      logoUrl: acc.institution?.logoUrl || '',
     });
   }
   const [certPdfFile, setCertPdfFile] = useState<File | null>(null);
@@ -524,6 +526,35 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
     }
   }
 
+
+  async function handleEditLogoSelect(file: File) {
+    if (!file || !file.type.startsWith('image/')) {
+      setError('Please select a valid image file (PNG, JPG, WEBP)');
+      return;
+    }
+    setSubmittingManual(true);
+    setError('');
+    try {
+      const formData = new FormData();
+      formData.append('logo', file);
+      const res = await api('/accreditations/upload-logo', {
+        method: 'POST',
+        body: formData,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setEditAccreditationForm(prev => ({ ...prev, logoUrl: data.key }));
+        setMessage('Logo uploaded successfully, please save the form to apply changes.');
+      } else {
+        setError('Failed to upload logo image.');
+      }
+    } catch {
+      setError('Error uploading logo file.');
+    } finally {
+      setSubmittingManual(false);
+    }
+  }
+
   async function handleSaveAccreditationEdit(e: React.FormEvent) {
     e.preventDefault();
     if (!editingAccreditation) return;
@@ -549,6 +580,7 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
           yearEstablished: editAccreditationForm.yearEstablished,
           description: editAccreditationForm.description,
           isActive: editAccreditationForm.status === 'active',
+          logoUrl: editAccreditationForm.logoUrl,
         },
       };
 
@@ -2102,6 +2134,54 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
                 <h4 style={{ margin: '0 0 1rem', fontSize: '0.975rem', fontWeight: 700, color: '#0f172a' }}>2. Institution Profile & Contact Information</h4>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div style={{ gridColumn: 'span 2', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px dashed #cbd5e1', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    {editAccreditationForm.logoUrl ? (
+                      <div style={{ width: '64px', height: '64px', borderRadius: '8px', backgroundColor: '#fff', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                        <img 
+                           src={editAccreditationForm.logoUrl.startsWith('http') ? editAccreditationForm.logoUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/accreditations/logo-file?key=${encodeURIComponent(editAccreditationForm.logoUrl)}`}
+                           alt="Logo" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
+                        />
+                      </div>
+                    ) : (
+                      <div style={{ width: '64px', height: '64px', borderRadius: '8px', border: '2px dashed #cbd5e1', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                          <circle cx="8.5" cy="8.5" r="1.5" />
+                          <polyline points="21 15 16 10 5 21" />
+                        </svg>
+                      </div>
+                    )}
+                    <div>
+                      <p style={{ margin: '0 0 0.25rem', fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>Institution Logo</p>
+                      <input
+                        type="file"
+                        id="edit-logo-input"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleEditLogoSelect(file);
+                        }}
+                        style={{ display: 'none' }}
+                      />
+                      <label
+                        htmlFor="edit-logo-input"
+                        style={{
+                          display: 'inline-block',
+                          padding: '0.4rem 0.75rem',
+                          backgroundColor: '#ffffff',
+                          border: '1px solid #cbd5e1',
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          color: '#475569',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Upload New Logo
+                      </label>
+                      <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: '#64748b' }}>PNG, JPG or WEBP (Max 5MB)</p>
+                    </div>
+                  </div>
                   <div style={{ gridColumn: 'span 2' }}>
                     <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
                       Institution / Company Name <span style={{ color: '#ef4444' }}>*</span>
