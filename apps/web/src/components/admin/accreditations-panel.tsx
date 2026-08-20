@@ -407,7 +407,7 @@ export function AccreditationsPanel({ api }: { api: (path: string, init?: Reques
       website: (acc.institution as any)?.website || '',
       yearEstablished: (acc.institution as any)?.yearEstablished ? String((acc.institution as any).yearEstablished) : '',
       description: (acc.institution as any)?.description || '',
-      logoUrl: acc.institution?.logoUrl || '',
+      logoUrl: (acc.institution as any)?.logoUrl || '',
     });
   }
   const [certPdfFile, setCertPdfFile] = useState<File | null>(null);
