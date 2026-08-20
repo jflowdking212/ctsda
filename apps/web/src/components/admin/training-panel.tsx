@@ -108,10 +108,16 @@ export function TrainingPanel({
 
     const apiBase = getApiBase().replace(/\/$/, '');
 
+    const KNOWN_HOSTS = [
+      'https://ctsda.acecoterieconsulting.com', 'http://ctsda.acecoterieconsulting.com',
+      'https://ctsdamerica.com', 'https://www.ctsdamerica.com', 'http://ctsdamerica.com',
+      'http://localhost:4000',
+    ];
+    for (const host of KNOWN_HOSTS) {
+      if (targetUrl.startsWith(host)) { targetUrl = targetUrl.slice(host.length); break; }
+    }
+
     if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) {
-      if (targetUrl.includes('localhost:4000')) {
-        return targetUrl.replace('http://localhost:4000', apiBase);
-      }
       return targetUrl;
     }
 

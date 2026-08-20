@@ -59,14 +59,19 @@ function getValidImageUrl(url?: string | null, category?: string, title?: string
 
   // If the DB record has a real URL (from the admin upload), use it after sanitizing localhost
   if (targetUrl) {
-    if (targetUrl.includes('localhost:4000')) {
-      targetUrl = targetUrl.replace(/https?:\/\/localhost:\d+/, apiBase);
+    // Strip any known CTSDA domain prefix so images work on any domain
+    const KNOWN_HOSTS = [
+      'https://ctsda.acecoterieconsulting.com', 'http://ctsda.acecoterieconsulting.com',
+      'https://ctsdamerica.com', 'https://www.ctsdamerica.com', 'http://ctsdamerica.com',
+      'http://localhost:4000',
+    ];
+    for (const host of KNOWN_HOSTS) {
+      if (targetUrl.startsWith(host)) { targetUrl = targetUrl.slice(host.length); break; }
     }
-    // If it's already an absolute URL (production), return as-is
     if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) return targetUrl;
-    // Relative path — prefix with apiBase
-    const cleanPath = targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`;
-    return `${apiBase}${cleanPath}`;
+    // Relative path — strip /api/uploads/ or /uploads/ prefix and rebuild cleanly
+    const clean = targetUrl.replace(/^\/?api\/uploads\//, '').replace(/^\/?uploads\//, '');
+    return `/api/uploads/${clean}`;
   }
 
   // No imageUrl in DB — pick a category/title-based fallback
