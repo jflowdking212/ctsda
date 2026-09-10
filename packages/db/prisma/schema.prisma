@@ -804,6 +804,17 @@ model TrainingEnrollment {
   @@map("training_enrollments")
 }
 
+// =============== SECURITY & WEBHOOKS ===============
+
+model WebhookEvent {
+  id              String   @id @default(uuid()) @db.Uuid
+  provider        String   @db.VarChar(50)
+  eventId         String   @unique @db.VarChar(255)
+  processedAt     DateTime @default(now())
+
+  @@map("webhook_events")
+}
+
 model EmailVerificationOTP {
   id        String   @id @default(uuid()) @db.Uuid
   email     String   @db.VarChar(255)

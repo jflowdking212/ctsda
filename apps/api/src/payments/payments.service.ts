@@ -197,10 +197,38 @@ export class PaymentsService {
   }
 
   async handleWebhook(payload: any, signature?: string, rawBody?: Buffer | string) {
+    const isProd = process.env.NODE_ENV === 'production';
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    
+    if (isProd && (!webhookSecret || webhookSecret.includes('test') || webhookSecret.includes('mock'))) {
+      throw new BadRequestException('Webhook secret is improperly configured for production');
+    }
+
     const event = webhookSecret
       ? this.constructStripeEvent(rawBody, signature, webhookSecret)
-      : payload;
+      : isProd ? null : payload;
+
+    if (!event) {
+      throw new BadRequestException('Unverified webhook payload');
+    }
+
+    const eventId = event.id || payload.eventId || payload.id || payload.paymentId;
+    const provider = payload.provider || 'stripe';
+    
+    // Webhook Replay Protection
+    if (eventId) {
+      try {
+        await this.prisma.webhookEvent.create({
+          data: { eventId, provider }
+        });
+      } catch (error: any) {
+        // Unique constraint violation means it's a duplicate
+        if (error.code === 'P2002') {
+          return { success: true, ignored: true, reason: 'duplicate_event' };
+        }
+        throw error;
+      }
+    }
 
     if (event.type === 'checkout.session.completed') {
       return this.handleCheckoutCompleted(event);
@@ -211,10 +239,10 @@ export class PaymentsService {
     }
 
     return this.handleProviderPayment({
-      eventId: payload.eventId || payload.id || payload.paymentId,
+      eventId,
       invoiceId: payload.invoiceId,
       providerPaymentId: payload.paymentId,
-      provider: payload.provider || 'stripe',
+      provider,
       idempotencyKey: payload.idempotencyKey,
     });
   }

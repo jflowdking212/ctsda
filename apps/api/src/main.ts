@@ -75,8 +75,13 @@ async function bootstrap() {
   });
 
   // Cookie parser
+  const isProd = configService.get('NODE_ENV') === 'production';
+  const sessionSecret = configService.get<string>('SESSION_SECRET');
+  if (isProd && (!sessionSecret || sessionSecret === 'change-this-to-a-random-64-char-string-please' || sessionSecret === 'change-me-in-production')) {
+    throw new Error('SESSION_SECRET is not configured for production');
+  }
   await app.register(fastifyCookie, {
-    secret: configService.get<string>('SESSION_SECRET', 'change-me-in-production'),
+    secret: sessionSecret || 'change-me-in-production',
   });
 
   // CSRF protection (double-submit cookie pattern)

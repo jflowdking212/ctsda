@@ -1,5 +1,6 @@
 import { Body, Controller, HttpCode, Post, Request, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { CreateUserSchema, ForgotPasswordSchema, ResetPasswordSchema } from '@ctsda/contracts';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginDto, LoginResponseDto } from './dto/login.dto';
 import { VerifyTotpDto } from './dto/totp.dto';
@@ -13,6 +14,7 @@ export class AuthController {
 
   constructor(private authService: AuthService) {}
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('request-otp')
   @HttpCode(200)
   async requestOtp(@Body() body: unknown) {
@@ -20,6 +22,7 @@ export class AuthController {
     return this.authService.requestOtp(dto.email);
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('verify-otp')
   @HttpCode(200)
   async verifyOtp(@Body() body: unknown) {
@@ -27,6 +30,7 @@ export class AuthController {
     return this.authService.verifyOtp(dto.email, dto.otp, false);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('register')
   async register(@Body() body: unknown) {
     const dto = RegisterApplicantSchema.parse(body);
@@ -43,6 +47,7 @@ export class AuthController {
     };
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('setup-account')
   @HttpCode(200)
   async setupAccount(@Body() body: any) {
@@ -52,6 +57,7 @@ export class AuthController {
     return this.authService.setupAccount(body.token, body.password);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('forgot-password')
   @HttpCode(200)
   async forgotPassword(@Body() body: unknown) {
@@ -60,6 +66,7 @@ export class AuthController {
     return { success: true, message: 'If the account exists, a reset link has been sent.' };
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('reset-password')
   @HttpCode(200)
   async resetPassword(@Body() body: unknown) {
@@ -67,6 +74,7 @@ export class AuthController {
     return this.authService.resetPassword(dto.token, dto.password);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   @HttpCode(200)
   async login(@Body() dto: LoginDto, @Request() req: any, @Res({ passthrough: true }) reply: any): Promise<LoginResponseDto> {
