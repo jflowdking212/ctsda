@@ -8,7 +8,7 @@ const strictCsp = `
   font-src 'self' data: https://fonts.gstatic.com;
   img-src 'self' data: https: blob:;
   frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
-  connect-src 'self' https://api.stripe.com;
+  connect-src 'self' https://api.stripe.com https://ctsdamerica.com https://www.ctsdamerica.com https://ctsda.acecoterieconsulting.com;
   object-src 'none';
   base-uri 'self';
   form-action 'self' https:;
@@ -22,7 +22,7 @@ const relaxedCsp = `
   font-src 'self' data: https://fonts.gstatic.com;
   img-src 'self' data: https: blob:;
   frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
-  connect-src 'self' https://api.stripe.com;
+  connect-src 'self' https://api.stripe.com https://ctsdamerica.com https://www.ctsdamerica.com https://ctsda.acecoterieconsulting.com;
   object-src 'none';
   base-uri 'self';
   form-action 'self' https:;
