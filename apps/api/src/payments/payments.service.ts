@@ -306,6 +306,11 @@ export class PaymentsService {
   }
 
   async verifyManualPayment(invoiceId: string, actorId: string) {
+    const actor = await this.prisma.user.findUnique({ where: { id: actorId } });
+    if (!['super_admin', 'finance_officer'].includes(actor?.role || '')) {
+      throw new ForbiddenException('Insufficient permissions');
+    }
+
     const invoice = await this.prisma.invoice.findUnique({
       where: { id: invoiceId },
     });

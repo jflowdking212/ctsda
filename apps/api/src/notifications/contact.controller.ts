@@ -28,7 +28,7 @@ export class ContactController {
 
     // Get the admin email from settings (or fallback to support)
     const siteSettings = await this.prisma.siteSetting.findMany();
-    const adminEmail = siteSettings.find(s => s.key === 'contactEmail')?.value || 'support@ctsdamerica.com';
+    const adminEmail = siteSettings.find(s => s.key === 'contactEmail')?.value || 'ctsdausa@gmail.com';
 
     // Construct the HTML email
     const html = `

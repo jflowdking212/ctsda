@@ -103,13 +103,13 @@ async function bootstrap() {
     },
   });
 
-  // Static file serving for uploads (logos, documents)
-  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+  // Static file serving for uploads (only logos are public, documents are private and served via getObjectStream)
+  const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'logos');
   const fs = await import('fs');
   if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
   await app.register(fastifyStatic, {
     root: uploadsDir,
-    prefix: '/uploads/',
+    prefix: '/uploads/logos/',
     decorateReply: false,
   });
 

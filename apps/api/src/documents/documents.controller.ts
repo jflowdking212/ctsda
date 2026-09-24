@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Delete, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
+import { BadRequestException, Controller, Delete, Get, Param, Post, Request, UseGuards, Res } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { AuthGuard } from '../common/guards/auth.guard';
@@ -33,8 +33,23 @@ export class DocumentsController {
     if (!document) throw new BadRequestException('Document not found');
     await this.documentsService.assertCanAccessDocument(user.userId, id);
 
-    const url = await this.documentsService.getSignedUrl(document.storageKey);
+    const baseUrl = process.env.API_PUBLIC_URL || process.env.NEXT_PUBLIC_API_URL || 'https://ctsdamerica.com/api';
+    const url = `${baseUrl}/documents/file/${document.storageKey}`;
     return { url, filename: document.fileName, expiresIn: 3600 };
+  }
+
+  @Get('file/:key')
+  @UseGuards(AuthGuard)
+  async downloadFile(@CurrentUser() user: any, @Param('key') key: string, @Res() res: any) {
+    const document = await this.documentsService.findByKey(key);
+    if (!document) throw new BadRequestException('Document not found');
+    
+    await this.documentsService.assertCanAccessDocument(user.userId, document.id);
+    
+    const { stream, contentType } = await this.documentsService.getObjectStream(key);
+    res.type(contentType);
+    res.header('Content-Disposition', `attachment; filename="${document.fileName}"`);
+    return res.send(stream);
   }
 
   @Delete(':id')

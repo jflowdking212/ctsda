@@ -140,6 +140,14 @@ export class DocumentsService {
     return this.storageService.getSignedUrl(storageKey);
   }
 
+  async findByKey(key: string) {
+    return this.prisma.document.findFirst({ where: { storageKey: key } });
+  }
+
+  async getObjectStream(key: string) {
+    return this.storageService.getObjectStream(key);
+  }
+
   async softDelete(id: string) {
     await this.prisma.applicationDocument.update({ where: { id }, data: { status: 'rejected' } });
   }

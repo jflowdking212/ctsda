@@ -202,7 +202,7 @@ export class AdminController {
     if (!data) throw new BadRequestException('No file uploaded');
 
     const fileName = `${Date.now()}-${data.filename.replace(/[^a-zA-Z0-9.\-]/g, '')}`;
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+    const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'logos');
     const filePath = path.join(uploadsDir, fileName);
     
     if (!fs.existsSync(uploadsDir)) {
@@ -212,6 +212,6 @@ export class AdminController {
     const buffer = await data.toBuffer();
     fs.writeFileSync(filePath, buffer);
 
-    return { url: `/api/uploads/${fileName}` };
+    return { url: `/api/uploads/logos/${fileName}` };
   }
 }
