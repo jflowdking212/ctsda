@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { NotificationsController } from './notifications.controller';
+import { ContactController } from './contact.controller';
 import { NotificationsService } from './notifications.service';
 import { BullModule } from '@nestjs/bullmq';
 import { EmailProcessor } from './processors/email.processor';
@@ -11,7 +12,7 @@ import { PrismaService } from '../common/prisma.service';
       name: 'email',
     }),
   ],
-  controllers: [NotificationsController],
+  controllers: [NotificationsController, ContactController],
   providers: [NotificationsService, EmailProcessor, PrismaService],
   exports: [NotificationsService],
 })

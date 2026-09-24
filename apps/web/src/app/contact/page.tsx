@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PublicPage } from '../../components/public-shell';
+import { ContactForm } from '../../components/contact-form';
 
 export const metadata = {
   title: 'Contact Us | CTSDA',
@@ -99,138 +100,7 @@ export default async function ContactPage() {
                 Fill out the form below and our inquiries team will respond within 24 business hours.
               </p>
 
-              <form style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#334155', marginBottom: '0.5rem' }}>
-                    Full Name <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Dr. Jane Smith"
-                    required
-                    style={{
-                      width: '100%',
-                      boxSizing: 'border-box',
-                      padding: '0.85rem 1rem',
-                      borderRadius: '0.625rem',
-                      border: '1px solid #cbd5e1',
-                      fontSize: '0.95rem',
-                      color: '#0f172a',
-                      outline: 'none',
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#334155', marginBottom: '0.5rem' }}>
-                    Email Address <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <input
-                    type="email"
-                    placeholder="jane@institution.edu"
-                    required
-                    style={{
-                      width: '100%',
-                      boxSizing: 'border-box',
-                      padding: '0.85rem 1rem',
-                      borderRadius: '0.625rem',
-                      border: '1px solid #cbd5e1',
-                      fontSize: '0.95rem',
-                      color: '#0f172a',
-                      outline: 'none',
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#334155', marginBottom: '0.5rem' }}>
-                    Institution / Organization
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Global Academy of Science"
-                    style={{
-                      width: '100%',
-                      boxSizing: 'border-box',
-                      padding: '0.85rem 1rem',
-                      borderRadius: '0.625rem',
-                      border: '1px solid #cbd5e1',
-                      fontSize: '0.95rem',
-                      color: '#0f172a',
-                      outline: 'none',
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#334155', marginBottom: '0.5rem' }}>
-                    Subject / Topic <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <select
-                    required
-                    style={{
-                      width: '100%',
-                      boxSizing: 'border-box',
-                      padding: '0.85rem 1rem',
-                      borderRadius: '0.625rem',
-                      border: '1px solid #cbd5e1',
-                      fontSize: '0.95rem',
-                      color: '#0f172a',
-                      backgroundColor: '#ffffff',
-                      outline: 'none',
-                    }}
-                  >
-                    <option value="">Select a subject...</option>
-                    <option value="accreditation">Institutional Accreditation Inquiry</option>
-                    <option value="verification">Certificate Verification Assistance</option>
-                    <option value="training">Training Program Accreditation</option>
-                    <option value="partnership">Partnership & Collaboration</option>
-                    <option value="other">General Question</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#334155', marginBottom: '0.5rem' }}>
-                    Your Message <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <textarea
-                    rows={4}
-                    placeholder="How can our team help you?"
-                    required
-                    style={{
-                      width: '100%',
-                      boxSizing: 'border-box',
-                      padding: '0.85rem 1rem',
-                      borderRadius: '0.625rem',
-                      border: '1px solid #cbd5e1',
-                      fontSize: '0.95rem',
-                      color: '#0f172a',
-                      outline: 'none',
-                      resize: 'vertical',
-                    }}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  style={{
-                    marginTop: '0.5rem',
-                    backgroundColor: '#2563eb',
-                    color: '#ffffff',
-                    fontWeight: 700,
-                    fontSize: '1rem',
-                    padding: '0.95rem 1.75rem',
-                    borderRadius: '0.625rem',
-                    border: 'none',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 14px rgba(37, 99, 235, 0.3)',
-                    width: '100%',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  Send Message
-                </button>
-              </form>
+              <ContactForm />
             </div>
 
             {/* Direct Contact Channels Column */}
