@@ -3,12 +3,12 @@ import type { NextConfig } from 'next';
 
 const strictCsp = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://*.googletagmanager.com https://*.google-analytics.com https://*.google.com;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src 'self' data: https://fonts.gstatic.com;
-  img-src 'self' data: https: blob:;
-  frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
-  connect-src 'self' https://api.stripe.com https://ctsdamerica.com https://www.ctsdamerica.com https://ctsda.acecoterieconsulting.com;
+  img-src 'self' data: https: blob: https://*.google-analytics.com https://*.googletagmanager.com https://*.google.com https://*.doubleclick.net;
+  frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://*.google.com https://*.doubleclick.net;
+  connect-src 'self' https://api.stripe.com https://ctsdamerica.com https://www.ctsdamerica.com https://ctsda.acecoterieconsulting.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://*.google.com;
   object-src 'none';
   base-uri 'self';
   form-action 'self' https:;
@@ -17,12 +17,12 @@ const strictCsp = `
 
 const relaxedCsp = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://*.googletagmanager.com https://*.google-analytics.com https://*.google.com;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src 'self' data: https://fonts.gstatic.com;
-  img-src 'self' data: https: blob:;
-  frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
-  connect-src 'self' https://api.stripe.com https://ctsdamerica.com https://www.ctsdamerica.com https://ctsda.acecoterieconsulting.com;
+  img-src 'self' data: https: blob: https://*.google-analytics.com https://*.googletagmanager.com https://*.google.com https://*.doubleclick.net;
+  frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://*.google.com https://*.doubleclick.net;
+  connect-src 'self' https://api.stripe.com https://ctsdamerica.com https://www.ctsdamerica.com https://ctsda.acecoterieconsulting.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://*.google.com;
   object-src 'none';
   base-uri 'self';
   form-action 'self' https:;
