@@ -141,7 +141,7 @@ export class DocumentsService {
   }
 
   async findByKey(key: string) {
-    return this.prisma.document.findFirst({ where: { storageKey: key } });
+    return this.prisma.applicationDocument.findFirst({ where: { storageKey: key } });
   }
 
   async getObjectStream(key: string) {
