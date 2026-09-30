@@ -3,8 +3,8 @@ const path = require('path');
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
-const publicDir = path.join(process.cwd(), 'public', 'uploads');
-const privateDir = path.join(process.cwd(), 'private_uploads');
+const publicDir = path.join(__dirname, 'public', 'uploads');
+const privateDir = path.join(__dirname, 'private_uploads');
 
 if (!fs.existsSync(privateDir)) {
   fs.mkdirSync(privateDir, { recursive: true });
