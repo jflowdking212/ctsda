@@ -273,7 +273,7 @@ export class AccreditationsService {
 
   async uploadLogoFile(file: any, mimeType?: string) {
     const key = this.storageService.generateStorageKey(file);
-    const result = await this.storageService.upload(file, key, mimeType || 'image/png', true);
+    const result = await this.storageService.upload(file, key, mimeType || 'image/png');
     const url = await this.storageService.getSignedUrl(result.key);
     return { key: result.key, url };
   }
@@ -330,7 +330,7 @@ export class AccreditationsService {
     let uploadedLogoKey = data.logoUrl || null;
     if (logoFile) {
       const key = this.storageService.generateStorageKey(logoFile);
-      const result = await this.storageService.upload(logoFile, key, logoFile.mimetype || 'image/png', true);
+      const result = await this.storageService.upload(logoFile, key, logoFile.mimetype || 'image/png');
       uploadedLogoKey = result.key;
     }
 

@@ -9,12 +9,12 @@ export interface StoredFile {
   size: number;
 }
 
-const PUBLIC_UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
-const PRIVATE_UPLOADS_DIR = path.join(process.cwd(), 'private_uploads');
+const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
 
-function ensureDirs() {
-  if (!fs.existsSync(PUBLIC_UPLOADS_DIR)) fs.mkdirSync(PUBLIC_UPLOADS_DIR, { recursive: true });
-  if (!fs.existsSync(PRIVATE_UPLOADS_DIR)) fs.mkdirSync(PRIVATE_UPLOADS_DIR, { recursive: true });
+function ensureUploadsDir() {
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
 }
 
 @Injectable()
@@ -26,24 +26,21 @@ export class StorageService {
     return `${timestamp}-${random}.${extension}`;
   }
 
-  async upload(file: StoredFile, key: string, _contentType: string, isPublic = false): Promise<{ key: string; size: number }> {
-    ensureDirs();
-    const dir = isPublic ? PUBLIC_UPLOADS_DIR : PRIVATE_UPLOADS_DIR;
-    const filePath = path.join(dir, key);
+  async upload(file: StoredFile, key: string, _contentType: string): Promise<{ key: string; size: number }> {
+    ensureUploadsDir();
+    const filePath = path.join(UPLOADS_DIR, key);
     fs.writeFileSync(filePath, file.buffer);
     return { key, size: file.size };
   }
 
   async getSignedUrl(key: string, _expiresIn = 3600): Promise<string> {
+    // Return a plain public URL — served as static files by the API
     const baseUrl = process.env.API_PUBLIC_URL || `http://localhost:${process.env.API_PORT || 4000}`;
     return `${baseUrl}/uploads/${key}`;
   }
 
   async getObjectStream(key: string): Promise<{ stream: any; contentType: string }> {
-    let filePath = path.join(PRIVATE_UPLOADS_DIR, key);
-    if (!fs.existsSync(filePath)) {
-      filePath = path.join(PUBLIC_UPLOADS_DIR, key);
-    }
+    const filePath = path.join(UPLOADS_DIR, key);
     if (!fs.existsSync(filePath)) {
       throw new Error(`File not found: ${key}`);
     }
@@ -59,14 +56,15 @@ export class StorageService {
   }
 
   async delete(key: string): Promise<void> {
-    const privatePath = path.join(PRIVATE_UPLOADS_DIR, key);
-    if (fs.existsSync(privatePath)) fs.unlinkSync(privatePath);
-    const publicPath = path.join(PUBLIC_UPLOADS_DIR, key);
-    if (fs.existsSync(publicPath)) fs.unlinkSync(publicPath);
+    const filePath = path.join(UPLOADS_DIR, key);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
   }
 
   async exists(key: string): Promise<boolean> {
-    return fs.existsSync(path.join(PRIVATE_UPLOADS_DIR, key)) || fs.existsSync(path.join(PUBLIC_UPLOADS_DIR, key));
+    const filePath = path.join(UPLOADS_DIR, key);
+    return fs.existsSync(filePath);
   }
 }
 

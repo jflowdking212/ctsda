@@ -103,7 +103,7 @@ async function bootstrap() {
     },
   });
 
-  // Static file serving for uploads (only logos are public, documents are private and served via getObjectStream)
+  // Static file serving for uploads (logos, public assets)
   const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
   const fs = await import('fs');
   if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
