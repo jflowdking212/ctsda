@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Blog & Insights | CTSDA',
-  description: 'Latest news, updates, and professional articles from the CTSDA on driver training standards.',
+  description: 'Latest news, updates, and professional articles from the CTSDA on training and development standards.',
 };
 
 async function getPosts() {

@@ -139,7 +139,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <div>
               <div style={{ fontWeight: 700, color: '#064e3b', marginBottom: '0.25rem' }}>CTSDA Editorial Team</div>
               <p style={{ color: '#065f46', fontSize: '0.9rem', lineHeight: 1.5, margin: 0 }}>
-                This article was prepared by the CTSDA's professional standards team. The CTSDA is a private, independent accreditation body dedicated to advancing excellence in driver training and road safety education.
+                This article was prepared by the CTSDA's professional standards team. The CTSDA is a private, independent accreditation body dedicated to advancing excellence in Training and Development.
               </p>
             </div>
           </div>
