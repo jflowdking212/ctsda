@@ -188,6 +188,7 @@ export default function ApplyPage() {
         });
       }
 
+      router.push(`/apply/thank-you?email=${encodeURIComponent(applicantForm.email || '')}`);
       setStep(4);
     } catch (err) {
       setError('Failed to submit application. Please try again.');
